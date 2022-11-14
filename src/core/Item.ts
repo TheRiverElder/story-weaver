@@ -1,4 +1,4 @@
-import { Unique } from "./common";
+import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { LivingEntity } from "./entity/LivingEntity";
 
 export interface ItemData extends Unique {
@@ -13,6 +13,8 @@ export abstract class Item implements Unique {
         this.uid = data.uid;
         this.name = data.name;
     }
+
+    abstract getActions(params: ActionParams): Action[];
 
     // 被装备时调用
     abstract onEquip(entity: LivingEntity): void;

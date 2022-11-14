@@ -1,3 +1,4 @@
+import { ActionParams, Action } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
 import { Item, ItemData } from "../Item";
 
@@ -11,6 +12,13 @@ export class ArmorItem extends Item {
     constructor(data: ArmorItemData) {
         super(data);
         this.defense = data.defense;
+    }
+
+    getActions(params: ActionParams): Action[] {
+        return [{
+            text: "装备",
+            act: ({ actor }) => actor.equipArmor(this),
+        }];
     }
     
     onEquip(entity: LivingEntity): void {
