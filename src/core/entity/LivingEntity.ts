@@ -1,6 +1,9 @@
 import { Action, ActionGroup, ActionParams } from "../common";
 import { Entity, EntityData } from "../Entity";
+import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
 import { Item } from "../Item";
+import { GenericProfile } from "../profile/GenericProfile";
+import { PropertyType } from "../profile/PropertyType";
 import { ItemEntity } from "./ItemEntity";
 
 export interface LivingEntityData extends EntityData {
@@ -11,17 +14,39 @@ export interface LivingEntityData extends EntityData {
     dexterity: number;
     weapon?: Item;
     armor?: Item;
+    items?: Item[]; 
 }
 
-export abstract class LivingEntity extends Entity {
-    health: number; // 当前生命
-    maxHealth: number; // 最大生命
-    attackPower: number; // 攻击力
-    defensePower: number; // 防御力
-    dexterity: number; // 敏捷，用于闪避等
+export const PROPERTY_TYPE_HEALTH = new PropertyType("health", "生命", 0);
+export const PROPERTY_TYPE_ATTACK = new PropertyType("attack", "攻击力", 0);
+export const PROPERTY_TYPE_DEFENSE = new PropertyType("defense", "防御力", 0);
+export const PROPERTY_TYPE_DEXTERITY = new PropertyType("dexterity", "敏捷", 50);
 
-    weapon: Item | null = null;
-    armor: Item | null = null;
+export abstract class LivingEntity extends Entity {
+
+    public readonly inventory = new LivingEntityInventory(this);
+    public readonly profile = new GenericProfile();
+
+    get health(): number { return this.profile.getProperty(PROPERTY_TYPE_HEALTH); }
+    set health(value: number) { this.profile.setProperty(PROPERTY_TYPE_HEALTH, value); }
+
+    get maxHealth(): number { return this.profile.getPropertyRange(PROPERTY_TYPE_HEALTH)[1]; }
+    set maxHealth(value: number) { this.profile.setPropertyRange(PROPERTY_TYPE_HEALTH, [0, value]); }
+
+    get attackPower(): number { return this.profile.getProperty(PROPERTY_TYPE_ATTACK); }
+    set attackPower(value: number) { this.profile.setProperty(PROPERTY_TYPE_ATTACK, value); }
+
+    get defensePower(): number {return this.profile.getProperty(PROPERTY_TYPE_DEFENSE); }
+    set defensePower(value: number) {this.profile.setProperty(PROPERTY_TYPE_DEFENSE, value); }
+
+    get dexterity(): number { return this.profile.getProperty(PROPERTY_TYPE_DEXTERITY); }
+    set dexterity(value: number) { this.profile.setProperty(PROPERTY_TYPE_DEXTERITY, value); }
+
+    get weapon(): Item | null { return this.inventory.weaponSlot.item; };
+    set weapon(item: Item | null) { this.inventory.weaponSlot.item = item; };
+
+    get armor(): Item | null { return this.inventory.armorSlot.item; };
+    set armor(item: Item | null) { this.inventory.armorSlot.item = item; };
 
     constructor(data: LivingEntityData) {
         super(data);
@@ -35,6 +60,9 @@ export abstract class LivingEntity extends Entity {
         }
         if (data.armor) {
             this.equipArmor(data.armor);
+        }
+        if (data.items) {
+            data.items.forEach(item => this.inventory.add(item));
         }
     }
 
@@ -74,8 +102,8 @@ export abstract class LivingEntity extends Entity {
     }
 
     equipArmor(item: Item) {
-        this.unequipWeapon();
-        this.weapon = item;
+        this.unequipArmor();
+        this.armor = item;
         item.onEquip(this);
     }
 
@@ -96,7 +124,7 @@ export abstract class LivingEntity extends Entity {
     }
 
     appendItem(item: Item): boolean {
-        return false;
+        return this.inventory.add(item);
     }
 
     appendOrDropItem(item: Item) {

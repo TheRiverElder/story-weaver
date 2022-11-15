@@ -16,16 +16,16 @@ export class DoorEntity extends Entity {
 
     getActionGroups(): ActionGroup[] {
         const walkThroughAction: Action = {
-            text: '走过',
+            text: '前往',
             labels: ['walk'],
             act: ({ game, actor }) => {
                 actor.teleport(this.targetRoom);
-                game.appendMessage(`穿过${this.name}，进入${this.targetRoom.name}`);
+                // game.appendMessage(`穿过${this.name}，进入${this.targetRoom.name}`);
             },
         };
         return [{
             source: this,
-            title: this.name,
+            title: "通往" + this.targetRoom.name,
             description: this.getBrief(),
             actions: [walkThroughAction],
         }];
@@ -33,7 +33,7 @@ export class DoorEntity extends Entity {
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
     getBrief() {
-        return `【门/路】${this.name}`;
+        return `${this.name}，通向${this.targetRoom.name}`;
     }
 
 }

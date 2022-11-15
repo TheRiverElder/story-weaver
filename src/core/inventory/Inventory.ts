@@ -8,6 +8,7 @@ export interface Inventory {
     get(index: number): Item | null;
     set(index: number, item: Item): boolean;
     add(item: Item): boolean;
+    remove(item: Item): boolean;
 
     getSlots(): InventorySlot[];
     getSlot(type: InventorySlotType): InventorySlot | null;

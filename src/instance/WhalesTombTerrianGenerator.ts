@@ -6,6 +6,7 @@ import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity } from "../core/entity/PlayerEntity";
 import { Game } from "../core/Game";
 import { ArmorItem } from "../core/item/ArmorItem";
+import { FoodItem } from "../core/item/FoodItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { Room } from "../core/Room";
 
@@ -28,7 +29,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             attackPower: 2,
             defensePower: 0,
             dexterity: 60,
-            inventory: [],
+            items: [],
         }) : game.adventurer;
 
 
@@ -112,6 +113,14 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     defensePower: 0,
                     dexterity: 60,
                 }),
+                new ItemEntity({
+                    uid: this.genUid(),
+                    item: new FoodItem({
+                        uid: this.genUid(),
+                        name: "蛋糕",
+                        energy: 2,
+                    }),
+                }),
             ],
         });
         // 厕所
@@ -121,7 +130,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             entities: [
                 new EnemyEntity({
                     uid: this.genUid(),
-                    name: "黑色粘稠的生物",
+                    name: "黑色粘稠生物",
                     health: 5,
                     maxHealth: 5,
                     attackPower: 2,
@@ -137,7 +146,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             entities: [
                 new EnemyEntity({
                     uid: this.genUid(),
-                    name: "大号黑色粘稠的生物",
+                    name: "大号黑色粘稠生物",
                     health: 10,
                     maxHealth: 10,
                     attackPower: 2,
@@ -174,12 +183,12 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
     connectRooms(room1: Room, room2: Room, doorName: string, doShowtargetName: boolean = true) {
         const door1 = new DoorEntity({
             uid: this.genUid(),
-            name: doorName + (doShowtargetName ? "→" + room2.name : ""),
+            name: doorName,
             targetRoom: room2,
         });
         const door2 = new DoorEntity({
             uid: this.genUid(),
-            name: doorName + (doShowtargetName ? "→" + room1.name : ""),
+            name: doorName,
             targetRoom: room1,
         });
         room1.addEntity(door1);

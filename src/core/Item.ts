@@ -1,4 +1,4 @@
-import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
+import { Action, ActionParams, Unique } from "./common";
 import { LivingEntity } from "./entity/LivingEntity";
 
 export interface ItemData extends Unique {

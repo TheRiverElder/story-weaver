@@ -1,4 +1,4 @@
-import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
+import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { Entity } from "./Entity";
 import { UniqueSet } from "./UniqueSet";
 
@@ -39,7 +39,15 @@ export class Room implements Unique, InteractiveGroup {
     }
     
     getActionGroups(params: ActionParams): ActionGroup[] {
-        const entityActionGroups: ActionGroup[] = this.entities.values().flatMap(it => it.getActionGroups(params));
+        const entityActionGroups: ActionGroup[] = [];
+        for (const entity of this.entities.values()) {
+            const groups = entity.getActionGroups(params);
+            if (entity === params.game.adventurer) {
+                entityActionGroups.unshift(...groups);
+            } else {
+                entityActionGroups.push(...groups);
+            };
+        } 
         return entityActionGroups;
     }
 

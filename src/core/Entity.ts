@@ -1,4 +1,4 @@
-import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
+import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { Room } from "./Room";
 
 

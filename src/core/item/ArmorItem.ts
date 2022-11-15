@@ -17,7 +17,10 @@ export class ArmorItem extends Item {
     getActions(params: ActionParams): Action[] {
         return [{
             text: "装备",
-            act: ({ actor }) => actor.equipArmor(this),
+            act: ({ actor }) => {
+                actor.inventory.remove(this);
+                actor.equipArmor(this);
+            },
         }];
     }
     

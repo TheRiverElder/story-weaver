@@ -9,4 +9,14 @@ export class InventorySlot {
         this.type = type;
         this.item = item;
     }
+
+    get(): Item | null {
+        return this.item;
+    }
+
+    set(item: Item | null): Item | null {
+        const old = this.item;
+        this.item = item;
+        return old;
+    }
 }

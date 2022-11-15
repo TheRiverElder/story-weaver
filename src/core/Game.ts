@@ -9,6 +9,11 @@ export interface GameData {
     terrianGenerator: TerrianGenerator;
 }
 
+export interface Message {
+    timestamp: Date;
+    text: string;
+}
+
 export type GameUpdateListener = (game: Game) => void;
 
 export class Game implements InteractiveGroup {
@@ -18,7 +23,7 @@ export class Game implements InteractiveGroup {
     rooms: UniqueSet<Room> = new UniqueSet();
     adventurer: PlayerEntity = {} as PlayerEntity;
     interactiveGroups: InteractiveGroup[] = [];
-    messages: string[] = [];
+    messages: Message[] = [];
 
     level: number = 1; // 当前关卡数
 
@@ -82,12 +87,16 @@ export class Game implements InteractiveGroup {
 
     getActionGroups(params: ActionParams): ActionGroup[] {
         if (this.interactiveGroups.length > 0) return this.interactiveGroups[this.interactiveGroups.length - 1].getActionGroups(params);
+        
         const adventurerActionGroups = this.adventurer.room?.getActionGroups(params);
         return adventurerActionGroups || [];
     }
 
     runAction(action: Action, actor: PlayerEntity = this.adventurer) {
         action.act({ game: this, actor });
+        if (this.adventurer.health <= 0) {
+            this.gameOverListeners.forEach(l => l(this));
+        }
         this.notifyUpdate();
     }
 
@@ -105,8 +114,13 @@ export class Game implements InteractiveGroup {
         this.notifyUpdate();
     }
 
-    appendMessage(message: string) {
-        this.messages.push(message);
+    appendMessage(message: Message | string) {
+        const msg = (typeof message === "string") ? {
+            timestamp: new Date(),
+            text: message,
+        } : message;
+        
+        this.messages.push(msg);
         this.notifyUpdate();
     }
 }

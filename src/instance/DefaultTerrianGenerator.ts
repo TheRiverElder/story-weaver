@@ -37,7 +37,7 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
             attackPower: 20,
             defensePower: 10,
             dexterity: 5,
-            inventory: [],
+            items: [],
         }) : game.adventurer;
 
         const startRoom = new Room({

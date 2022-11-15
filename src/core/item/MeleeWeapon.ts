@@ -17,7 +17,10 @@ export class MeleeWeapon extends Item {
     getActions(params: ActionParams): Action[] {
         return [{
             text: "装备",
-            act: ({ actor }) => actor.equipWeapon(this),
+            act: ({ actor }) => {
+                actor.inventory.remove(this);
+                actor.equipWeapon(this);
+            },
         }];
     }
     

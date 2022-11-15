@@ -1,7 +1,6 @@
 import { Component } from "react";
 import { Game } from "../core/Game";
 import { IncrementNumberGenerator } from "../core/util/IncrementNumberGenerator";
-import { DefaultTerrianGenerator } from "../instance/DefaultTerrianGenerator";
 import { WhalesTombTerrianGenerator } from "../instance/WhalesTombTerrianGenerator";
 
 export interface StartPageProps {
@@ -17,6 +16,7 @@ export class StartPage extends Component<StartPageProps, StartPageState> {
         super(props);
         this.state = {};
     }
+    
     render() { 
         return (
             <div>

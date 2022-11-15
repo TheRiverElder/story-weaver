@@ -1,4 +1,4 @@
-import { ActionParams, ActionGroup, Action } from "../common";
+import { ActionParams, Action } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
 import { Item } from "../Item";
 

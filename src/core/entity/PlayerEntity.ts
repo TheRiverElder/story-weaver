@@ -1,20 +1,11 @@
-import { Action, ActionGroup } from "../common";
-import { Item } from "../Item";
-import { InverntoryView } from "../misc/InventoryView";
-import { UniqueSet } from "../UniqueSet";
+import { ActionGroup } from "../common";
+import { InventoryTask } from "../task/InventoryTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
 export interface PlayerEntityData extends LivingEntityData {
-    inventory: Item[];
 }
 
 export class PlayerEntity extends LivingEntity {
-    inventory: UniqueSet<Item> = new UniqueSet();
-
-    constructor(data: PlayerEntityData) {
-        super(data);
-        this.inventory.values().forEach(this.inventory.add.bind(this.inventory));
-    }
 
     getActionGroups(): ActionGroup[] {
         return [{
@@ -23,16 +14,9 @@ export class PlayerEntity extends LivingEntity {
             description: this.getBrief(),
             actions: [{
                 text: "打开背包",
-                act: ({ game }) => {game.appendInteravtiveGroup(new InverntoryView(game.uidGenerator.generate()))},
+                act: ({ game }) => {game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate()))},
             }],
         }];
-    }
-
-    appendItem(item: Item): boolean {
-        let itemCount = this.inventory.size + (this.weapon ? 1 : 0) + (this.armor ? 1 : 0);
-        if (itemCount >= 6) return false;
-        this.inventory.add(item);
-        return true;
     }
 
     getBrief(): string {

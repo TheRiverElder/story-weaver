@@ -1,4 +1,5 @@
 import { Action, ActionGroup, ActionParams } from "../common";
+import { FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
 export interface EnemyEntityData extends LivingEntityData {
@@ -6,17 +7,17 @@ export interface EnemyEntityData extends LivingEntityData {
 
 export class EnemyEntity extends LivingEntity {
 
-    constructor(data: EnemyEntityData) {
-        super(data);
-    }
-
     getActionGroups(params: ActionParams): ActionGroup[] {
         if (params.actor.uid === this.uid) return [];
 
         const attackAction: Action = {
-            text: '攻击' + this.getBrief(),
+            text: '攻击',
             labels: ['attack'],
-            act: ({ game, actor }) => game.runAttack(actor, this),
+            act: ({ game, actor }) => {
+                const fighting = new FightingTask(game.uidGenerator.generate(), [actor, this]);
+                game.appendInteravtiveGroup(fighting);
+                fighting.attack(actor, this, game);
+            },
         };
         return [{
             source: this,

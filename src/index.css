@@ -41,3 +41,20 @@ html, body, #root {
   overflow: hidden;
 }
 
+@keyframes flash-appear {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes message-appear {
+  0% { opacity: 0; background-color: #4ed354; }
+  100% { opacity: 1; background-color: transparent; }
+}
+
+.animate-flash-appear {
+  animation: flash-appear 500ms ease-in-out;
+}
+
+.animate-message-appear {
+  animation: message-appear 500ms ease-in-out;
+}
