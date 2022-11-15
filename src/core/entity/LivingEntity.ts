@@ -4,6 +4,7 @@ import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
 import { PropertyType } from "../profile/PropertyType";
+import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { ItemEntity } from "./ItemEntity";
 
 export interface LivingEntityData extends EntityData {
@@ -15,6 +16,7 @@ export interface LivingEntityData extends EntityData {
     weapon?: Item;
     armor?: Item;
     items?: Item[]; 
+    tags?: string[]; 
 }
 
 export const PROPERTY_TYPE_HEALTH = new PropertyType("health", "生命", 0);
@@ -26,6 +28,7 @@ export abstract class LivingEntity extends Entity {
 
     public readonly inventory = new LivingEntityInventory(this);
     public readonly profile = new GenericProfile();
+    public readonly tags = new Set<string>();
 
     get health(): number { return this.profile.getProperty(PROPERTY_TYPE_HEALTH); }
     set health(value: number) { this.profile.setProperty(PROPERTY_TYPE_HEALTH, value); }
@@ -63,6 +66,9 @@ export abstract class LivingEntity extends Entity {
         }
         if (data.items) {
             data.items.forEach(item => this.inventory.add(item));
+        }
+        if (data.tags) {
+            data.tags.forEach(tag => this.tags.add(tag));
         }
     }
 
@@ -135,4 +141,11 @@ export abstract class LivingEntity extends Entity {
         }
     }
 
+    onFightTurn(fighting: FightingTask): FightingActionType {
+        return FightingActionType.SKIP;
+    }
+
+    onFightEscape(entity: LivingEntity, fighting: FightingTask): FightingActionType {
+        return FightingActionType.SKIP;
+    }
 }

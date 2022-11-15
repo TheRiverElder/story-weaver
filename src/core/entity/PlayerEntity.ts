@@ -1,4 +1,5 @@
 import { ActionGroup } from "../common";
+import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { InventoryTask } from "../task/InventoryTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
@@ -23,4 +24,11 @@ export class PlayerEntity extends LivingEntity {
         return `这是你`;
     }
 
+    onFightTurn(fighting: FightingTask): FightingActionType {
+        return FightingActionType.WAITING;
+    }
+
+    onFightEscape(entity: LivingEntity, fighting: FightingTask): FightingActionType {
+        return FightingActionType.WAITING;
+    }
 }

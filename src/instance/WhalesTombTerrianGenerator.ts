@@ -30,6 +30,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             defensePower: 0,
             dexterity: 60,
             items: [],
+            tags: ["human"],
         }) : game.adventurer;
 
 
@@ -72,6 +73,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     attackPower: 2,
                     defensePower: 0,
                     dexterity: 60,
+                    tags: ["human", "crew"],
                 }),
             ],
         });
@@ -112,6 +114,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     attackPower: 2,
                     defensePower: 0,
                     dexterity: 60,
+                    tags: ["human", "passenger"],
                 }),
                 new ItemEntity({
                     uid: this.genUid(),
@@ -136,6 +139,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     attackPower: 2,
                     defensePower: 0,
                     dexterity: 60,
+                    tags: ["monster"],
                 }),
             ],
         });
@@ -152,6 +156,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     attackPower: 2,
                     defensePower: 3,
                     dexterity: 60,
+                    tags: ["monster"],
                 }),
             ],
         });
