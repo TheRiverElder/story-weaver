@@ -1,14 +1,20 @@
 import { Terrian, TerrianGenerator, Generator } from "../core/common";
+import { Entity } from "../core/Entity";
 import { DoorEntity } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
+import { InvestigatableEntity } from "../core/entity/InvestigatableEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
+import { PROPERTY_TYPE_DEXTERITY } from "../core/entity/LivingEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity } from "../core/entity/PlayerEntity";
 import { Game } from "../core/Game";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
+import { NormalItem } from "../core/item/NormalItem";
+import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/Room";
+import { ChatOption, ChatTextFragment } from "../core/task/ChatTask";
 
 
 export class WhalesTombTerrianGenerator implements TerrianGenerator {
@@ -65,16 +71,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             uid: this.genUid(),
             name: "走廊",
             entities: [
-                new NeutralEntity({
-                    uid: this.genUid(),
-                    name: "Crit",
-                    health: 1,
-                    maxHealth: 12,
-                    attackPower: 2,
-                    defensePower: 0,
-                    dexterity: 60,
-                    tags: ["human", "crew"],
-                }),
+                this.createEntityCrit(game),
             ],
         });
 
@@ -115,6 +112,8 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     defensePower: 0,
                     dexterity: 60,
                     tags: ["human", "passenger"],
+                    chatStartFragmentId: 0,
+                    chatTextFragments: [],
                 }),
                 new ItemEntity({
                     uid: this.genUid(),
@@ -198,6 +197,66 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
         });
         room1.addEntity(door1);
         room2.addEntity(door2);
+    }
+
+    createEntityCrit(game: Game): Entity {
+        const entity = new NeutralEntity({
+            uid: this.genUid(),
+            name: "Crit",
+            health: 1,
+            maxHealth: 12,
+            attackPower: 2,
+            defensePower: 0,
+            dexterity: 60,
+            tags: ["human", "crew"],
+            chatStartFragmentId: "start",
+        });
+
+        const corpse = new InvestigatableEntity({
+            uid: this.genUid(),
+            name: "Crit的尸体",
+            brief: "这是船员Crit的尸体",
+            maxInvestigationAmount: 2,
+            clues: [{
+                validSkills: new Set<PropertyType>([PROPERTY_TYPE_DEXTERITY]),
+                discoverd: false,
+                text: "身上有火柴",
+                onDiscover: (clue, entity, { game, actor }) => {
+                    actor.appendOrDropItem(new NormalItem({
+                        uid: this.genUid(),
+                        name: "火柴",
+                    }));
+                },
+            }],
+        });
+
+        const fragments: ChatTextFragment[] = [
+            new ChatTextFragment(
+                "start",
+                [
+                    "你！",
+                    "舵室有型号枪",
+                    "块，快去",
+                    "不要乘坐救生艇！",
+                    "千万不要乘坐救生艇！",
+                    "啊",
+                    "（这个人昏撅过去力）",
+                ],
+                [
+                    new ChatOption("...", null, () => {
+                        entity.chatTextFragments = null;
+                        entity.health = 0;
+                        entity.room?.addEntity(corpse);
+                        entity.remove();
+                        game.appendMessage(`${entity.name}死了。`);
+                    }),
+                ],
+            ),
+        ];
+
+        entity.chatTextFragments = fragments;
+
+        return entity;
     }
 
     

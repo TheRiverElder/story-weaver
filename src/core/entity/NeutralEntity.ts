@@ -1,16 +1,28 @@
 import { Action, ActionGroup, ActionParams } from "../common";
+import { ChatTask, ChatTextFragment } from "../task/ChatTask";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
 export interface NeutralEntityData extends LivingEntityData {
+    chatTextFragments?: ChatTextFragment[];
+    chatStartFragmentId?: string | number;
 }
 
 export class NeutralEntity extends LivingEntity {
+    chatTextFragments: ChatTextFragment[] | null;
+    chatStartFragmentId: string | number;
+
+    constructor(data: NeutralEntityData) {
+        super(data);
+        this.chatTextFragments = data.chatTextFragments || null;
+        this.chatStartFragmentId = data.chatStartFragmentId || 0;
+    }
 
     getActionGroups(params: ActionParams): ActionGroup[] {
         if (params.actor.uid === this.uid) return [];
 
-        const attackAction: Action = {
+        const actions: Action[] = [];
+        actions.push({
             text: '攻击',
             labels: ['attack'],
             act: ({ game, actor }) => {
@@ -18,19 +30,24 @@ export class NeutralEntity extends LivingEntity {
                 game.appendInteravtiveGroup(fighting);
                 fighting.continueRound();
             },
-        };
-        const talkAction: Action = {
-            text: '交谈',
-            labels: ['talk'],
-            act: ({ game, actor }) => {
-                game.appendMessage("Hello, I am " + this.name);
-            },
-        };
+        });
+        if (this.chatTextFragments) {
+            actions.push({
+                text: '交谈',
+                labels: ['talk'],
+                act: ({ game }) => {
+                    if (!this.chatTextFragments) return;
+                    
+                    const chat = new ChatTask(game.uidGenerator.generate(), game, this.chatTextFragments, this.chatStartFragmentId);
+                    game.appendInteravtiveGroup(chat);
+                },
+            });
+        }
         return [{
             source: this,
             title: this.name,
             description: this.getBrief(),
-            actions: [talkAction, attackAction],
+            actions,
         }];
     }
 

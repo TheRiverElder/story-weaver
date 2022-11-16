@@ -46,12 +46,13 @@
 
 .GameView .messages > .message {
     display: flex;
-    
+    font-size: 0.8em;
+    font-family: "楷体", "黑体";
 }
 
 .GameView .messages > .message > .timestamp {
     width: 3em;
-    padding-top: 0.25em;
+    padding-top: 0.1em;
     font-family: Consolas;
     font-size: 0.9em;
     color: #7f7f7f;

@@ -28,7 +28,9 @@ export class FightingTask implements Unique, InteractiveGroup {
     public readonly participants: Participant[];
     private index: number = 0;
     private finished: boolean = false;
+    // 按照执行顺序轮到的参与者
     private currentParticipant: Participant | null = null;
+    // 真正能执行的参与者
     private pendingParticipant: Participant | null = null;
     private skipCounter: number = 0;
     private escapingParticipant: Participant | null = null;
@@ -184,13 +186,14 @@ export class FightingTask implements Unique, InteractiveGroup {
     attack(source: LivingEntity, target: LivingEntity) {
         if (!this.checkCanAct(source)) return;
         this.skipCounter = 0;
-
+        
         const sourceFirst: boolean = simpleCheck(source.dexterity) && (source.dexterity >= target.dexterity || !simpleCheck(target.dexterity));
+        let prefix = sourceFirst ? `🗡${source.name} 对 ${target.name} 发起攻击：` : `🗡${source.name} 进攻 ${target.name} 失败，反被回击：`;
         
         if (sourceFirst) {
-            this.sigleAttack(source, target);
+            this.sigleAttack(source, target, prefix);
         } else {
-            this.sigleAttack(target, source);
+            this.sigleAttack(target, source, prefix);
         }
         if (source.health <= 0) {
             this.remove(source);
@@ -202,16 +205,16 @@ export class FightingTask implements Unique, InteractiveGroup {
         this.turn();
     }
 
-    private sigleAttack(source: LivingEntity, target: LivingEntity, isStrike: boolean = false): boolean {
+    private sigleAttack(source: LivingEntity, target: LivingEntity, prefix: string, isStrike: boolean = false): boolean {
         if (Math.random() < target.dexterity / 100) {
-            this.game.appendMessage(`${target.name}躲过了${source.name}的攻击`);
+            this.game.appendMessage(prefix + `${target.name}躲过了${source.name}的攻击！`);
         } else {
             if (isStrike) {
                 this.escapingFinished = true;
             }
             const damage = Math.max(0, source.attackPower - target.defensePower);
             target.mutateHealth(-damage);
-            this.game.appendMessage(`${source.name}对${target.name}造成${damage}点伤害`);
+            this.game.appendMessage(prefix + `${source.name}对${target.name}造成${damage}点伤害！`);
     
             if (target.health <= 0) {
                 this.game.appendMessage(`💀${target.name}阵亡！`);
@@ -223,7 +226,7 @@ export class FightingTask implements Unique, InteractiveGroup {
     strike(source: LivingEntity) {
         if (!this.escapingParticipant) return;
         
-        this.sigleAttack(source, this.escapingParticipant.entity);
+        this.sigleAttack(source, this.escapingParticipant.entity, `${source.name}试图阻截${this.escapingParticipant.entity.name}：`, true);
     }
 
     release() {
@@ -308,6 +311,6 @@ export class FightingTask implements Unique, InteractiveGroup {
 
 }
 
-function simpleCheck(value: number): boolean {
+export function simpleCheck(value: number): boolean {
     return Math.floor(Math.random() * 100) + 1 <= value;
 }
