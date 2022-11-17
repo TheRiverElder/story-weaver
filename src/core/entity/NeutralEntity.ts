@@ -4,18 +4,15 @@ import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
 export interface NeutralEntityData extends LivingEntityData {
-    chatTextFragments?: ChatTextFragment[];
-    chatStartFragmentId?: string | number;
+    chatProvider?: (params: ActionParams) => ChatTask | null;
 }
 
 export class NeutralEntity extends LivingEntity {
-    chatTextFragments: ChatTextFragment[] | null;
-    chatStartFragmentId: string | number;
+    chatProvider: ((params: ActionParams) => ChatTask | null) | null;
 
     constructor(data: NeutralEntityData) {
         super(data);
-        this.chatTextFragments = data.chatTextFragments || null;
-        this.chatStartFragmentId = data.chatStartFragmentId || 0;
+        this.chatProvider = data.chatProvider || null;
     }
 
     getActionGroups(params: ActionParams): ActionGroup[] {
@@ -31,16 +28,12 @@ export class NeutralEntity extends LivingEntity {
                 fighting.continueRound();
             },
         });
-        if (this.chatTextFragments) {
+        const chatTask = this.chatProvider && this.chatProvider(params);
+        if (chatTask) {
             actions.push({
                 text: '交谈',
                 labels: ['talk'],
-                act: ({ game }) => {
-                    if (!this.chatTextFragments) return;
-                    
-                    const chat = new ChatTask(game.uidGenerator.generate(), game, this.chatTextFragments, this.chatStartFragmentId);
-                    game.appendInteravtiveGroup(chat);
-                },
+                act: ({ game }) => game.appendInteravtiveGroup(chatTask),
             });
         }
         return [{

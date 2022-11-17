@@ -1,9 +1,11 @@
 import { Action, ActionGroup, Unique } from "../common";
-import { Entity } from "../Entity";
+import { Entity, EntityData } from "../Entity";
+import { Game } from "../Game";
 import { Item } from "../Item";
 
-export interface ItemEntityData extends Unique {
+export interface ItemEntityData {
     item: Item;
+    game: Game;
 }
 
 export class ItemEntity extends Entity {

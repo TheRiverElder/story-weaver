@@ -1,16 +1,20 @@
 import { Action, ActionParams, Unique } from "./common";
 import { LivingEntity } from "./entity/LivingEntity";
+import { Game } from "./Game";
 
-export interface ItemData extends Unique {
+export interface ItemData {
     name: string;
+    game: Game;
 }
 
 export abstract class Item implements Unique {
     uid: number;
+    game: Game;
     name: string;
 
     constructor(data: ItemData) {
-        this.uid = data.uid;
+        this.game = data.game;
+        this.uid = this.game.uidGenerator.generate();
         this.name = data.name;
     }
 

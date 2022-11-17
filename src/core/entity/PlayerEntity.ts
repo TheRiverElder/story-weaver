@@ -1,7 +1,12 @@
 import { ActionGroup } from "../common";
+import { PropertyType } from "../profile/PropertyType";
 import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { InventoryTask } from "../task/InventoryTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
+
+export const PROPERTY_TYPE_WATCH = new PropertyType("watch", "观察", 20);
+export const PROPERTY_TYPE_LISTEN = new PropertyType("listen", "听", 20);
+export const PROPERTY_TYPE_MEDICINE = new PropertyType("medicine", "药学", 1);
 
 export interface PlayerEntityData extends LivingEntityData {
 }

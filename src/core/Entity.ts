@@ -1,20 +1,24 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
+import { Game } from "./Game";
 import { Room } from "./Room";
 
 
-export interface EntityData extends Unique {
+export interface EntityData {
     name: string;
+    game: Game;
 }
 
 export abstract class Entity implements Unique, InteractiveGroup {
     uid: number;
     name: string;
+    game: Game;
 
     room: Room | null = null;
 
     constructor(data: EntityData) {
-        this.uid = data.uid;
         this.name = data.name;
+        this.game = data.game;
+        this.uid = this.game.uidGenerator.generate();
     }
 
     remove() {

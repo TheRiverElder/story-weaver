@@ -22,6 +22,7 @@ export class InvestigatableEntity extends Entity {
     brief: string;
     clues: Clue[];
     maxInvestigationAmount: number;
+    investigationAmount: number = 0;
 
     constructor(data: InvestigatableEntityData) {
         super(data);
@@ -34,9 +35,11 @@ export class InvestigatableEntity extends Entity {
     getActionGroups(params: ActionParams): ActionGroup[] {
         const skills = new Set<PropertyType>();
 
-        for (const clue of this.clues) {
-            if (clue.discoverd) continue;
-            clue.validSkills.forEach(s => skills.add(s));
+        if (this.investigationAmount < this.maxInvestigationAmount) {
+            for (const clue of this.clues) {
+                if (clue.discoverd) continue;
+                clue.validSkills.forEach(s => skills.add(s));
+            }
         }
 
         const actions: Action[] = [{
@@ -56,10 +59,11 @@ export class InvestigatableEntity extends Entity {
             title: this.name,
             description: this.getBrief() + (skills.size === 0 ? "\n没有什么值得调查的了" : ""),
             actions,
-        }]
+        }];
     }
 
     onApplySkill(actor: PlayerEntity, game: Game, type: PropertyType) {
+        this.investigationAmount++;
         const newClues: Clue[] = [];
         if (simpleCheck(actor.profile.getProperty(type))) {
             for (const clue of this.clues) {

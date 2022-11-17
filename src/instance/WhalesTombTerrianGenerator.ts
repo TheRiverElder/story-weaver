@@ -4,9 +4,9 @@ import { DoorEntity } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
 import { InvestigatableEntity } from "../core/entity/InvestigatableEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
-import { PROPERTY_TYPE_DEXTERITY } from "../core/entity/LivingEntity";
+import { LivingEntity, PROPERTY_TYPE_DEXTERITY } from "../core/entity/LivingEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
-import { PlayerEntity } from "../core/entity/PlayerEntity";
+import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { Game } from "../core/Game";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
@@ -14,7 +14,7 @@ import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
 import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/Room";
-import { ChatOption, ChatTextFragment } from "../core/task/ChatTask";
+import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
 
 
 export class WhalesTombTerrianGenerator implements TerrianGenerator {
@@ -28,7 +28,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
         this.uidGenerator = game.uidGenerator;
 
         const adventurer = game.level === 1 ? new PlayerEntity({
-            uid: this.genUid(),
+            game,
             name: 'Jack',
             health: 7,
             maxHealth: 11,
@@ -48,14 +48,14 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
          * 你旁边的人都没醒来，周围一片死寂
          */
         const guestRoom217 = new Room({
-            uid: this.genUid(),
+            game,
             name: "217号客房",
             entities: [
                 adventurer,
                 new ItemEntity({
-                    uid: this.genUid(),
+                    game,
                     item: new MeleeWeapon({
-                        uid: this.genUid(),
+                        game,
                         name: "拆信刀",
                         damage: 1,
                     }),
@@ -68,7 +68,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
          * 很明显他也没有说话的力气，但是似乎还有一丝意识尚存
          */
         const corridorRoom = new Room({
-            uid: this.genUid(),
+            game,
             name: "走廊",
             entities: [
                 this.createEntityCrit(game),
@@ -77,21 +77,21 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
 
         // 厨房
         const kitchenRoom = new Room({
-            uid: this.genUid(),
+            game,
             name: "厨房",
             entities: [
                 new ItemEntity({
-                    uid: this.genUid(),
+                    game,
                     item: new MeleeWeapon({
-                        uid: this.genUid(),
+                        game,
                         name: "菜刀",
                         damage: 3,
                     }),
                 }),
                 new ItemEntity({
-                    uid: this.genUid(),
+                    game,
                     item: new ArmorItem({
-                        uid: this.genUid(),
+                        game,
                         name: "汤锅",
                         defense: 3,
                     }),
@@ -100,11 +100,11 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
         });
         // 餐厅
         const dinningRoom = new Room({
-            uid: this.genUid(),
+            game,
             name: "餐厅",
             entities: [
                 new NeutralEntity({
-                    uid: this.genUid(),
+                    game,
                     name: "昏迷的人",
                     health: 1,
                     maxHealth: 12,
@@ -112,13 +112,11 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                     defensePower: 0,
                     dexterity: 60,
                     tags: ["human", "passenger"],
-                    chatStartFragmentId: 0,
-                    chatTextFragments: [],
                 }),
                 new ItemEntity({
-                    uid: this.genUid(),
+                    game,
                     item: new FoodItem({
-                        uid: this.genUid(),
+                        game,
                         name: "蛋糕",
                         energy: 2,
                     }),
@@ -127,11 +125,11 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
         });
         // 厕所
         const toiletRoom = new Room({
-            uid: this.genUid(),
+            game,
             name: "厕所",
             entities: [
                 new EnemyEntity({
-                    uid: this.genUid(),
+                    game,
                     name: "黑色粘稠生物",
                     health: 5,
                     maxHealth: 5,
@@ -144,11 +142,11 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
         });
         // 海水净化仓
         const purificationRoom = new Room({
-            uid: this.genUid(),
+            game,
             name: "海水净化仓",
             entities: [
                 new EnemyEntity({
-                    uid: this.genUid(),
+                    game,
                     name: "大号黑色粘稠生物",
                     health: 10,
                     maxHealth: 10,
@@ -162,12 +160,12 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
         // 动力舱
         // 杂项地点
 
-        this.connectRooms(corridorRoom, guestRoom217, "金属门");
-        this.connectRooms(corridorRoom, kitchenRoom, "金属门");
-        this.connectRooms(corridorRoom, dinningRoom, "木门框");
+        this.connectRooms(corridorRoom, guestRoom217, "金属门", game);
+        this.connectRooms(corridorRoom, kitchenRoom, "金属门", game);
+        this.connectRooms(corridorRoom, dinningRoom, "木门框", game);
 
-        this.connectRooms(dinningRoom, toiletRoom, "金属门");
-        this.connectRooms(dinningRoom, purificationRoom, "金属门");
+        this.connectRooms(dinningRoom, toiletRoom, "金属门", game);
+        this.connectRooms(dinningRoom, purificationRoom, "金属门", game);
 
         return {
             rooms: [
@@ -184,14 +182,14 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
     
 
 
-    connectRooms(room1: Room, room2: Room, doorName: string, doShowtargetName: boolean = true) {
+    connectRooms(room1: Room, room2: Room, doorName: string, game: Game, doShowtargetName: boolean = true) {
         const door1 = new DoorEntity({
-            uid: this.genUid(),
+            game,
             name: doorName,
             targetRoom: room2,
         });
         const door2 = new DoorEntity({
-            uid: this.genUid(),
+            game,
             name: doorName,
             targetRoom: room1,
         });
@@ -200,34 +198,30 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
     }
 
     createEntityCrit(game: Game): Entity {
-        const entity = new NeutralEntity({
-            uid: this.genUid(),
-            name: "Crit",
-            health: 1,
-            maxHealth: 12,
-            attackPower: 2,
-            defensePower: 0,
-            dexterity: 60,
-            tags: ["human", "crew"],
-            chatStartFragmentId: "start",
-        });
 
         const corpse = new InvestigatableEntity({
-            uid: this.genUid(),
+            game,
             name: "Crit的尸体",
             brief: "这是船员Crit的尸体",
             maxInvestigationAmount: 2,
-            clues: [{
-                validSkills: new Set<PropertyType>([PROPERTY_TYPE_DEXTERITY]),
-                discoverd: false,
-                text: "身上有火柴",
-                onDiscover: (clue, entity, { game, actor }) => {
-                    actor.appendOrDropItem(new NormalItem({
-                        uid: this.genUid(),
-                        name: "火柴",
-                    }));
+            clues: [
+                {
+                    validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
+                    discoverd: false,
+                    text: "身上有火柴",
+                    onDiscover: (clue, entity, { game, actor }) => {
+                        actor.appendOrDropItem(new NormalItem({
+                            game,
+                            name: "火柴",
+                        }));
+                    },
                 },
-            }],
+                {
+                    validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
+                    discoverd: false,
+                    text: "皮肤溃烂严重，口中还有些许带有腥味的黑色液体",
+                },
+            ],
         });
 
         const fragments: ChatTextFragment[] = [
@@ -235,17 +229,16 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 "start",
                 [
                     "你！",
-                    "舵室有型号枪",
-                    "块，快去",
+                    "舵室有信号枪",
+                    "快，快去",
                     "不要乘坐救生艇！",
                     "千万不要乘坐救生艇！",
-                    "啊",
-                    "（这个人昏撅过去力）",
+                    "啊！",
+                    "（这个人失去了气息）",
                 ],
                 [
                     new ChatOption("...", null, () => {
-                        entity.chatTextFragments = null;
-                        entity.health = 0;
+                        entity.chatProvider = null;
                         entity.room?.addEntity(corpse);
                         entity.remove();
                         game.appendMessage(`${entity.name}死了。`);
@@ -254,10 +247,22 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             ),
         ];
 
-        entity.chatTextFragments = fragments;
+        const entity = new NeutralEntity({
+            game,
+            name: "Crit",
+            health: 1,
+            maxHealth: 12,
+            attackPower: 2,
+            defensePower: 0,
+            dexterity: 60,
+            tags: ["human", "crew"],
+            chatProvider: () => new ChatTask(this.genUid(), game, fragments, "start"),
+        });
 
         return entity;
     }
-
-    
 } 
+
+class CritNPCEntity extends LivingEntity {
+    
+}
