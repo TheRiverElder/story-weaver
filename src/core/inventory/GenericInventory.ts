@@ -3,54 +3,57 @@ import { Inventory } from "./Inventory";
 import { InventorySlot } from "./InventorySlot";
 import { InventorySlotType } from "./InventorySlotType";
 
+export type InventoryMutationListener = (slot: InventorySlot, previousItem: Item | null) => void;
+
 export abstract class GenericInventory implements Inventory {
 
-    protected readonly items: Item[] = [];
-    protected readonly maxSize: number;
+    protected readonly indexedSlots: InventorySlot[];
+    public readonly listeners = new Set<InventoryMutationListener>();
 
-    constructor(maxSize: number = Infinity) {
-        this.maxSize = maxSize;
+    constructor(size: number = 1, items: Item[] = []) {
+        this.indexedSlots = Array(size).fill(0).map((_, index) => new InventorySlot(this, index, items[index] || null));
     }
 
-    getItems(): Item[] {
-        return this.items;
-    }
 
     count(): number {
-        return this.items.length;
+        return this.indexedSlots.length;
     }
 
-    get(index: number): Item | null {
-        return this.items[index] || null;
+    getIndexedSlots(): InventorySlot[] {
+        return this.indexedSlots.slice();
     }
 
-    set(index: number, item: Item): boolean {
-        if (index >= this.maxSize) return false; 
-        this.items[index] = item;
-        return true;
+    getIndexedSlot(index: number): InventorySlot | null {
+        return this.indexedSlots[index] || null;
     }
 
-    add(item: Item): boolean {
-        if (this.count() >= this.maxSize) return false; 
-        this.items.push(item);
-        return true;
+    abstract getSpecialSlots(): InventorySlot[];
+    abstract getSpecialSlot(type: InventorySlotType): InventorySlot | null;
+
+    findEmptyIndexedSlot(): InventorySlot | null {
+        return this.indexedSlots.find(slot => !slot.item) || null;
     }
 
-    remove(item: Item): boolean {
-        const index = this.items.indexOf(item);
-        if (index >= 0) {
-            this.items.splice(index, 1);
-            return true;
-        }
-        const slot = this.getSlots().find(slot => slot.item === item);
+    findIndexedSlotWithItem(item: Item): InventorySlot | null {
+        return this.indexedSlots.find(slot => slot.item === item) || null;
+    }
+
+    addItem(item: Item): boolean {
+        const slot = this.findEmptyIndexedSlot();
         if (slot) {
-            slot.item = null;
+            slot.set(item);
             return true;
         }
         return false;
     }
 
-    abstract getSlots(): InventorySlot[];
-    abstract getSlot(type: InventorySlotType): InventorySlot | null;
+    remove(item: Item): boolean {
+        const slot = this.findIndexedSlotWithItem(item);
+        if (slot) {
+            slot.set(null);
+            return true;
+        }
+        return false;
+    }
 
 }

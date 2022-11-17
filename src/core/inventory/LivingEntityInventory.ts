@@ -1,4 +1,5 @@
 import { LivingEntity } from "../entity/LivingEntity";
+import { Item } from "../Item";
 import { GenericInventory } from "./GenericInventory"
 import { InventorySlot } from "./InventorySlot";
 import { InventorySlotType } from "./InventorySlotType";
@@ -9,19 +10,19 @@ export const SLOT_TYPE_ARMOR = new InventorySlotType("armor", "护甲");
 export class LivingEntityInventory extends GenericInventory {
 
     public readonly owner: LivingEntity;
-    public readonly weaponSlot = new InventorySlot(SLOT_TYPE_WEAPON);
-    public readonly armorSlot = new InventorySlot(SLOT_TYPE_ARMOR);
+    public readonly weaponSlot = new InventorySlot(this, SLOT_TYPE_WEAPON);
+    public readonly armorSlot = new InventorySlot(this, SLOT_TYPE_ARMOR);
 
-    constructor(owner: LivingEntity) {
-        super();
+    constructor(owner: LivingEntity, items: Item[] = []) {
+        super(6, items);
         this.owner = owner;
     }
 
-    getSlots(): InventorySlot[] {
+    getSpecialSlots(): InventorySlot[] {
         return [this.weaponSlot, this.armorSlot];
     }
 
-    getSlot(type: InventorySlotType): InventorySlot | null {
+    getSpecialSlot(type: InventorySlotType): InventorySlot | null {
         switch (type) {
             case SLOT_TYPE_WEAPON: return this.weaponSlot;
             case SLOT_TYPE_ARMOR: return this.armorSlot;

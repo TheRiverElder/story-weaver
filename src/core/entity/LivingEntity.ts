@@ -1,5 +1,8 @@
 import { Action, ActionGroup, ActionParams } from "../common";
 import { Entity, EntityData } from "../Entity";
+import { Inventory } from "../inventory/Inventory";
+import { InventorySlot, SLOT_TYPE_INDEXED } from "../inventory/InventorySlot";
+import { InventorySlotType } from "../inventory/InventorySlotType";
 import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
@@ -27,7 +30,7 @@ export const PROPERTY_TYPE_DEXTERITY = new PropertyType("dexterity", "敏捷", 5
 
 export abstract class LivingEntity extends Entity {
 
-    public readonly inventory = new LivingEntityInventory(this);
+    public readonly inventory: LivingEntityInventory;
     public readonly profile = new GenericProfile();
     public readonly tags = new Set<string>();
 
@@ -63,6 +66,8 @@ export abstract class LivingEntity extends Entity {
         this.dexterity = data.dexterity;
         
         this.profile.listeners.add(this.onPropertyChanged.bind(this));
+
+        this.inventory = new LivingEntityInventory(this, data.items);
         
         if (data.weapon) {
             this.equipWeapon(data.weapon);
@@ -71,11 +76,13 @@ export abstract class LivingEntity extends Entity {
             this.equipArmor(data.armor);
         }
         if (data.items) {
-            data.items.forEach(item => this.inventory.add(item));
+            data.items.forEach(item => this.inventory.addItem(item));
         }
         if (data.tags) {
             data.tags.forEach(tag => this.tags.add(tag));
         }
+        
+        this.inventory.listeners.add(this.onInventoryChanged.bind(this));
     }
 
     getActionGroups(params: ActionParams): ActionGroup[] {
@@ -136,7 +143,8 @@ export abstract class LivingEntity extends Entity {
     }
 
     appendItem(item: Item): boolean {
-        return this.inventory.add(item);
+        if (this.inventory.findIndexedSlotWithItem(item)) return true;
+        return this.inventory.addItem(item);
     }
 
     appendOrDropItem(item: Item) {
@@ -161,6 +169,10 @@ export abstract class LivingEntity extends Entity {
                 this.die();
             }
         }
+    }
+
+    onInventoryChanged(slot: InventorySlot, previousItem: Item | null) {
+        
     }
 
     die(reason?: string) {
