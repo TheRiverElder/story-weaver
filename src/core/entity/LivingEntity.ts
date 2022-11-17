@@ -3,6 +3,7 @@ import { Entity, EntityData } from "../Entity";
 import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
+import { Profile } from "../profile/Profile";
 import { PropertyType } from "../profile/PropertyType";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { ItemEntity } from "./ItemEntity";
@@ -29,6 +30,8 @@ export abstract class LivingEntity extends Entity {
     public readonly inventory = new LivingEntityInventory(this);
     public readonly profile = new GenericProfile();
     public readonly tags = new Set<string>();
+
+    get alive(): boolean { return this.health > 0; }
 
     get health(): number { return this.profile.getProperty(PROPERTY_TYPE_HEALTH); }
     set health(value: number) { this.profile.setProperty(PROPERTY_TYPE_HEALTH, value); }
@@ -58,6 +61,9 @@ export abstract class LivingEntity extends Entity {
         this.attackPower = data.attackPower;
         this.defensePower = data.defensePower;
         this.dexterity = data.dexterity;
+        
+        this.profile.listeners.add(this.onPropertyChanged.bind(this));
+        
         if (data.weapon) {
             this.equipWeapon(data.weapon);
         }
@@ -136,7 +142,7 @@ export abstract class LivingEntity extends Entity {
     appendOrDropItem(item: Item) {
         if (!this.appendItem(item)) {
             if (this.room !== null) {
-                this.room.addEntity(new ItemEntity({ uid: item.uid, item}));
+                this.room.addEntity(new ItemEntity({ item }));
             }
         }
     }
@@ -147,5 +153,23 @@ export abstract class LivingEntity extends Entity {
 
     onFightEscape(entity: LivingEntity, fighting: FightingTask): FightingActionType {
         return FightingActionType.SKIP;
+    }
+
+    onPropertyChanged(type: PropertyType, currentValue: number, previousValue: number, profile: Profile) {
+        if (type === PROPERTY_TYPE_HEALTH) {
+            if (currentValue <= 0) {
+                this.die();
+            }
+        }
+    }
+
+    die(reason?: string) {
+        this.game.appendMessage(`💀${this.name}死亡` + (reason ? `，死因：${reason}！` : "！"));
+        this.onDied(reason);
+        this.remove();
+    }
+
+    onDied(reason?: string) {
+        
     }
 }

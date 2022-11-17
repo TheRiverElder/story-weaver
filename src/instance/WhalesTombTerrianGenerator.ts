@@ -199,8 +199,47 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
 
     createEntityCrit(game: Game): Entity {
 
-        const corpse = new InvestigatableEntity({
+        const fragments: ChatTextFragment[] = [
+            new ChatTextFragment(
+                "start",
+                [
+                    "你！",
+                    "舵室有信号枪",
+                    "快，快去",
+                    "不要乘坐救生艇！",
+                    "千万不要乘坐救生艇！",
+                    "啊！",
+                    "（这个人失去了气息）",
+                ],
+                [
+                    new ChatOption("什...？", null, () => {
+                        entity.chatProvider = null;
+                        entity.die();
+                    }),
+                ],
+            ),
+        ];
+
+        const entity = new CritNPCEntity({
             game,
+            name: "Crit",
+            health: 1,
+            maxHealth: 12,
+            attackPower: 2,
+            defensePower: 0,
+            dexterity: 60,
+            tags: ["human", "crew"],
+            chatProvider: () => new ChatTask(this.genUid(), game, fragments, "start"),
+        });
+
+        return entity;
+    }
+} 
+
+class CritNPCEntity extends NeutralEntity {
+    onDied() {
+        const corpse = new InvestigatableEntity({
+            game: this.game,
             name: "Crit的尸体",
             brief: "这是船员Crit的尸体",
             maxInvestigationAmount: 2,
@@ -224,45 +263,6 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             ],
         });
 
-        const fragments: ChatTextFragment[] = [
-            new ChatTextFragment(
-                "start",
-                [
-                    "你！",
-                    "舵室有信号枪",
-                    "快，快去",
-                    "不要乘坐救生艇！",
-                    "千万不要乘坐救生艇！",
-                    "啊！",
-                    "（这个人失去了气息）",
-                ],
-                [
-                    new ChatOption("...", null, () => {
-                        entity.chatProvider = null;
-                        entity.room?.addEntity(corpse);
-                        entity.remove();
-                        game.appendMessage(`${entity.name}死了。`);
-                    }),
-                ],
-            ),
-        ];
-
-        const entity = new NeutralEntity({
-            game,
-            name: "Crit",
-            health: 1,
-            maxHealth: 12,
-            attackPower: 2,
-            defensePower: 0,
-            dexterity: 60,
-            tags: ["human", "crew"],
-            chatProvider: () => new ChatTask(this.genUid(), game, fragments, "start"),
-        });
-
-        return entity;
+        this.room?.addEntity(corpse);
     }
-} 
-
-class CritNPCEntity extends LivingEntity {
-    
 }

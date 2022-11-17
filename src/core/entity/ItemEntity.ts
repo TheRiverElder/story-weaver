@@ -5,14 +5,18 @@ import { Item } from "../Item";
 
 export interface ItemEntityData {
     item: Item;
-    game: Game;
+    game?: Game;
 }
 
 export class ItemEntity extends Entity {
     item: Item;
 
     constructor(data: ItemEntityData) {
-        super({ ...data, name: data.item.name });
+        super({ 
+            ...data, 
+            game: data.game || data.item.game, 
+            name: data.item.name,
+        });
         this.item = data.item;
     }
 
