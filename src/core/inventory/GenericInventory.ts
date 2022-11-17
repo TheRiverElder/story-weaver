@@ -27,6 +27,10 @@ export abstract class GenericInventory implements Inventory {
         return this.indexedSlots[index] || null;
     }
 
+    getItems(): Item[] {
+        return this.indexedSlots.filter(slot => !!slot.item).map(slot => slot.item!!);
+    }
+
     abstract getSpecialSlots(): InventorySlot[];
     abstract getSpecialSlot(type: InventorySlotType): InventorySlot | null;
 

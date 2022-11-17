@@ -30,7 +30,7 @@ export class InventoryTask implements Unique, InteractiveGroup {
             actions: item.getActions(params),
         }));
 
-        for (const slot of actor.inventory.getSlots()) {
+        for (const slot of actor.inventory.getSpecialSlots()) {
             const item = slot.item;
             if (!item) continue;
 

@@ -240,8 +240,8 @@ class CritNPCEntity extends NeutralEntity {
     onDied() {
         const corpse = new InvestigatableEntity({
             game: this.game,
-            name: "Crit的尸体",
-            brief: "这是船员Crit的尸体",
+            name: `${this.name}的尸体`,
+            brief: `这是船员${this.name}的尸体`,
             maxInvestigationAmount: 2,
             clues: [
                 {

@@ -30,7 +30,7 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
         this.uidGenerator = game.uidGenerator;
 
         const adventurer = game.level === 1 ? new PlayerEntity({
-            uid: this.genUid(),
+            game,
             name: 'Jack',
             health: 100,
             maxHealth: 100,
@@ -41,7 +41,7 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
         }) : game.adventurer;
 
         const startRoom = new Room({
-            uid: this.genUid(),
+            game,
             name: "初始房间",
             entities: [
                 adventurer,
@@ -61,7 +61,7 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
             if (!node) break;
 
             this.rooms.set(node.room.uid, node.room);
-            this.handleRoom(node, queue);
+            this.handleRoom(node, queue, game);
         }
 
         const rooms = Array.from(this.rooms.values());
@@ -70,16 +70,16 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
     }
     
 
-    handleRoom(node: RoomMetaNode, queue: RoomMetaNode[]) {
+    handleRoom(node: RoomMetaNode, queue: RoomMetaNode[], game: Game) {
         const distance = node.distance;
         if (distance >= 20) return;
 
         const offsets: Vec2[] = [[-1, 0], [+1, 0], [0, -1], [0, +1]];
         const nextRoomOffsets = randomOnes<Vec2>(offsets, Math.floor(4 * Math.exp(-(distance + 1)/ 5)));
-        const nextRoomNodes = nextRoomOffsets.map(it => this.createRoomNode(node, ...it)).filter(it => !!it);
+        const nextRoomNodes = nextRoomOffsets.map(it => this.createRoomNode(node, ...it, game)).filter(it => !!it);
         if (nextRoomNodes.length === 0) {
             node.room.addEntity(new EscapeEntity({
-                uid: this.genUid(),
+                game,
                 name: "逃生门",
             }));
             return;
@@ -88,12 +88,12 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
             const n = it as RoomMetaNode;
             const doorName = randomOne(DOOR_NAMES);
             node.room.addEntity(new DoorEntity({
-                uid: this.genUid(),
+                game,
                 name: doorName,
                 targetRoom: n.room,
             }));
             n.room.addEntity(new DoorEntity({
-                uid: this.genUid(),
+                game,
                 name: doorName,
                 targetRoom: node.room,
             }));
@@ -101,14 +101,14 @@ export class DefaultTerrianGenerator implements TerrianGenerator {
         });
     }
 
-    createRoomNode(leadingNode: RoomMetaNode, xOffset: number, yOffset: number): RoomMetaNode | null {
+    createRoomNode(leadingNode: RoomMetaNode, xOffset: number, yOffset: number, game: Game): RoomMetaNode | null {
         const x = leadingNode.x + xOffset;
         const y = leadingNode.y + yOffset;
         const distance = leadingNode.distance + 1;
 
         if (this.matrix.has(x, y)) return null;
 
-        const room: Room = randomOne(ROOM_GENERATORS)(this.genUid);
+        const room: Room = randomOne(ROOM_GENERATORS)(game);
         return { room, distance, x, y };
     }
 
@@ -157,24 +157,24 @@ interface RoomMetaNode {
     // connectedRoomUids: Array<number>; // 通向其它房间的单向门，这是通向房间的UID
 }
 
-type RoomGenerator = (genUid: () => number) => Room;
+type RoomGenerator = (game: Game) => Room;
 
 const ROOM_GENERATORS: RoomGenerator[] = [
     genSurgenRoom,
     genDiningRoom,
 ];
 
-function genSurgenRoom(genUid: () => number): Room {
+function genSurgenRoom(game: Game): Room {
     const knifeEntity = new ItemEntity({
-        uid: genUid(),
+        game,
         item: new MeleeWeapon({
-            uid: genUid(),
+            game,
             name: "手术刀",
             damage: 10,
         }),
     });
     const nurseEntity = new EnemyEntity({
-        uid: genUid(),
+        game,
         name: '扭曲护士',
         health: 40,
         maxHealth: 40,
@@ -182,14 +182,14 @@ function genSurgenRoom(genUid: () => number): Room {
         defensePower: 1,
         dexterity: 20,
         weapon: new MeleeWeapon({
-            uid: genUid(),
+            game,
             name: "手术刀",
             damage: 10,
         }),
     });
 
     return new Room({
-        uid: genUid(),
+        game,
         name: "手术室",
         entities: [
             knifeEntity,
@@ -198,25 +198,25 @@ function genSurgenRoom(genUid: () => number): Room {
     });
 }
 
-function genDiningRoom(genUid: () => number): Room {
+function genDiningRoom(game: Game): Room {
     const items = [
         new MeleeWeapon({
-            uid: genUid(),
+            game,
             name: "叉子",
             damage: 10,
         }),
         new MeleeWeapon({
-            uid: genUid(),
+            game,
             name: "餐刀",
             damage: 20,
         }),
     ];
 
     return new Room({
-        uid: genUid(),
+        game,
         name: "餐厅",
         entities: [
-            ...items.map(item => new ItemEntity({ uid: genUid(), item })),
+            ...items.map(item => new ItemEntity({ game, item })),
         ],
     });
 }
