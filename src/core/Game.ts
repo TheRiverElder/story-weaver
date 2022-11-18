@@ -1,12 +1,11 @@
-import { Action, InteractiveGroup, Generator, Terrian, ActionParams, TerrianGenerator, ActionGroup } from "./common";
-import { LivingEntity } from "./entity/LivingEntity";
+import { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "./common";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Room } from "./Room";
 import { UniqueSet } from "./UniqueSet";
 
 export interface GameData {
     uidGenerator: Generator<number>;
-    terrianGenerator: TerrianGenerator;
+    gameInitializer: GameInitializer;
 }
 
 export interface Message {
@@ -19,7 +18,7 @@ export type GameUpdateListener = (game: Game) => void;
 export class Game implements InteractiveGroup {
 
     uidGenerator: Generator<number>;
-    terrianGenerator: TerrianGenerator;
+    gameInitializer: GameInitializer;
     rooms: UniqueSet<Room> = new UniqueSet();
     adventurer: PlayerEntity = {} as PlayerEntity;
     interactiveGroups: InteractiveGroup[] = [];
@@ -32,17 +31,16 @@ export class Game implements InteractiveGroup {
 
     constructor(data: GameData) {
         this.uidGenerator = data.uidGenerator;
-        this.terrianGenerator = data.terrianGenerator;
+        this.gameInitializer = data.gameInitializer;
     }
 
     // 初始化当前关卡
     initialize(): boolean {
         const adventurers: PlayerEntity[] = [];
 
-        const terrian: Terrian = this.terrianGenerator.generate(this);
+        this.gameInitializer.initialize(this);
         
-        for (const room of terrian.rooms) {
-            this.rooms.add(room);
+        for (const room of this.rooms.values()) {
             const adventurer = room.entities.values().find(it => it instanceof PlayerEntity);
             if (adventurer) {
                 adventurers.push(adventurer as PlayerEntity);
@@ -60,30 +58,6 @@ export class Game implements InteractiveGroup {
             return true;
         }
     }
-
-
-    runAttack(source: LivingEntity, target: LivingEntity) {
-        if (source.dexterity >= target.dexterity) {
-            this.runSingleAttack(source, target) && this.runSingleAttack(target, source);
-        } else {
-            this.runSingleAttack(target, source) && this.runSingleAttack(source, target);
-        }
-    }
-
-    // 返回该战斗是否继续
-    runSingleAttack(source: LivingEntity, target: LivingEntity): boolean {
-        this.appendMessage(`⚔ ${source.name} 攻击了 ${target.name}`);
-        if (Math.random() < target.dexterity / 100) {
-            this.appendMessage(`${target.name}躲过了${source.name}的攻击`);
-        } else {
-            const damage = Math.max(0, source.attackPower - target.defensePower);
-            this.appendMessage(`${source.name}造成${source.attackPower} - ${target.defensePower} = ${damage} 伤害`);
-            target.mutateHealth(-damage);
-        }
-        return target.health > 0;
-    }
-
-
 
     getActionGroups(params: ActionParams): ActionGroup[] {
         if (this.interactiveGroups.length > 0) return this.interactiveGroups[this.interactiveGroups.length - 1].getActionGroups(params);

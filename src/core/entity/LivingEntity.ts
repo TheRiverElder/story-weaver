@@ -1,8 +1,6 @@
 import { Action, ActionGroup, ActionParams } from "../common";
 import { Entity, EntityData } from "../Entity";
-import { Inventory } from "../inventory/Inventory";
-import { InventorySlot, SLOT_TYPE_INDEXED } from "../inventory/InventorySlot";
-import { InventorySlotType } from "../inventory/InventorySlotType";
+import { InventorySlot } from "../inventory/InventorySlot";
 import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
@@ -91,7 +89,7 @@ export abstract class LivingEntity extends Entity {
 
         const attackAction: Action = {
             text: '攻击' + this.getBrief(),
-            act: ({ game, actor }) => game.runAttack(actor, this),
+            act: ({ game, actor }) => game.appendInteravtiveGroup(new FightingTask(game.uidGenerator.generate(), game, [actor, this])),
         };
         return [{
             source: this,

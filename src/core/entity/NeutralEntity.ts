@@ -1,5 +1,5 @@
 import { Action, ActionGroup, ActionParams } from "../common";
-import { ChatTask, ChatTextFragment } from "../task/ChatTask";
+import { ChatTask } from "../task/ChatTask";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 

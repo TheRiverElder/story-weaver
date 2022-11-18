@@ -1,5 +1,4 @@
-import { Terrian, TerrianGenerator, Generator } from "../core/common";
-import { Entity } from "../core/Entity";
+import { GameInitializer, Generator } from "../core/common";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
@@ -19,14 +18,14 @@ import { Room } from "../core/Room";
 import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
 
 
-export class WhalesTombTerrianGenerator implements TerrianGenerator {
+export class WhalesTombGameInitializer implements GameInitializer {
     uidGenerator: Generator<number> = { generate: () => 0 };
 
     genUid = () => {
         return this.uidGenerator.generate();
     }
     
-    generate(game: Game): Terrian {
+    initialize(game: Game): Game {
         this.uidGenerator = game.uidGenerator;
 
         const adventurer = game.level === 1 ? new PlayerEntity({
@@ -40,6 +39,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             items: [],
             tags: ["human"],
         }) : game.adventurer;
+        adventurer.profile.setProperty(PROPERTY_TYPE_WATCH, 70);
 
 
         /**
@@ -64,6 +64,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 }),
             ],
         });
+        game.rooms.add(guestRoom217);
 
         /**
          * 走廊也是一片死寂，除了。。。一位海员，从面相上看，他已经病入膏肓了，眼球不满红血丝，黑眼圈，龟裂布满它的脸
@@ -75,6 +76,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             name: "走廊",
             entities: [crit],
         });
+        game.rooms.add(corridorRoom);
 
         // 厨房
         const kitchenRoom = new Room({
@@ -99,6 +101,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 }),
             ],
         });
+        game.rooms.add(kitchenRoom);
         // 餐厅
         const dinningRoom = new Room({
             game,
@@ -124,6 +127,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 }),
             ],
         });
+        game.rooms.add(dinningRoom);
         // 厕所
         const toiletRoom = new Room({
             game,
@@ -141,6 +145,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 }),
             ],
         });
+        game.rooms.add(toiletRoom);
         // 海水净化仓
         const purificationRoom = new Room({
             game,
@@ -158,6 +163,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 }),
             ],
         });
+        game.rooms.add(purificationRoom);
         // 动力舱
         // 船长室
         const captainRoom = new Room({
@@ -178,6 +184,7 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 }),
             ],
         });
+        game.rooms.add(captainRoom);
         // 杂项地点
 
         this.connectRooms(corridorRoom, guestRoom217, "金属门", game);
@@ -191,17 +198,8 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
 
         crit.onGetCaptainRoomDoorPair = () => captainRoomDoorPair;
 
-        return {
-            rooms: [
-                corridorRoom,
-                guestRoom217,
-                kitchenRoom,
-                dinningRoom,
-                toiletRoom,
-                purificationRoom,
-                captainRoom,
-            ],
-        };
+
+        return game;
     }
 
 
@@ -287,7 +285,7 @@ class CritNPCEntity extends NeutralEntity {
             game: this.game,
             name: `${this.name}的尸体`,
             brief: `这是船员${this.name}的尸体`,
-            maxInvestigationAmount: 3,
+            maxInvestigationAmount: 5,
             clues: clues,
         });
 

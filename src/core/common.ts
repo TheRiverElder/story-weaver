@@ -39,6 +39,6 @@ export interface Terrian {
     rooms: Room[];
 }
 
-export interface TerrianGenerator {
-    generate(game: Game): Terrian;
+export interface GameInitializer {
+    initialize(game: Game): Game;
 }

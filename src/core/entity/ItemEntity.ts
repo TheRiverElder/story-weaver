@@ -1,5 +1,5 @@
-import { Action, ActionGroup, Unique } from "../common";
-import { Entity, EntityData } from "../Entity";
+import { Action, ActionGroup } from "../common";
+import { Entity } from "../Entity";
 import { Game } from "../Game";
 import { Item } from "../Item";
 

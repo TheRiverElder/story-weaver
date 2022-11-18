@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { Game } from "../core/Game";
 import { IncrementNumberGenerator } from "../core/util/IncrementNumberGenerator";
-import { WhalesTombTerrianGenerator } from "../instance/WhalesTombTerrianGenerator";
+import { WhalesTombGameInitializer } from "../instance/WhalesTombGameInitializer";
 
 export interface StartPageProps {
     onStart: (game: Game) => void;
@@ -27,8 +27,8 @@ export class StartPage extends Component<StartPageProps, StartPageState> {
 
     onClickStart = () => {
         const uidGenerator = new IncrementNumberGenerator();
-        const terrianGenerator = new WhalesTombTerrianGenerator();
-        const game = new Game({ uidGenerator, terrianGenerator });
+        const gameInitializer = new WhalesTombGameInitializer();
+        const game = new Game({ uidGenerator, gameInitializer });
         if (game.initialize()) {
             this.props.onStart(game);
         }
