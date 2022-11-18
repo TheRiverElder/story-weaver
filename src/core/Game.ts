@@ -68,6 +68,11 @@ export class Game implements InteractiveGroup {
 
     runAction(action: Action, actor: PlayerEntity = this.adventurer) {
         action.act({ game: this, actor });
+        for (const room of this.rooms.values()) {
+            for (const entity of room.entities.values()) {
+                entity.onActed(actor, action);
+            }
+        }
         if (this.adventurer.health <= 0) {
             this.gameOverListeners.forEach(l => l(this));
         }

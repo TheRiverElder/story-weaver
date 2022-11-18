@@ -46,6 +46,8 @@ export abstract class Entity implements Unique, InteractiveGroup, Investigatable
         }
         room.addEntity(this);
     }
+
+    onActed(actor: PlayerEntity, action: Action) { }
     
 
 

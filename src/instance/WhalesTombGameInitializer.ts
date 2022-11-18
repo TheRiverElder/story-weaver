@@ -1,11 +1,12 @@
-import { GameInitializer, Generator } from "../core/common";
+import { Action, GameInitializer, Generator } from "../core/common";
+import { Entity } from "../core/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
-import { Game } from "../core/Game";
+import { Game, GameUpdateListener } from "../core/Game";
 import { Clue } from "../core/InvestigatableObject";
 import { Item } from "../core/Item";
 import { ArmorItem } from "../core/item/ArmorItem";
@@ -13,9 +14,11 @@ import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
+import { TextItem } from "../core/item/TextItem";
 import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/Room";
 import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
+import { UsingItemTask } from "../core/task/UsingItemTask";
 
 
 export class WhalesTombGameInitializer implements GameInitializer {
@@ -40,6 +43,11 @@ export class WhalesTombGameInitializer implements GameInitializer {
             tags: ["human"],
         }) : game.adventurer;
         adventurer.profile.setProperty(PROPERTY_TYPE_WATCH, 70);
+
+        const crit = this.createEntityCrit(game);
+        const captainRoomDoorLock: Lock = { locked: true };
+        const storeRoomDoorLock: Lock = { locked: true };
+        crit.onGetCaptainRoomDoorLock = () => captainRoomDoorLock;
 
 
         /**
@@ -70,7 +78,6 @@ export class WhalesTombGameInitializer implements GameInitializer {
          * 走廊也是一片死寂，除了。。。一位海员，从面相上看，他已经病入膏肓了，眼球不满红血丝，黑眼圈，龟裂布满它的脸
          * 很明显他也没有说话的力气，但是似乎还有一丝意识尚存
          */
-        const crit = this.createEntityCrit(game);
         const corridorRoom = new Room({
             game,
             name: "走廊",
@@ -133,9 +140,9 @@ export class WhalesTombGameInitializer implements GameInitializer {
             game,
             name: "厕所",
             entities: [
-                new EnemyEntity({
+                new MonsterEntity({
                     game,
-                    name: "黑色粘稠生物",
+                    name: "黑粘生物",
                     health: 5,
                     maxHealth: 5,
                     attackPower: 2,
@@ -151,9 +158,9 @@ export class WhalesTombGameInitializer implements GameInitializer {
             game,
             name: "海水净化仓",
             entities: [
-                new EnemyEntity({
+                new MonsterEntity({
                     game,
-                    name: "大号黑色粘稠生物",
+                    name: "大型黑粘生物",
                     health: 10,
                     maxHealth: 10,
                     attackPower: 2,
@@ -164,6 +171,20 @@ export class WhalesTombGameInitializer implements GameInitializer {
             ],
         });
         game.rooms.add(purificationRoom);
+        // 储藏间
+        const storeRoom = new Room({
+            game,
+            name: "储藏间",
+            entities: [
+                new ItemEntity({
+                    item: new DynamiteItem({
+                        game,
+                        name: "炸药"
+                    }),
+                }),
+            ],
+        });
+        game.rooms.add(storeRoom);
         // 动力舱
         // 船长室
         const captainRoom = new Room({
@@ -176,9 +197,15 @@ export class WhalesTombGameInitializer implements GameInitializer {
                     brief: "看来是被穿刺心脏，失血而死",
                     maxInvestigationAmount: 2,
                     clues: [
-                        createItemClue(new NormalItem({
+                        createItemClue(new TextItem({
                             game,
                             name: "船长日志",
+                            texts: [
+                                "3月3日 晴天：今天的乘客总觉得有些奇怪",
+                                "3月4日 阴天：似乎有些混种人在信奉什么异端，西往他们不要再我的船上搞事情",
+                                "3月5日 下雨：（字迹潦草）可恶，这群家伙要干什么？唯一能确定的是，不能只身前往海上，不能乘坐救生艇，更不能游泳",
+                                "3月6日 大风：（字迹十分潦草）如果上帝还有一丝怜悯，就让我和这艘船一起沉入这无底的深渊，而不复返吧！",
+                            ],
                         })),
                     ],
                 }),
@@ -193,11 +220,8 @@ export class WhalesTombGameInitializer implements GameInitializer {
 
         this.connectRooms(dinningRoom, toiletRoom, "金属门", game);
         this.connectRooms(dinningRoom, purificationRoom, "金属门", game);
-        const captainRoomDoorLock: Lock = { locked: true };
-        const captainRoomDoorPair: [DoorEntity, DoorEntity] = this.connectRooms(dinningRoom, captainRoom, "金属门", game, captainRoomDoorLock);
-
-        crit.onGetCaptainRoomDoorPair = () => captainRoomDoorPair;
-
+        this.connectRooms(dinningRoom, captainRoom, "金属门", game, captainRoomDoorLock);
+        this.connectRooms(dinningRoom, storeRoom, "金属门", game, storeRoomDoorLock);
 
         return game;
     }
@@ -262,22 +286,22 @@ export class WhalesTombGameInitializer implements GameInitializer {
 } 
 
 class CritNPCEntity extends NeutralEntity {
-    onGetCaptainRoomDoorPair: (() => [DoorEntity, DoorEntity]) | null = null;
+    onGetCaptainRoomDoorLock: (() => Lock) | null = null;
 
     onDied() {
         const clues: Clue[] = [
-            createItemClue(new NormalItem({
+            createItemClue(new FireSourceItem({
                 game: this.game,
                 name: "火柴",
             })),
             createTextClue("皮肤溃烂严重，口中还有些许带有腥味的黑色液体"),
         ];
 
-        if (this.onGetCaptainRoomDoorPair) {
+        if (this.onGetCaptainRoomDoorLock) {
             clues.push(createItemClue(new KeyItem({
                 game: this.game,
                 name: "钥匙",
-                doors: this.onGetCaptainRoomDoorPair(),
+                lock: this.onGetCaptainRoomDoorLock(),
             })));
         }
 
@@ -310,4 +334,58 @@ function createTextClue(text: string): Clue {
         discoverd: false,
         text,
     };
+}
+
+
+
+class MonsterEntity extends EnemyEntity {
+    onDied() {
+        const clue: Clue = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
+        clue.onDiscover = () => {
+            let progress = 0;
+            const listener: GameUpdateListener = () => {
+                progress += 0.03;
+                if (progress >= 1) {
+                    this.game.adventurer.health = 0;
+                    this.game.appendMessage(`你感觉身体越来越糟糕`);
+                    this.game.updateListeners.delete(listener);
+                }
+            };
+            this.game.updateListeners.add(listener);
+        };
+
+        const corpse = new SimpleEntity({
+            game: this.game,
+            name: `怪物的尸体`,
+            brief: `这是怪物的尸体`,
+            maxInvestigationAmount: 5,
+            clues: [clue],
+        });
+
+        this.room?.addEntity(corpse);
+    }
+}
+
+class DynamiteItem extends NormalItem {
+    explode() {
+        this.game.appendMessage(`随着一声巨响，船和深渊底下的怪物一起沉入了海底`);
+    }
+}
+
+class FireSourceItem extends NormalItem {
+
+    getActions(): Action[] {
+        return [{
+            text: "使用",
+            act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
+        }]
+    }
+
+    getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
+        if (!(target instanceof ItemEntity) || !(target.item instanceof DynamiteItem)) return [];
+        return [{
+            text: "引爆",
+            act: () => (target.item as DynamiteItem).explode(),
+        }];
+    }
 }
