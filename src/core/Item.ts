@@ -1,5 +1,7 @@
 import { Action, ActionParams, Unique } from "./common";
+import { Entity } from "./Entity";
 import { LivingEntity } from "./entity/LivingEntity";
+import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 
 export interface ItemData {
@@ -21,7 +23,11 @@ export abstract class Item implements Unique {
     abstract getActions(params: ActionParams): Action[];
 
     // 被装备时调用
-    abstract onEquip(entity: LivingEntity): void;
+    onEquip(entity: LivingEntity): void { }
     // 被取消装备时调用
-    abstract onUnequip(entity: LivingEntity): void;
+    onUnequip(entity: LivingEntity): void { }
+
+    getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
+        return [];
+    }
 }

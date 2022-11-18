@@ -1,15 +1,17 @@
 import { Terrian, TerrianGenerator, Generator } from "../core/common";
 import { Entity } from "../core/Entity";
-import { DoorEntity } from "../core/entity/DoorEntity";
+import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
-import { InvestigatableEntity } from "../core/entity/InvestigatableEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
-import { LivingEntity, PROPERTY_TYPE_DEXTERITY } from "../core/entity/LivingEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
+import { SimpleEntity } from "../core/entity/SimpleEntity";
 import { Game } from "../core/Game";
+import { Clue } from "../core/InvestigatableObject";
+import { Item } from "../core/Item";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
+import { KeyItem } from "../core/item/KeyItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
 import { PropertyType } from "../core/profile/PropertyType";
@@ -67,12 +69,11 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
          * 走廊也是一片死寂，除了。。。一位海员，从面相上看，他已经病入膏肓了，眼球不满红血丝，黑眼圈，龟裂布满它的脸
          * 很明显他也没有说话的力气，但是似乎还有一丝意识尚存
          */
+        const crit = this.createEntityCrit(game);
         const corridorRoom = new Room({
             game,
             name: "走廊",
-            entities: [
-                this.createEntityCrit(game),
-            ],
+            entities: [crit],
         });
 
         // 厨房
@@ -158,6 +159,25 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
             ],
         });
         // 动力舱
+        // 船长室
+        const captainRoom = new Room({
+            game,
+            name: "船长室",
+            entities: [
+                new SimpleEntity({
+                    game,
+                    name: "船长的尸体",
+                    brief: "看来是被穿刺心脏，失血而死",
+                    maxInvestigationAmount: 2,
+                    clues: [
+                        createItemClue(new NormalItem({
+                            game,
+                            name: "船长日志",
+                        })),
+                    ],
+                }),
+            ],
+        });
         // 杂项地点
 
         this.connectRooms(corridorRoom, guestRoom217, "金属门", game);
@@ -166,6 +186,10 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
 
         this.connectRooms(dinningRoom, toiletRoom, "金属门", game);
         this.connectRooms(dinningRoom, purificationRoom, "金属门", game);
+        const captainRoomDoorLock: Lock = { locked: true };
+        const captainRoomDoorPair: [DoorEntity, DoorEntity] = this.connectRooms(dinningRoom, captainRoom, "金属门", game, captainRoomDoorLock);
+
+        crit.onGetCaptainRoomDoorPair = () => captainRoomDoorPair;
 
         return {
             rooms: [
@@ -175,29 +199,32 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
                 dinningRoom,
                 toiletRoom,
                 purificationRoom,
+                captainRoom,
             ],
         };
     }
 
-    
 
-
-    connectRooms(room1: Room, room2: Room, doorName: string, game: Game, doShowtargetName: boolean = true) {
+    connectRooms(room1: Room, room2: Room, doorName: string, game: Game, lock?: Lock, doShowtargetName: boolean = true): [DoorEntity, DoorEntity] {
         const door1 = new DoorEntity({
             game,
+            lock,
             name: doorName,
             targetRoom: room2,
         });
         const door2 = new DoorEntity({
             game,
+            lock,
             name: doorName,
             targetRoom: room1,
         });
         room1.addEntity(door1);
         room2.addEntity(door2);
+
+        return [door1, door2];
     }
 
-    createEntityCrit(game: Game): Entity {
+    createEntityCrit(game: Game): CritNPCEntity {
 
         const fragments: ChatTextFragment[] = [
             new ChatTextFragment(
@@ -237,32 +264,52 @@ export class WhalesTombTerrianGenerator implements TerrianGenerator {
 } 
 
 class CritNPCEntity extends NeutralEntity {
+    onGetCaptainRoomDoorPair: (() => [DoorEntity, DoorEntity]) | null = null;
+
     onDied() {
-        const corpse = new InvestigatableEntity({
+        const clues: Clue[] = [
+            createItemClue(new NormalItem({
+                game: this.game,
+                name: "火柴",
+            })),
+            createTextClue("皮肤溃烂严重，口中还有些许带有腥味的黑色液体"),
+        ];
+
+        if (this.onGetCaptainRoomDoorPair) {
+            clues.push(createItemClue(new KeyItem({
+                game: this.game,
+                name: "钥匙",
+                doors: this.onGetCaptainRoomDoorPair(),
+            })));
+        }
+
+        const corpse = new SimpleEntity({
             game: this.game,
             name: `${this.name}的尸体`,
             brief: `这是船员${this.name}的尸体`,
-            maxInvestigationAmount: 2,
-            clues: [
-                {
-                    validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
-                    discoverd: false,
-                    text: "身上有火柴",
-                    onDiscover: (clue, entity, { game, actor }) => {
-                        actor.appendOrDropItem(new NormalItem({
-                            game,
-                            name: "火柴",
-                        }));
-                    },
-                },
-                {
-                    validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
-                    discoverd: false,
-                    text: "皮肤溃烂严重，口中还有些许带有腥味的黑色液体",
-                },
-            ],
+            maxInvestigationAmount: 3,
+            clues: clues,
         });
 
         this.room?.addEntity(corpse);
     }
+}
+
+function createItemClue(item: Item): Clue {
+    return {
+        validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
+        discoverd: false,
+        text: `身上有${item.name}`,
+        onDiscover: (clue, entity, { actor }) => {
+            actor.appendOrDropItem(item);
+        },
+    };
+}
+
+function createTextClue(text: string): Clue {
+    return {
+        validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
+        discoverd: false,
+        text,
+    };
 }
