@@ -1,6 +1,7 @@
 import { ActionGroup } from "../common";
 import { PropertyType } from "../profile/PropertyType";
 import { FightingTask, FightingActionType } from "../task/FightingTask";
+import { GameOverTask } from "../task/GameOverTask";
 import { InventoryTask } from "../task/InventoryTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
@@ -35,5 +36,9 @@ export class PlayerEntity extends LivingEntity {
 
     onFightEscape(entity: LivingEntity, fighting: FightingTask): FightingActionType {
         return FightingActionType.WAITING;
+    }
+
+    onDied() {
+        this.game.appendInteravtiveGroup(new GameOverTask(this.game, "你死了"));
     }
 }

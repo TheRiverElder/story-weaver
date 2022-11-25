@@ -16,7 +16,7 @@ export abstract class GenericInventory implements Inventory {
 
 
     count(): number {
-        return this.indexedSlots.length;
+        return this.indexedSlots.filter(slot => !!slot.get()).length;
     }
 
     getIndexedSlots(): InventorySlot[] {

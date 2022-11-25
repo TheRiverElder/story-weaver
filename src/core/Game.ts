@@ -73,24 +73,20 @@ export class Game implements InteractiveGroup {
                 entity.onActed(actor, action);
             }
         }
-        if (this.adventurer.health <= 0) {
-            this.gameOverListeners.forEach(l => l(this));
-        }
         this.notifyUpdate();
     }
 
     notifyUpdate() {
+        // console.log("notifyUpdate");
         this.updateListeners.forEach(it => it(this));
     }
 
     appendInteravtiveGroup(interactiveGroup: InteractiveGroup) {
         this.interactiveGroups.push(interactiveGroup);
-        this.notifyUpdate();
     }
 
     removeInteravtiveGroup(interactiveGroup: InteractiveGroup) {
         this.interactiveGroups = this.interactiveGroups.filter(e => e !== interactiveGroup);
-        this.notifyUpdate();
     }
 
     appendMessage(message: Message | string) {
@@ -100,6 +96,5 @@ export class Game implements InteractiveGroup {
         } : message;
         
         this.messages.push(msg);
-        this.notifyUpdate();
     }
 }

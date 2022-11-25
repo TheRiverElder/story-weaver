@@ -22,6 +22,7 @@ import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/Room";
 import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
 import { simpleCheck } from "../core/task/FightingTask";
+import { GameOverTask } from "../core/task/GameOverTask";
 import { UsingItemTask } from "../core/task/UsingItemTask";
 
 
@@ -45,7 +46,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
             maxHealth: 11,
             attackPower: 2,
             defensePower: 0,
-            dexterity: 60,
+            dexterity: 100,
             tags: ["human"],
         }) : game.adventurer;
         adventurer.profile.setProperty(PROPERTY_TYPE_WATCH, 70);
@@ -359,6 +360,7 @@ class CallOfAbyssBuff implements Buff {
     progress: number = 0;
     step: number = 0;
     private readonly listener = () => {
+        // console.log("CallOfAbyssBuff listener");
         this.progress += this.step;
         if (this.progress >= 1) {
             this.game.adventurer.health--;
@@ -372,7 +374,7 @@ class CallOfAbyssBuff implements Buff {
         this.game = game;
         this.level = level;
         this.progress = progress;
-        this.step = progress;
+        this.step = step;
     }
 
     onAdd() {
@@ -394,8 +396,8 @@ class CallOfAbyssBuff implements Buff {
 
     effect(value: number, type: PropertyType, profile: Profile): number {
         switch (type) {
-            case PROPERTY_TYPE_DEFENSE: return Math.min(0, value - this.level);
-            case PROPERTY_TYPE_ATTACK: return Math.min(0, value - this.level);
+            case PROPERTY_TYPE_DEFENSE: return Math.max(0, value - this.level);
+            case PROPERTY_TYPE_ATTACK: return Math.max(0, value - this.level);
             default: return value;
         } 
     }
@@ -409,10 +411,8 @@ class MonsterEntity extends EnemyEntity {
         if (!corpse) return null;
 
         const clue: Clue = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
-        clue.onDiscover = (clue, entity) => {
-            if (entity instanceof LivingEntity) {
-                entity.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
-            }
+        clue.onDiscover = (clue, entity, { actor }) => {
+            actor.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
         };
 
         corpse.clues.push(clue);
@@ -482,7 +482,7 @@ class OldBookItem extends TextItem {
                         this.game.appendMessage(`却没想到，这段咒语是用来召唤深渊母体的，`);
                         this.game.appendMessage(`随着一阵阵狂浪的逼近，你的心跳愈发紧迫，`);
                         this.game.appendMessage(`在最后吞噬船只的咆哮声出现之前，你就已经在极度的恐惧中放弃了生存的思考`);
-                        actor.health = 0;
+                        this.game.appendInteravtiveGroup(new GameOverTask(this.game, "惊惧而终"));
                     },
                 },
                 burn,

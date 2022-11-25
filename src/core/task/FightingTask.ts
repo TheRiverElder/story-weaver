@@ -190,7 +190,7 @@ export class FightingTask implements Unique, InteractiveGroup {
         if (!this.checkCanAct(source)) return;
         this.skipCounter = 0;
         
-        const sourceFirst: boolean = simpleCheck(source.dexterity) && (source.dexterity >= target.dexterity || !simpleCheck(target.dexterity));
+        const sourceFirst: boolean = !simpleCheck(target.dexterity) || simpleCheck(source.dexterity);
         let prefix = sourceFirst ? `🗡${source.name} 对 ${target.name} 发起攻击：` : `🗡${source.name} 进攻 ${target.name} 失败，反被回击：`;
         
         if (sourceFirst) {
