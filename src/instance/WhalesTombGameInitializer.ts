@@ -17,11 +17,12 @@ import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
-import { TextItem } from "../core/item/TextItem";
+import { TextItem, TextItemData } from "../core/item/TextItem";
 import { Profile } from "../core/profile/Profile";
 import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/Room";
 import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
+import { simpleCheck } from "../core/task/FightingTask";
 import { UsingItemTask } from "../core/task/UsingItemTask";
 
 
@@ -226,6 +227,23 @@ export class WhalesTombGameInitializer implements GameInitializer {
                         })),
                     ],
                 }),
+                new ItemEntity({item: new MeleeWeapon({
+                    game,
+                    name: "信号枪",
+                    damage: 5,
+                })}),
+                new ItemEntity({item: new OldBookItem({
+                    game,
+                    name: "残破的古卷",
+                    skill: PROPERTY_TYPE_READ,
+                    maxDecryptAmount: 1,
+                    texts: [
+                        "它来自一本有关深渊海洋恶魔的书",
+                        "其中一页记载了召唤与退去这种恶魔的咒语，",
+                        "但是唯一能解读出来的文字并不能确是用来召唤还是驱退它的：",
+                        "MI REEM REKIRTNEZXE IEB EMAN SED ULUTC RUF RIM NEMMOK EIS",
+                    ],
+                })}),
             ],
         });
         game.rooms.add(captainRoom);
@@ -428,5 +446,50 @@ class FireSourceItem extends NormalItem {
             text: "引爆",
             act: () => item.explode(),
         }];
+    }
+}
+
+interface OldBookItemData extends TextItemData {
+    skill: PropertyType; 
+    maxDecryptAmount: number;
+}
+
+const PROPERTY_TYPE_READ = new PropertyType("read", "阅读", 20);
+
+class OldBookItem extends TextItem {
+    skill: PropertyType; 
+    decrypted: boolean = false;
+    decryptCounter: number = 0;
+    maxDecryptAmount: number;
+
+    constructor(data: OldBookItemData) {
+        super(data);
+        this.skill = data.skill;
+        this.maxDecryptAmount = data.maxDecryptAmount;
+    }
+
+    getActions(): Action[] {
+        if (this.decrypted) return super.getActions();
+        else return [];
+    }
+
+    getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
+        const actions = super.getUsageActions(actor, target);
+        
+        if (target === null && !this.decrypted && this.decryptCounter < this.maxDecryptAmount) {
+            actions.push({
+                text: `尝试破译（${this.skill}）`,
+                act: ({ actor }) => {
+                    if (simpleCheck(actor.getProperty(this.skill))) {
+                        this.game.appendMessage(`❗你从这些文字中窥探到一些信息：`);
+                        this.texts.forEach(line => this.game.appendMessage(line));
+                    } else {
+                        this.game.appendMessage(`什么也没破解出来`);
+                    }
+                    this.decryptCounter++;
+                },
+            });
+        }
+        return actions;
     }
 }
