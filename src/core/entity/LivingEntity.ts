@@ -1,14 +1,17 @@
+import { Buff } from "../buff/Buff";
+import { BuffSet } from "../buff/BuffSet";
 import { Action, ActionGroup, ActionParams } from "../common";
 import { Entity, EntityData } from "../Entity";
-import { GameUpdateListener } from "../Game";
 import { InventorySlot } from "../inventory/InventorySlot";
-import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
-import { Clue, createItemClue, createTextClue } from "../InvestigatableObject";
+import { LivingEntityInventory, SLOT_TYPE_ARMOR, SLOT_TYPE_WEAPON } from "../inventory/LivingEntityInventory";
+import { createItemClue } from "../InvestigatableObject";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
 import { Profile } from "../profile/Profile";
+import { ProfileEffector } from "../profile/ProfileEffector";
 import { PropertyType } from "../profile/PropertyType";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
+import { filterNotNull } from "../util/lang";
 import { ItemEntity } from "./ItemEntity";
 import { SimpleEntity } from "./SimpleEntity";
 
@@ -22,6 +25,7 @@ export interface LivingEntityData extends EntityData {
     armor?: Item;
     items?: Item[]; 
     tags?: string[]; 
+    buffs?: Buff[]; 
 }
 
 export const PROPERTY_TYPE_HEALTH = new PropertyType("health", "生命", 0);
@@ -35,6 +39,7 @@ export abstract class LivingEntity extends Entity {
     public readonly inventory: LivingEntityInventory;
     public readonly profile = new GenericProfile();
     public readonly tags = new Set<string>();
+    public readonly buffs = new BuffSet();
 
     get alive(): boolean { return this.health > 0; }
 
@@ -44,13 +49,13 @@ export abstract class LivingEntity extends Entity {
     get maxHealth(): number { return this.profile.getPropertyRange(PROPERTY_TYPE_HEALTH)[1]; }
     set maxHealth(value: number) { this.profile.setPropertyRange(PROPERTY_TYPE_HEALTH, [0, value]); }
 
-    get attackPower(): number { return this.profile.getProperty(PROPERTY_TYPE_ATTACK); }
+    get attackPower(): number { return this.getProperty(PROPERTY_TYPE_ATTACK); }
     set attackPower(value: number) { this.profile.setProperty(PROPERTY_TYPE_ATTACK, value); }
 
-    get defensePower(): number {return this.profile.getProperty(PROPERTY_TYPE_DEFENSE); }
+    get defensePower(): number {return this.getProperty(PROPERTY_TYPE_DEFENSE); }
     set defensePower(value: number) {this.profile.setProperty(PROPERTY_TYPE_DEFENSE, value); }
 
-    get dexterity(): number { return this.profile.getProperty(PROPERTY_TYPE_DEXTERITY); }
+    get dexterity(): number { return this.getProperty(PROPERTY_TYPE_DEXTERITY); }
     set dexterity(value: number) { this.profile.setProperty(PROPERTY_TYPE_DEXTERITY, value); }
 
     get weapon(): Item | null { return this.inventory.weaponSlot.item; };
@@ -70,21 +75,12 @@ export abstract class LivingEntity extends Entity {
         this.profile.listeners.add(this.onPropertyChanged.bind(this));
 
         this.inventory = new LivingEntityInventory(this, data.items);
-        
-        if (data.weapon) {
-            this.equipWeapon(data.weapon);
-        }
-        if (data.armor) {
-            this.equipArmor(data.armor);
-        }
-        if (data.items) {
-            data.items.forEach(item => this.inventory.addItem(item));
-        }
-        if (data.tags) {
-            data.tags.forEach(tag => this.tags.add(tag));
-        }
-        
+        this.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.set(data.weapon || null, true);
+        this.inventory.getSpecialSlot(SLOT_TYPE_ARMOR)?.set(data.armor || null, true);
         this.inventory.listeners.add(this.onInventoryChanged.bind(this));
+
+        data.tags?.forEach(tag => this.tags.add(tag));
+        data.buffs?.forEach(buff => this.buffs.add(buff));
     }
 
     getActionGroups(params: ActionParams): ActionGroup[] {
@@ -203,5 +199,24 @@ export abstract class LivingEntity extends Entity {
             .filter(item => !!item)
             .map(item => createItemClue(item!!)),
         });
+    }
+
+    getProperty(type: PropertyType): number {
+        return this.getEffectors(type).reduce((value, effector) => effector.effect(value, type, this.profile), this.profile.getProperty(type));
+    }
+
+    getEffectors(type: PropertyType): ProfileEffector[] {
+        return [
+            ...this.getIdenticalEffectors(type),
+            ...this.buffs.values(),
+        ];
+    }
+
+    getIdenticalEffectors(type: PropertyType): ProfileEffector[] {
+        switch (type) {
+            case PROPERTY_TYPE_ATTACK: return filterNotNull([this.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.item]);
+            case PROPERTY_TYPE_DEFENSE: return filterNotNull([this.inventory.getSpecialSlot(SLOT_TYPE_ARMOR)?.item]);
+            default: return [];
+        }
     }
 }

@@ -26,10 +26,12 @@ export class InventorySlot {
         return this.item;
     }
 
-    set(item: Item | null): Item | null {
+    set(item: Item | null, silent: boolean = false): Item | null {
         const old = this.item;
         this.item = item;
-        this.inventory.listeners.forEach(l => l(this, old));
+        if (!silent) {
+            this.inventory.listeners.forEach(l => l(this, old));
+        }
         return old;
     }
 }

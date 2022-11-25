@@ -1,8 +1,11 @@
+import { Buff } from "../core/buff/Buff";
+import { BuffType } from "../core/buff/BuffType";
 import { Action, GameInitializer, Generator } from "../core/common";
 import { Entity } from "../core/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
+import { LivingEntity, PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE } from "../core/entity/LivingEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
@@ -15,6 +18,7 @@ import { KeyItem } from "../core/item/KeyItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
 import { TextItem } from "../core/item/TextItem";
+import { Profile } from "../core/profile/Profile";
 import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/Room";
 import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
@@ -282,6 +286,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
             defensePower: 0,
             dexterity: 60,
             tags: ["human", "crew"],
+            items: [new FireSourceItem({ game, name: "火柴" })],
             chatProvider: () => new ChatTask(this.genUid(), game, fragments, "start"),
         });
 
@@ -292,12 +297,12 @@ export class WhalesTombGameInitializer implements GameInitializer {
 class CritNPCEntity extends NeutralEntity {
     onGetCaptainRoomDoorLock: (() => Lock) | null = null;
 
-    onDied() {
+    createCorpse() {
+
+        const corpse = super.createCorpse();
+        if (!corpse) return null;
+
         const clues: Clue[] = [
-            createItemClue(new FireSourceItem({
-                game: this.game,
-                name: "火柴",
-            })),
             createTextClue("皮肤溃烂严重，口中还有些许带有腥味的黑色液体"),
         ];
 
@@ -307,20 +312,68 @@ class CritNPCEntity extends NeutralEntity {
                 name: "钥匙",
                 lock: this.onGetCaptainRoomDoorLock(),
             })));
+
+            corpse.clues.push(...clues);
+    
+            return corpse;
         }
 
-        const corpse = new SimpleEntity({
-            game: this.game,
-            name: `${this.name}的尸体`,
-            brief: `这是船员${this.name}的尸体`,
-            maxInvestigationAmount: 5,
-            clues: clues,
-        });
+        return corpse;
 
-        this.room?.addEntity(corpse);
     }
 }
 
+const BUFF_TYPE_CALL_OF_ABYSS = new BuffType("call_of_abyss", "深渊之召");
+
+class CallOfAbyssBuff implements Buff {
+    readonly type: BuffType = BUFF_TYPE_CALL_OF_ABYSS;
+
+    readonly game: Game;
+    level: number = 1;
+    progress: number = 0;
+    step: number = 0;
+    private readonly listener = () => {
+        this.progress += this.step;
+        if (this.progress >= 1) {
+            this.game.adventurer.health--;
+            this.level++;
+            this.game.appendMessage(`你感觉身体越来越糟糕`);
+            this.progress = 0;
+        }
+    };
+
+    constructor(game: Game, level: number = 1, progress: number = 0, step: number = 0.01) {
+        this.game = game;
+        this.level = level;
+        this.progress = progress;
+        this.step = progress;
+    }
+
+    onAdd() {
+        this.game.updateListeners.add(this.listener);
+    }
+
+    onRestore() {
+        this.game.updateListeners.add(this.listener);
+    }
+
+    onRemove() {
+        this.game.updateListeners.delete(this.listener);
+    }
+
+    onMerge(other: Buff): Buff {
+        if (!(other instanceof CallOfAbyssBuff)) return this;
+        return this.level >= other.level ? this : other;
+    }
+
+    effect(value: number, type: PropertyType, profile: Profile): number {
+        switch (type) {
+            case PROPERTY_TYPE_DEFENSE: return Math.min(0, value - this.level);
+            case PROPERTY_TYPE_ATTACK: return Math.min(0, value - this.level);
+            default: return value;
+        } 
+    }
+}
 
 
 class MonsterEntity extends EnemyEntity {
@@ -330,17 +383,10 @@ class MonsterEntity extends EnemyEntity {
         if (!corpse) return null;
 
         const clue: Clue = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
-        clue.onDiscover = () => {
-            let progress = 0;
-            const listener: GameUpdateListener = () => {
-                progress += 0.03;
-                if (progress >= 1) {
-                    this.game.adventurer.health = 0;
-                    this.game.appendMessage(`你感觉身体越来越糟糕`);
-                    this.game.updateListeners.delete(listener);
-                }
-            };
-            this.game.updateListeners.add(listener);
+        clue.onDiscover = (clue, entity) => {
+            if (entity instanceof LivingEntity) {
+                entity.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
+            }
         };
 
         corpse.clues.push(clue);
