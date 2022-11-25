@@ -1,7 +1,7 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { Entity } from "./Entity";
 import { Game } from "./Game";
-import { UniqueSet } from "./UniqueSet";
+import { UniqueSet } from "./util/UniqueSet";
 
 export interface RoomData {
     name: string;

@@ -1,5 +1,6 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
 import { Item } from "../Item";
+import { filterNotNull } from "../util/lang";
 
 export class UsingItemTask implements Unique, InteractiveGroup {
 
@@ -27,11 +28,15 @@ export class UsingItemTask implements Unique, InteractiveGroup {
             ],
         };
 
-        const itemGroups: ActionGroup[] = Array.from(params.actor.room?.entities.values() || []).map(entity => ({
-            source: this,
-            title: entity.name,
-            description: entity.getBrief(),
-            actions: this.item.getUsageActions(actor, entity),
+        const itemGroups: ActionGroup[] = filterNotNull(Array.from(params.actor.room?.entities.values() || []).map(entity => {
+            const actions = this.item.getUsageActions(actor, entity);
+            if (actions && actions.length > 0) return {
+                source: this,
+                title: entity.name,
+                description: entity.getBrief(),
+                actions,
+            };
+            return null;
         }));
 
         return [

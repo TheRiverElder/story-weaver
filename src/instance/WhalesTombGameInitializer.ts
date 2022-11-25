@@ -73,7 +73,16 @@ export class WhalesTombGameInitializer implements GameInitializer {
             dexterity: 60,
             tags: ["monster"],
         });
-        const motherMonster = null;
+        const motherMonster = new MonsterEntity({
+            game,
+            name: "母体",
+            health: 80,
+            maxHealth: 80,
+            attackPower: 5,
+            defensePower: 8,
+            dexterity: 50,
+            tags: ["monster", "monster_mother"],
+        });
 
 
         /**
@@ -411,10 +420,13 @@ class FireSourceItem extends NormalItem {
     }
 
     getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
-        if (!(target instanceof ItemEntity) || !(target.item instanceof DynamiteItem)) return [];
+        if (!(target instanceof ItemEntity)) return [];
+        const item = target.item;
+        if (!(item instanceof DynamiteItem)) return [];
+
         return [{
             text: "引爆",
-            act: () => (target.item as DynamiteItem).explode(),
+            act: () => item.explode(),
         }];
     }
 }

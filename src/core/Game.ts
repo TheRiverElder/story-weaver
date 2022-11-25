@@ -1,7 +1,7 @@
 import { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "./common";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Room } from "./Room";
-import { UniqueSet } from "./UniqueSet";
+import { UniqueSet } from "./util/UniqueSet";
 
 export interface GameData {
     uidGenerator: Generator<number>;
