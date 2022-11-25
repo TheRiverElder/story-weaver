@@ -9,9 +9,8 @@ import { LivingEntity, PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE } from "../co
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
-import { Game, GameUpdateListener } from "../core/Game";
+import { Game } from "../core/Game";
 import { Clue, createItemClue, createTextClue } from "../core/InvestigatableObject";
-import { Item } from "../core/Item";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
@@ -236,7 +235,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
                     game,
                     name: "残破的古卷",
                     skill: PROPERTY_TYPE_READ,
-                    maxDecryptAmount: 1,
+                    maxDecryptAmount: 5,
                     texts: [
                         "它来自一本有关深渊海洋恶魔的书",
                         "其中一页记载了召唤与退去这种恶魔的咒语，",
@@ -469,27 +468,42 @@ class OldBookItem extends TextItem {
     }
 
     getActions(): Action[] {
-        if (this.decrypted) return super.getActions();
-        else return [];
-    }
-
-    getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
-        const actions = super.getUsageActions(actor, target);
-        
-        if (target === null && !this.decrypted && this.decryptCounter < this.maxDecryptAmount) {
-            actions.push({
-                text: `尝试破译（${this.skill}）`,
-                act: ({ actor }) => {
-                    if (simpleCheck(actor.getProperty(this.skill))) {
-                        this.game.appendMessage(`❗你从这些文字中窥探到一些信息：`);
-                        this.texts.forEach(line => this.game.appendMessage(line));
-                    } else {
-                        this.game.appendMessage(`什么也没破解出来`);
-                    }
-                    this.decryptCounter++;
-                },
-            });
+        const burn: Action = {
+            text: '扔掉',
+            act: ({ actor }) => actor.inventory.remove(this),
         }
-        return actions;
+        if (this.decrypted) {
+            return [
+                ...super.getActions(),
+                {
+                    text: `使用咒语`,
+                    act: ({ actor }) => {
+                        this.game.appendMessage(`你大声念出了咒语`);
+                        this.game.appendMessage(`却没想到，这段咒语是用来召唤深渊母体的，`);
+                        this.game.appendMessage(`随着一阵阵狂浪的逼近，你的心跳愈发紧迫，`);
+                        this.game.appendMessage(`在最后吞噬船只的咆哮声出现之前，你就已经在极度的恐惧中放弃了生存的思考`);
+                        actor.health = 0;
+                    },
+                },
+                burn,
+            ];
+        } else if (this.decryptCounter < this.maxDecryptAmount) {
+            return [
+                {
+                    text: `尝试破译（${this.skill.name}）`,
+                    act: ({ actor }) => {
+                        if (simpleCheck(actor.getProperty(this.skill))) {
+                            this.decrypted = true;
+                            this.game.appendMessage(`❗你从这些文字中窥探到一些信息：`);
+                            this.texts.forEach(line => this.game.appendMessage(line));
+                        } else {
+                            this.game.appendMessage(`什么也没破解出来`);
+                        }
+                        this.decryptCounter++;
+                    },
+                },
+                burn,
+            ];
+        } else return [burn];
     }
 }

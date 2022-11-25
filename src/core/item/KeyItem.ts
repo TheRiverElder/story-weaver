@@ -37,7 +37,11 @@ export class KeyItem extends NormalItem {
             text: door.lock.locked ? "解锁" : "上锁",
             act: () => {
                 if (!door.lock) return;
-                door.lock.locked = !door.lock.locked;
+                const previous = door.lock.locked;
+                if (door.lock === this.lock) {
+                    door.lock.locked = !door.lock.locked;
+                }
+                this.game.appendMessage(`${previous ? "解锁" : "上锁"}${previous === door.lock.locked ? "失败" : "成功"}`);
             },
         }]
     }

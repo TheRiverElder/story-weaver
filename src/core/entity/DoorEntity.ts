@@ -47,7 +47,9 @@ export class DoorEntity extends Entity {
                     const message = `以${damage}点生命为代价，` + (succeeded ? "撞开了门" : "也没把门撞开");
                     this.game.appendMessage(message);
                     actor.health -= damage;
-                    this.lock.locked = false;
+                    if (succeeded) {
+                        this.lock.locked = false;
+                    }
                 },
             };
         }

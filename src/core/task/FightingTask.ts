@@ -123,7 +123,10 @@ export class FightingTask implements Unique, InteractiveGroup {
 
         while (this.escapingIndex < this.participants.length && !this.escapingFinished) {
             const participant = this.participants[this.escapingIndex];
-            if (participant.removed || participant.entity === this.escapingParticipant.entity) continue;
+            if (participant.removed || participant.entity === this.escapingParticipant.entity) {
+                this.escapingIndex++;
+                continue;
+            }
 
             this.pendingParticipant = participant;
             const actiontype = participant.entity.onFightEscape(this.escapingParticipant.entity, this);
@@ -153,7 +156,7 @@ export class FightingTask implements Unique, InteractiveGroup {
             this.escapingFinished = true;
         }
 
-        this.turn();
+        this.continueEscape();
     }
 
     private remove(entity: LivingEntity) {
