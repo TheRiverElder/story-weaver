@@ -1,13 +1,16 @@
 import { Action, ActionGroup, ActionParams } from "../common";
 import { Entity, EntityData } from "../Entity";
+import { GameUpdateListener } from "../Game";
 import { InventorySlot } from "../inventory/InventorySlot";
 import { LivingEntityInventory } from "../inventory/LivingEntityInventory";
+import { Clue, createItemClue, createTextClue } from "../InvestigatableObject";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
 import { Profile } from "../profile/Profile";
 import { PropertyType } from "../profile/PropertyType";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { ItemEntity } from "./ItemEntity";
+import { SimpleEntity } from "./SimpleEntity";
 
 export interface LivingEntityData extends EntityData {
     health: number;
@@ -181,6 +184,24 @@ export abstract class LivingEntity extends Entity {
     }
 
     onDied(reason?: string) {
-        
+        const corpse = this.createCorpse(reason);   
+        if (corpse && this.room) {
+            this.room.addEntity(corpse);
+        }      
+    }
+
+    createCorpse(reason?: string): Entity | null {
+        return new SimpleEntity({
+            game: this.game,
+            name: `${this.name}的尸体`,
+            brief: `这是${this.name}的尸体`,
+            maxInvestigationAmount: 5,
+            clues: [
+                ...this.inventory.getIndexedSlots(), 
+                ...this.inventory.getSpecialSlots(),
+            ].map(slot => slot.get())
+            .filter(item => !!item)
+            .map(item => createItemClue(item!!)),
+        });
     }
 }

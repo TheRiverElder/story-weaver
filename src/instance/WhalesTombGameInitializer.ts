@@ -7,7 +7,7 @@ import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
 import { Game, GameUpdateListener } from "../core/Game";
-import { Clue } from "../core/InvestigatableObject";
+import { Clue, createItemClue, createTextClue } from "../core/InvestigatableObject";
 import { Item } from "../core/Item";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
@@ -31,6 +31,9 @@ export class WhalesTombGameInitializer implements GameInitializer {
     initialize(game: Game): Game {
         this.uidGenerator = game.uidGenerator;
 
+        const captainRoomDoorLock: Lock = { locked: true };
+        const storeRoomDoorLock: Lock = { locked: true };
+
         const adventurer = game.level === 1 ? new PlayerEntity({
             game,
             name: 'Jack',
@@ -39,15 +42,34 @@ export class WhalesTombGameInitializer implements GameInitializer {
             attackPower: 2,
             defensePower: 0,
             dexterity: 60,
-            items: [],
             tags: ["human"],
         }) : game.adventurer;
         adventurer.profile.setProperty(PROPERTY_TYPE_WATCH, 70);
 
         const crit = this.createEntityCrit(game);
-        const captainRoomDoorLock: Lock = { locked: true };
-        const storeRoomDoorLock: Lock = { locked: true };
         crit.onGetCaptainRoomDoorLock = () => captainRoomDoorLock;
+
+        const smallMonster = new MonsterEntity({
+            game,
+            name: "黑粘生物",
+            health: 5,
+            maxHealth: 5,
+            attackPower: 2,
+            defensePower: 0,
+            dexterity: 60,
+            tags: ["monster"],
+        });
+        const largeMonster = new MonsterEntity({
+            game,
+            name: "大型黑粘生物",
+            health: 10,
+            maxHealth: 10,
+            attackPower: 2,
+            defensePower: 3,
+            dexterity: 60,
+            tags: ["monster"],
+        });
+        const motherMonster = null;
 
 
         /**
@@ -75,7 +97,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
         game.rooms.add(guestRoom217);
 
         /**
-         * 走廊也是一片死寂，除了。。。一位海员，从面相上看，他已经病入膏肓了，眼球不满红血丝，黑眼圈，龟裂布满它的脸
+         * 走廊也是一片死寂，除了。。。一位海员，从面相上看，他已经病入膏肓了，眼球布满红血丝，黑眼圈，龟裂布满它的脸
          * 很明显他也没有说话的力气，但是似乎还有一丝意识尚存
          */
         const corridorRoom = new Room({
@@ -140,16 +162,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
             game,
             name: "厕所",
             entities: [
-                new MonsterEntity({
-                    game,
-                    name: "黑粘生物",
-                    health: 5,
-                    maxHealth: 5,
-                    attackPower: 2,
-                    defensePower: 0,
-                    dexterity: 60,
-                    tags: ["monster"],
-                }),
+                smallMonster,
             ],
         });
         game.rooms.add(toiletRoom);
@@ -158,16 +171,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
             game,
             name: "海水净化仓",
             entities: [
-                new MonsterEntity({
-                    game,
-                    name: "大型黑粘生物",
-                    health: 10,
-                    maxHealth: 10,
-                    attackPower: 2,
-                    defensePower: 3,
-                    dexterity: 60,
-                    tags: ["monster"],
-                }),
+                largeMonster,
             ],
         });
         game.rooms.add(purificationRoom);
@@ -317,29 +321,14 @@ class CritNPCEntity extends NeutralEntity {
     }
 }
 
-function createItemClue(item: Item): Clue {
-    return {
-        validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
-        discoverd: false,
-        text: `身上有${item.name}`,
-        onDiscover: (clue, entity, { actor }) => {
-            actor.appendOrDropItem(item);
-        },
-    };
-}
-
-function createTextClue(text: string): Clue {
-    return {
-        validSkills: new Set<PropertyType>([PROPERTY_TYPE_WATCH]),
-        discoverd: false,
-        text,
-    };
-}
-
 
 
 class MonsterEntity extends EnemyEntity {
-    onDied() {
+    createCorpse() {
+
+        const corpse = super.createCorpse();
+        if (!corpse) return null;
+
         const clue: Clue = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
         clue.onDiscover = () => {
             let progress = 0;
@@ -354,15 +343,9 @@ class MonsterEntity extends EnemyEntity {
             this.game.updateListeners.add(listener);
         };
 
-        const corpse = new SimpleEntity({
-            game: this.game,
-            name: `怪物的尸体`,
-            brief: `这是怪物的尸体`,
-            maxInvestigationAmount: 5,
-            clues: [clue],
-        });
+        corpse.clues.push(clue);
 
-        this.room?.addEntity(corpse);
+        return corpse;
     }
 }
 
