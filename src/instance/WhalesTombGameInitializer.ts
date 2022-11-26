@@ -1,6 +1,6 @@
 import { Buff } from "../core/buff/Buff";
 import { BuffType } from "../core/buff/BuffType";
-import { Action, GameInitializer, Generator } from "../core/common";
+import { Action, ActionParams, GameInitializer, Generator } from "../core/common";
 import { Entity } from "../core/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
@@ -14,7 +14,7 @@ import { Clue, createItemClue, createTextClue } from "../core/InvestigatableObje
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
-import { MeleeWeapon } from "../core/item/MeleeWeapon";
+import { MeleeWeapon, MeleeWeaponData } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
 import { TextItem, TextItemData } from "../core/item/TextItem";
 import { Profile } from "../core/profile/Profile";
@@ -203,6 +203,19 @@ export class WhalesTombGameInitializer implements GameInitializer {
             ],
         });
         game.rooms.add(storeRoom);
+        // 甲板
+        const deckRoom = new Room({
+            game,
+            name: "甲板",
+            entities: [
+                new BoatEntity({
+                    game,
+                    name: "救生艇",
+                    brief: "一艘木制的救生艇，看着挺结实",
+                }),
+            ],
+        });
+        game.rooms.add(deckRoom);
         // 动力舱
         // 船长室
         const captainRoom = new Room({
@@ -227,7 +240,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
                         })),
                     ],
                 }),
-                new ItemEntity({item: new MeleeWeapon({
+                new ItemEntity({item: new SignalPistolItem({
                     game,
                     name: "信号枪",
                     damage: 5,
@@ -252,11 +265,13 @@ export class WhalesTombGameInitializer implements GameInitializer {
         this.connectRooms(corridorRoom, guestRoom217, "金属门", game);
         this.connectRooms(corridorRoom, kitchenRoom, "金属门", game);
         this.connectRooms(corridorRoom, dinningRoom, "木门框", game);
+        this.connectRooms(corridorRoom, deckRoom, "大门", game);
 
         this.connectRooms(dinningRoom, toiletRoom, "金属门", game);
         this.connectRooms(dinningRoom, purificationRoom, "金属门", game);
         this.connectRooms(dinningRoom, captainRoom, "金属门", game, captainRoomDoorLock);
         this.connectRooms(dinningRoom, storeRoom, "金属门", game, storeRoomDoorLock);
+        this.connectRooms(dinningRoom, deckRoom, "大门", game);
 
         return game;
     }
@@ -505,5 +520,48 @@ class OldBookItem extends TextItem {
                 burn,
             ];
         } else return [burn];
+    }
+}
+
+class SignalPistolItem extends MeleeWeapon {
+
+    getActions(params: ActionParams): Action[] {
+        return super.getActions(params).concat({
+            text: "发射求救信号",
+            act: () => {
+                this.game.appendMessage(`若干秒的火光转瞬即逝`);
+                this.game.appendMessage(`你在船上焦急地等待`);
+                this.game.appendMessage(`很庆幸，在几十分钟后`);
+                this.game.appendMessage(`一艘轮船的探照灯找到了你的脸上`);
+                this.game.appendMessage(`终于，你获救了`);
+                this.game.appendInteravtiveGroup(new GameOverTask(this.game, "被其它船只救走了"));
+            },
+        });
+    }
+}
+
+class BoatEntity extends SimpleEntity {
+    getActionGroups(params: ActionParams) {
+        const groups = super.getActionGroups(params);
+        const action: Action = {
+            text: "坐上出逃",
+            act: () => {
+                this.game.appendMessage(`开始的一片平静让你松了一口气`);
+                this.game.appendMessage(`可是在想了一会儿后`);
+                this.game.appendMessage(`你陷入了深不见底的绝望`);
+                this.game.appendInteravtiveGroup(new GameOverTask(this.game, "I C U!"));
+            },
+        };
+        if (groups.length > 0) {
+            groups[0].actions.push(action);
+        } else {
+            groups.push({
+                source: this,
+                title: this.name,
+                description: this.getBrief(),
+                actions: [action],
+            });
+        }
+        return groups;
     }
 }
