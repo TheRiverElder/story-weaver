@@ -439,6 +439,7 @@ class MonsterEntity extends EnemyEntity {
 class DynamiteItem extends NormalItem {
     explode() {
         this.game.appendMessage(`随着一声巨响，船和深渊底下的怪物一起沉入了海底`);
+        this.game.appendInteravtiveGroup(new GameOverTask(this.game, "爆炸"));
     }
 }
 
