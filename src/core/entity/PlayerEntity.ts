@@ -3,6 +3,7 @@ import { PropertyType } from "../profile/PropertyType";
 import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { GameOverTask } from "../task/GameOverTask";
 import { InventoryTask } from "../task/InventoryTask";
+import { InvestigationTask } from "../task/InvestigationTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
 
 export const PROPERTY_TYPE_WATCH = new PropertyType("watch", "观察", 20);
@@ -19,10 +20,16 @@ export class PlayerEntity extends LivingEntity {
             source: this,
             title: this.name,
             description: this.getBrief(),
-            actions: [{
-                text: "打开背包",
-                act: ({ game }) => {game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate()))},
-            }],
+            actions: [
+                {
+                    text: "打开背包",
+                    act: ({ game }) => {game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate()))},
+                },
+                {
+                    text: "调查现场",
+                    act: ({ game }) => {game.appendInteravtiveGroup(new InvestigationTask(game))},
+                },
+            ],
         }];
     }
 

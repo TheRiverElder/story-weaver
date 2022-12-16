@@ -1,21 +1,23 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { Entity } from "./Entity";
 import { Game } from "./Game";
+import { GenericInvestigatableObject, GenericInvestigatableObjectData, InvestigatableObject } from "./InvestigatableObject";
 import { UniqueSet } from "./util/UniqueSet";
 
-export interface RoomData {
+export interface RoomData extends GenericInvestigatableObjectData {
     name: string;
     game: Game;
     entities: Entity[];
 }
 
-export class Room implements Unique, InteractiveGroup {
+export class Room extends GenericInvestigatableObject implements Unique, InteractiveGroup {
     uid: number;
     game: Game;
     name: string;
     entities: UniqueSet<Entity> = new UniqueSet();
 
     constructor(data: RoomData) {
+        super(data);
         this.name = data.name;
         this.game = data.game;
         this.uid = this.game.uidGenerator.generate();
