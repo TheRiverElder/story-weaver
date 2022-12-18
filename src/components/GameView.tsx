@@ -10,6 +10,7 @@ interface GameViewProps {
  
 interface GameViewState {
     actionGroups: ActionGroup[];
+    groupIndex: number;
 }
  
 class GameView extends Component<GameViewProps, GameViewState> {
@@ -18,6 +19,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
         super(props);
         this.state = {
             actionGroups: [],
+            groupIndex: -1,
         };
     }
 
@@ -32,7 +34,10 @@ class GameView extends Component<GameViewProps, GameViewState> {
         this.props.game.gameOverListeners.delete(this.props.onReturn);
     }
 
+    programCounter = 0;
+
     update = () => {
+        this.programCounter++;
         this.setState((_, { game }) => ({ actionGroups: game.getActionGroups({ game, actor: game.adventurer }) }))
     }
 
@@ -44,7 +49,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
     private readonly messageBox = React.createRef<HTMLDivElement>();
 
-    render() { 
+    render() {
         return (
             <div className="GameView fill">
                 { this.renderTopBar() }
@@ -58,7 +63,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                     )) }
                 </main>
 
-                <div className="cards fill-x animate-flash-appear" key={ Date.now() }>
+                <div className="cards fill-x animate-flash-appear" key={ this.programCounter }>
                     { this.state.actionGroups.map(this.renderActionGroupView.bind(this)) }
                 </div>
             </div>
@@ -92,19 +97,35 @@ class GameView extends Component<GameViewProps, GameViewState> {
     }
 
     renderActionGroupView(actionGroup: ActionGroup, index: number, actionGroups: ActionGroup[]) {
+        const groupIndex = this.state.groupIndex;
         return (
-            <div className="card" key={ index }>
-                <div>
-                    <h3 className="title">{ actionGroup.title }</h3>
-                    <article>{ actionGroup.description }</article>
-                </div>
+            <div 
+                className={ "card-wrapper " + (groupIndex >= 0 && index > groupIndex ? "abdicated" : "")}
+                onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
+            >
+                <div 
+                    className="card" 
+                    key={ index } 
+                    onMouseEnter={() => this.setState(() => ({ groupIndex: index }))}
+                    onClick={() => this.setState(() => ({ groupIndex: index }))}
+                >
+                    <div className="content">
+                        <div>
+                            <h3 className="title">{ actionGroup.title }</h3>
+                            <article>{ actionGroup.description }</article>
+                        </div>
 
-                <div className="buttons fill-x">
-                    { actionGroup.actions.map(this.renderActionButton.bind(this)) }
-                </div>
+                        <div className="buttons fill-x">
+                            { actionGroup.actions.map(this.renderActionButton.bind(this)) }
+                        </div>
 
-                <div className="index">
-                    -= 第{index + 1}张 共{actionGroups.length}张 =-
+                        <div className="index">
+                            -= 第{index + 1}张 共{actionGroups.length}张 =-
+                        </div>
+                    </div>
+                    <div className="small-title">
+                        <span>{ actionGroup.title }</span>
+                    </div>
                 </div>
             </div>
         );
