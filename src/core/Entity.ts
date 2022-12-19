@@ -2,9 +2,7 @@ import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./c
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Clue, GenericInvestigatableObject, GenericInvestigatableObjectData } from "./InvestigatableObject";
-import { PropertyType } from "./profile/PropertyType";
 import { Room } from "./Room";
-import { simpleCheck } from "./task/FightingTask";
 
 
 export interface EntityData extends GenericInvestigatableObjectData {

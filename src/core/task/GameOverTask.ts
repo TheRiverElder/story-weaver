@@ -22,6 +22,7 @@ export class GameOverTask implements Unique, InteractiveGroup {
                 text: "重来",
                 act: () => this.game.gameOverListeners.forEach(l => l(this.game)),
             }],
+            labels: ["menu"],
         }];
     }
 

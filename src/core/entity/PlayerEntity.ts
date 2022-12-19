@@ -30,6 +30,7 @@ export class PlayerEntity extends LivingEntity {
                     act: ({ game }) => {game.appendInteravtiveGroup(new InvestigationTask(game))},
                 },
             ],
+            labels: ["player-entity"],
         }];
     }
 

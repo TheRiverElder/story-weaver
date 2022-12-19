@@ -41,6 +41,7 @@ export class NeutralEntity extends LivingEntity {
             title: this.name,
             description: this.getBrief(),
             actions,
+            labels: ["living-entity"],
         }];
     }
 

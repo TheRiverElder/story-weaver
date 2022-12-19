@@ -38,6 +38,7 @@ export class ItemEntity extends Entity {
             title: this.name,
             description: this.getBrief(),
             actions: [pickUpAction],
+            labels: ["item-entity"],
         }];
     }
 

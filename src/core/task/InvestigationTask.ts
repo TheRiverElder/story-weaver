@@ -1,5 +1,4 @@
 import { Unique, InteractiveGroup, ActionGroup, ActionParams, Action } from "../common";
-import { Entity } from "../Entity";
 import { PlayerEntity, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../entity/PlayerEntity";
 import { Game } from "../Game";
 import { InvestigatableObject } from "../InvestigatableObject";
@@ -29,6 +28,7 @@ export class InvestigationTask implements Unique, InteractiveGroup {
                     act: (params: ActionParams) => this.game.removeInteravtiveGroup(this),
                 },
             ],
+            labels: ["menu"],
         };
 
         return [

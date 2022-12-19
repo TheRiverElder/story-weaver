@@ -23,6 +23,7 @@ export interface ActionGroup {
     title: string;
     description: string;
     actions: Action[];
+    labels?: string[],
 };
 
 export interface InteractiveGroup {

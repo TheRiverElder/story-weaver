@@ -286,6 +286,7 @@ export class FightingTask implements Unique, InteractiveGroup {
                     act: ({ game }) => game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate())),
                 },
             ],
+            labels: ["menu"],
         };
 
         const itemGroups: ActionGroup[] = [];

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
 import { Game } from "../core/Game";
 import "./GameView.css";
@@ -38,7 +38,10 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
     update = () => {
         this.programCounter++;
-        this.setState((_, { game }) => ({ actionGroups: game.getActionGroups({ game, actor: game.adventurer }) }))
+        this.setState((_, { game }) => ({ 
+            actionGroups: game.getActionGroups({ game, actor: game.adventurer }),
+            groupIndex: -1,
+        }));
     }
 
     componentDidUpdate() {
@@ -63,7 +66,12 @@ class GameView extends Component<GameViewProps, GameViewState> {
                     )) }
                 </main>
 
-                <div className="cards fill-x animate-flash-appear" key={ this.programCounter }>
+                <div 
+                    className="cards fill-x animate-flash-appear" key={ this.programCounter }
+                    onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
+                    // onTouchEnd={() => this.setState(() => ({ groupIndex: -1 }))}
+                    // onBlur={() => this.setState(() => ({ groupIndex: -1 }))}
+                >
                     { this.state.actionGroups.map(this.renderActionGroupView.bind(this)) }
                 </div>
             </div>
@@ -101,13 +109,13 @@ class GameView extends Component<GameViewProps, GameViewState> {
         return (
             <div 
                 className={ "card-wrapper " + (groupIndex >= 0 && index > groupIndex ? "abdicated" : "")}
-                onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
             >
                 <div 
-                    className="card" 
+                    className={ "card " + (actionGroup.labels?.join(' ') || "empty") } 
                     key={ index } 
-                    onMouseEnter={() => this.setState(() => ({ groupIndex: index }))}
-                    onClick={() => this.setState(() => ({ groupIndex: index }))}
+                    // onMouseDown={() => this.setState(() => ({ groupIndex: index }))}
+                    // onTouchStart={() => this.setState(() => ({ groupIndex: index }))}
+                    onClick={event => this.onSelectGroup(event, index)}
                 >
                     <div className="content">
                         <div>
@@ -120,7 +128,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                         </div>
 
                         <div className="index">
-                            -= 第{index + 1}张 共{actionGroups.length}张 =-
+                            -= 第{index + 1}张 / 共{actionGroups.length}张 =-
                         </div>
                     </div>
                     <div className="small-title">
@@ -136,16 +144,20 @@ class GameView extends Component<GameViewProps, GameViewState> {
             <button 
                 className={ "action-button fill-x " + (action.labels?.join(' ') || '') }
                 key={ index }
-                onClick={ this.createOnClickActionButtonListener(action) }
+                onClick={ event => this.onClickActionButton(event, action) }
             >{ action.text }</button>
         );
     }
 
-    createOnClickActionButtonListener(action: Action) {
-        return () => {
-            this.props.game.runAction(action);
-            this.forceUpdate();
-        };
+    onSelectGroup(event: MouseEvent, index: number = -1) {
+        event.stopPropagation();
+        this.setState(() => ({ groupIndex: index }));
+    }
+
+    onClickActionButton(event: MouseEvent, action: Action) {
+        event.stopPropagation();
+        this.props.game.runAction(action);
+        this.update();
     }
 }
  

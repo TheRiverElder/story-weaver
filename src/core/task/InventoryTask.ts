@@ -21,6 +21,7 @@ export class InventoryTask implements Unique, InteractiveGroup {
                     act: ({ game }) => game.removeInteravtiveGroup(this),
                 },
             ],
+            labels: ["menu"],
         };
 
         const itemGroups: ActionGroup[] = params.actor.inventory.getItems().map(item => ({
@@ -28,6 +29,7 @@ export class InventoryTask implements Unique, InteractiveGroup {
             title: item.name,
             description: "",
             actions: item.getActions(params),
+            labels: ["item"],
         }));
 
         for (const slot of actor.inventory.getSpecialSlots()) {
@@ -48,6 +50,7 @@ export class InventoryTask implements Unique, InteractiveGroup {
                         }
                     },
                 }],
+                labels: ["item"],
             });
         }
 

@@ -43,7 +43,9 @@
     padding: 0;
     margin: 0 0.5em;
     background-color: #ffffff;
-    box-shadow: #00000020 2px 2px 3px;
+    border: #ffffff solid 0.5em;
+    border-radius: 0.5em;
+    box-shadow: #00000040 0 0 0.2em;
     position: relative;
 }
 
@@ -58,10 +60,18 @@
 .GameView .cards .card-wrapper .card .small-title {
     font-family: 'MircosoftYahei';
     position: absolute;
-    left: 0.5em;
-    top: 0.3em;
+    left: 0;
+    top: 0;
     writing-mode: vertical-lr;
     opacity: 1;
+    padding: 0.5em 0.2em;
+    border-bottom-right-radius: 0.5em;
+    color: #ffffff;
+}
+
+.GameView .cards .card-wrapper .card.empty .small-title {
+    background-color: #ffffff;
+    color: #000000;
 }
 
 .GameView .cards .card-wrapper:last-child .card .small-title,
@@ -77,11 +87,13 @@
     font-size: 0.8em;
     display: flex;
     flex-direction: column;
+    pointer-events: none;
 }
 
 .GameView .cards .card-wrapper:last-child .card .content,
 .GameView .cards .card-wrapper .card:hover .content {
     opacity: 1;
+    pointer-events: all;
 }
 
 .GameView .cards .card-wrapper .card,
@@ -167,3 +179,16 @@
 .GameView .buttons button.use {
     background-color: #d1e947;
 }
+
+
+
+.GameView .card-wrapper > .card.menu { border-color: #d1e947; }
+.GameView .card-wrapper > .card.menu .small-title { background-color: #d1e947; }
+.GameView .card-wrapper > .card.door-entity { border-color: #4f71b9; }
+.GameView .card-wrapper > .card.door-entity .small-title { background-color: #4f71b9; }
+.GameView .card-wrapper > .card.living-entity { border-color: #c54040; }
+.GameView .card-wrapper > .card.living-entity .small-title { background-color: #c54040; }
+.GameView .card-wrapper > .card.player-entity { border-color: #3a9b3a; }
+.GameView .card-wrapper > .card.player-entity .small-title { background-color: #3a9b3a; }
+.GameView .card-wrapper > .card.item-entity { border-color: #7f7f7f; }
+.GameView .card-wrapper > .card.item-entity .small-title { background-color: #7f7f7f; }

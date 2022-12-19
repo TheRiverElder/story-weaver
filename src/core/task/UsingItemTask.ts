@@ -26,6 +26,7 @@ export class UsingItemTask implements Unique, InteractiveGroup {
                     act: ({ game }) => game.removeInteravtiveGroup(this),
                 },
             ],
+            labels: ["menu"],
         };
 
         const itemGroups: ActionGroup[] = filterNotNull(Array.from(params.actor.room?.entities.values() || []).map(entity => {
@@ -35,6 +36,7 @@ export class UsingItemTask implements Unique, InteractiveGroup {
                 title: entity.name,
                 description: entity.getBrief(),
                 actions,
+                labels: ["item"],
             };
             return null;
         }));

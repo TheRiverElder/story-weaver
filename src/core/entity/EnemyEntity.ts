@@ -24,6 +24,7 @@ export class EnemyEntity extends LivingEntity {
             title: this.name,
             description: this.getBrief(),
             actions: [attackAction],
+            labels: ["living-entity"],
         }];
     }
 

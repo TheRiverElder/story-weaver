@@ -58,6 +58,7 @@ export class DoorEntity extends Entity {
             title: "通往" + this.targetRoom.name,
             description: this.getBrief(),
             actions: [action],
+            labels: ["door-entity"],
         }];
     }
 
