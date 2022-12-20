@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
 import { Game } from "../core/Game";
@@ -111,7 +112,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 className={ "card-wrapper " + (groupIndex >= 0 && index > groupIndex ? "abdicated" : "")}
             >
                 <div 
-                    className={ "card " + (actionGroup.labels?.join(' ') || "empty") } 
+                    className={ classNames("card", groupIndex === index ? "selected" : "", actionGroup.labels?.join(' ') || "empty") } 
                     key={ index } 
                     // onMouseDown={() => this.setState(() => ({ groupIndex: index }))}
                     // onTouchStart={() => this.setState(() => ({ groupIndex: index }))}
