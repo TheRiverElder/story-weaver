@@ -14,7 +14,7 @@ export class EnemyEntity extends LivingEntity {
             text: '攻击',
             labels: ['attack'],
             act: ({ game, actor }) => {
-                const fighting = new FightingTask(game.uidGenerator.generate(), game, [actor, this]);
+                const fighting = new FightingTask(game, [actor, this]);
                 game.appendInteravtiveGroup(fighting);
                 fighting.continueRound();
             },
@@ -25,6 +25,7 @@ export class EnemyEntity extends LivingEntity {
             description: this.getBrief(),
             actions: [attackAction],
             labels: ["living-entity"],
+            target: this,
         }];
     }
 

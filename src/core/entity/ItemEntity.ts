@@ -1,7 +1,10 @@
-import { Action, ActionGroup } from "../common";
+import { ActionGroup, Action } from "../common";
 import { Entity } from "../Entity";
 import { Game } from "../Game";
 import { Item } from "../Item";
+
+alert("FUCK from ItemEntity");
+
 
 export interface ItemEntityData {
     item: Item;
@@ -39,6 +42,7 @@ export class ItemEntity extends Entity {
             description: this.getBrief(),
             actions: [pickUpAction],
             labels: ["item-entity"],
+            target: this,
         }];
     }
 
@@ -46,5 +50,4 @@ export class ItemEntity extends Entity {
     getBrief() {
         return `【物品】${this.name}`;
     }
-
 }

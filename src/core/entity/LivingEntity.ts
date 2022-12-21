@@ -1,19 +1,23 @@
 import { Buff } from "../buff/Buff";
 import { BuffSet } from "../buff/BuffSet";
-import { Action, ActionGroup, ActionParams } from "../common";
-import { Entity, EntityData } from "../Entity";
+import { ActionParams, ActionGroup, Action } from "../common";
+import { EntityData, Entity } from "../Entity";
+import { Interaction } from "../Interaction";
 import { InventorySlot } from "../inventory/InventorySlot";
-import { LivingEntityInventory, SLOT_TYPE_ARMOR, SLOT_TYPE_WEAPON } from "../inventory/LivingEntityInventory";
+import { LivingEntityInventory, SLOT_TYPE_WEAPON, SLOT_TYPE_ARMOR } from "../inventory/LivingEntityInventory";
 import { createItemClue } from "../InvestigatableObject";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
 import { Profile } from "../profile/Profile";
 import { ProfileEffector } from "../profile/ProfileEffector";
 import { PropertyType } from "../profile/PropertyType";
-import { FightingActionType, FightingTask } from "../task/FightingTask";
+import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { filterNotNull } from "../util/lang";
 import { ItemEntity } from "./ItemEntity";
 import { SimpleEntity } from "./SimpleEntity";
+
+alert("FUCK from LivingEntity");
+
 
 export interface LivingEntityData extends EntityData {
     health: number;
@@ -88,13 +92,14 @@ export abstract class LivingEntity extends Entity {
 
         const attackAction: Action = {
             text: '攻击' + this.getBrief(),
-            act: ({ game, actor }) => game.appendInteravtiveGroup(new FightingTask(game.uidGenerator.generate(), game, [actor, this])),
+            act: ({ game, actor }) => game.appendInteravtiveGroup(new FightingTask(game, [actor, this])),
         };
         return [{
             source: this,
             title: this.name,
             description: this.getBrief(),
             actions: [attackAction],
+            target: this,
         }];
     }
 
@@ -217,6 +222,16 @@ export abstract class LivingEntity extends Entity {
             case PROPERTY_TYPE_ATTACK: return filterNotNull([this.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.item]);
             case PROPERTY_TYPE_DEFENSE: return filterNotNull([this.inventory.getSpecialSlot(SLOT_TYPE_ARMOR)?.item]);
             default: return [];
+        }
+    }
+
+    canInteract() {
+        return true;
+    }
+
+    onReceive({ actor, skill }: Interaction) {
+        if (skill === PROPERTY_TYPE_ATTACK) {
+            this.game.appendInteravtiveGroup(new FightingTask(this.game, [actor, this]));
         }
     }
 }

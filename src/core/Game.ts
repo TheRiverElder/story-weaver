@@ -1,7 +1,10 @@
-import { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "./common";
+import type { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "./common";
 import { PlayerEntity } from "./entity/PlayerEntity";
-import { Room } from "./Room";
+import type { Interaction } from "./Interaction";
+import type { Room } from "./Room";
 import { UniqueSet } from "./util/UniqueSet";
+
+alert("FUCK from Game")
 
 export interface GameData {
     uidGenerator: Generator<number>;
@@ -96,5 +99,13 @@ export class Game implements InteractiveGroup {
         } : message;
         
         this.messages.push(msg);
+    }
+
+    interact(interaction: Interaction) {
+        const { media, target } = interaction;
+        if (!target.canInteract()) return;
+
+        media?.onApply(interaction);
+        target.onReceive(interaction);
     }
 }

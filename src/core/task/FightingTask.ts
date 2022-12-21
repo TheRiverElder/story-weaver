@@ -37,8 +37,8 @@ export class FightingTask implements Unique, InteractiveGroup {
     private escapingIndex: number = 0;
     private escapingFinished: boolean = true;
 
-    constructor(uid: number, game: Game, entities: LivingEntity[] = []) {
-        this.uid = uid;
+    constructor(game: Game, entities: LivingEntity[] = []) {
+        this.uid = game.uidGenerator.generate();
         this.game = game;
         this.participants = entities.map((entity, index) => new Participant(entity, index));
     }

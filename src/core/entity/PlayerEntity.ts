@@ -1,10 +1,13 @@
-import { ActionGroup } from "../common";
+import type { ActionGroup } from "../common";
 import { PropertyType } from "../profile/PropertyType";
 import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { GameOverTask } from "../task/GameOverTask";
 import { InventoryTask } from "../task/InventoryTask";
 import { InvestigationTask } from "../task/InvestigationTask";
-import { LivingEntity, LivingEntityData } from "./LivingEntity";
+import { LivingEntityData, LivingEntity } from "./LivingEntity";
+
+alert("FUCK from PlayerEntity");
+
 
 export const PROPERTY_TYPE_WATCH = new PropertyType("watch", "观察", 20);
 export const PROPERTY_TYPE_LISTEN = new PropertyType("listen", "听", 20);
@@ -31,6 +34,7 @@ export class PlayerEntity extends LivingEntity {
                 },
             ],
             labels: ["player-entity"],
+            target: this,
         }];
     }
 

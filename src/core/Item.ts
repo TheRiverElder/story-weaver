@@ -3,6 +3,7 @@ import { Entity } from "./Entity";
 import { LivingEntity } from "./entity/LivingEntity";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
+import { Interaction, InteractionMedia } from "./Interaction";
 import { Profile } from "./profile/Profile";
 import { ProfileEffector } from "./profile/ProfileEffector";
 import { PropertyType } from "./profile/PropertyType";
@@ -12,7 +13,7 @@ export interface ItemData {
     game: Game;
 }
 
-export abstract class Item implements Unique, ProfileEffector {
+export abstract class Item implements Unique, ProfileEffector, InteractionMedia {
     uid: number;
     game: Game;
     name: string;
@@ -37,4 +38,6 @@ export abstract class Item implements Unique, ProfileEffector {
     getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
         return [];
     }
+
+    onApply(interaction: Interaction) { }
 }

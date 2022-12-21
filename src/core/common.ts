@@ -2,6 +2,7 @@ import { Room } from "./Room";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Entity } from "./Entity";
+import { InteractionTarget } from "./Interaction";
 
 export interface Unique {
     uid: number;
@@ -24,6 +25,7 @@ export interface ActionGroup {
     description: string;
     actions: Action[];
     labels?: string[],
+    target?: InteractionTarget,
 };
 
 export interface InteractiveGroup {

@@ -1,4 +1,4 @@
-import { Action, ActionGroup, ActionParams } from "../common";
+import { ActionGroup, ActionParams } from "../common";
 import { ChatTask } from "../task/ChatTask";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
@@ -18,31 +18,17 @@ export class NeutralEntity extends LivingEntity {
     getActionGroups(params: ActionParams): ActionGroup[] {
         if (params.actor.uid === this.uid) return [];
 
-        const actions: Action[] = [];
-        actions.push({
+        const groups = super.getActionGroups(params);
+        groups[0]?.actions.push({
             text: '攻击',
             labels: ['attack'],
             act: ({ game, actor }) => {
-                const fighting = new FightingTask(game.uidGenerator.generate(), game, [actor, this]);
+                const fighting = new FightingTask(game, [actor, this]);
                 game.appendInteravtiveGroup(fighting);
                 fighting.continueRound();
             },
         });
-        const chatTask = this.chatProvider && this.chatProvider(params);
-        if (chatTask) {
-            actions.push({
-                text: '交谈',
-                labels: ['talk'],
-                act: ({ game }) => game.appendInteravtiveGroup(chatTask),
-            });
-        }
-        return [{
-            source: this,
-            title: this.name,
-            description: this.getBrief(),
-            actions,
-            labels: ["living-entity"],
-        }];
+        return groups;
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等

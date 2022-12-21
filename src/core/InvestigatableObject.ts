@@ -2,6 +2,7 @@ import { ActionParams } from "./common";
 import { Entity } from "./Entity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "./entity/PlayerEntity";
 import { Game } from "./Game";
+import { Interaction, InteractionTarget } from "./Interaction";
 import { Item } from "./Item";
 import { PropertyType } from "./profile/PropertyType";
 import { simpleCheck } from "./task/FightingTask";
@@ -26,7 +27,7 @@ export interface GenericInvestigatableObjectData {
     investigationAmount?: number;
 }
 
-export abstract class GenericInvestigatableObject implements InvestigatableObject {
+export abstract class GenericInvestigatableObject implements InvestigatableObject, InteractionTarget {
     abstract game: Game;
     clues: Clue[];
     maxInvestigationAmount: number;
@@ -64,6 +65,14 @@ export abstract class GenericInvestigatableObject implements InvestigatableObjec
 
     getDiscoveredClues(actor: PlayerEntity) {
         return this.clues.filter(clue => clue.discoverd);
+    }
+
+    canInteract() {
+        return this.canInvestigate(this.game.adventurer) && this.clues.some(clue => !clue.discoverd);
+    }
+
+    onReceive({ actor, skill }: Interaction) { 
+        this.onInvestigate(actor, skill);
     }
 
     

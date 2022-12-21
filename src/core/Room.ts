@@ -1,7 +1,7 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { Entity } from "./Entity";
 import { Game } from "./Game";
-import { GenericInvestigatableObject, GenericInvestigatableObjectData, InvestigatableObject } from "./InvestigatableObject";
+import { GenericInvestigatableObject, GenericInvestigatableObjectData } from "./InvestigatableObject";
 import { UniqueSet } from "./util/UniqueSet";
 
 export interface RoomData extends GenericInvestigatableObjectData {

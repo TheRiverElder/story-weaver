@@ -1,17 +1,19 @@
 import { LivingEntity } from "./entity/LivingEntity";
+import { PlayerEntity } from "./entity/PlayerEntity";
 import { PropertyType } from "./profile/PropertyType";
 
-export interface InterativeMedia {
+export interface InteractionMedia {
     onApply(interaction: Interaction): void;
 }
 
-export interface InterativeTarget {
+export interface InteractionTarget {
+    canInteract(): boolean;
     onReceive(interaction: Interaction): void;
 }
 
 export interface Interaction {
-    readonly actor: LivingEntity;
-    readonly media: InterativeMedia;
+    readonly actor: PlayerEntity;
+    readonly media: InteractionMedia | null;
     readonly skill: PropertyType;
-    readonly target: InterativeTarget;
+    readonly target: InteractionTarget;
 }

@@ -1,7 +1,12 @@
 import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
+import { PROPERTY_TYPE_ATTACK } from "../core/entity/LivingEntity";
+import { PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { Game } from "../core/Game";
+import { Interaction } from "../core/Interaction";
+import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
+import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
 
 interface GameViewProps {
@@ -70,11 +75,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 <div 
                     className="cards fill-x animate-flash-appear" key={ this.programCounter }
                     onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
-                    // onTouchEnd={() => this.setState(() => ({ groupIndex: -1 }))}
-                    // onBlur={() => this.setState(() => ({ groupIndex: -1 }))}
                 >
                     { this.state.actionGroups.map(this.renderActionGroupView.bind(this)) }
                 </div>
+                
+                { this.renderSkillSelectionBar() }
             </div>
         );
     }
@@ -109,13 +114,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
         const groupIndex = this.state.groupIndex;
         return (
             <div 
-                className={ "card-wrapper " + (groupIndex >= 0 && index > groupIndex ? "abdicated" : "")}
+                className={ classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
             >
                 <div 
-                    className={ classNames("card", groupIndex === index ? "selected" : "", actionGroup.labels?.join(' ') || "empty") } 
+                    className={ classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty") } 
                     key={ index } 
-                    // onMouseDown={() => this.setState(() => ({ groupIndex: index }))}
-                    // onTouchStart={() => this.setState(() => ({ groupIndex: index }))}
                     onClick={event => this.onSelectGroup(event, index)}
                 >
                     <div className="content">
@@ -143,11 +146,31 @@ class GameView extends Component<GameViewProps, GameViewState> {
     renderActionButton(action: Action, index: number) {
         return (
             <button 
-                className={ "action-button fill-x " + (action.labels?.join(' ') || '') }
+                className={ classNames("action-button", "fill-x", action.labels) }
                 key={ index }
                 onClick={ event => this.onClickActionButton(event, action) }
             >{ action.text }</button>
         );
+    }
+
+    renderSkillSelectionBar() {
+        const actionGroup = this.state.actionGroups[this.state.groupIndex];
+        const collapsed = !(actionGroup && actionGroup.target?.canInteract());
+        return (
+            <div className={ classNames("skill-selection-bar", { collapsed }) }>
+                { this.getSkills().map(skill => (
+                    <button onClick={() => this.onClickSkillButton(skill)}>{skill.name}</button>
+                )) }
+            </div>
+        );
+    }
+
+    getSkills(): PropertyType[] {
+        return [
+            PROPERTY_TYPE_ATTACK,
+            PROPERTY_TYPE_LISTEN,
+            PROPERTY_TYPE_WATCH,
+        ];
     }
 
     onSelectGroup(event: MouseEvent, index: number = -1) {
@@ -159,6 +182,25 @@ class GameView extends Component<GameViewProps, GameViewState> {
         event.stopPropagation();
         this.props.game.runAction(action);
         this.update();
+    }
+
+    onClickSkillButton(skill: PropertyType) {
+        const actionGroup = this.state.actionGroups[this.state.groupIndex];
+        if (!actionGroup) return;
+
+        const target = actionGroup.target;
+        if (!target) return;
+
+        const actor = this.props.game.adventurer;
+        const interaction: Interaction = {
+            actor,
+            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || null, 
+            skill,
+            target,
+        };
+
+        this.props.game.interact(interaction);
+        this.forceUpdate();
     }
 }
  

@@ -5,7 +5,7 @@ import { Entity } from "../core/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
-import { LivingEntity, PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE } from "../core/entity/LivingEntity";
+import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE } from "../core/entity/LivingEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
@@ -14,7 +14,7 @@ import { Clue, createItemClue, createTextClue } from "../core/InvestigatableObje
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
-import { MeleeWeapon, MeleeWeaponData } from "../core/item/MeleeWeapon";
+import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
 import { TextItem, TextItemData } from "../core/item/TextItem";
 import { Profile } from "../core/profile/Profile";
@@ -261,6 +261,14 @@ export class WhalesTombGameInitializer implements GameInitializer {
         });
         game.rooms.add(captainRoom);
         // 杂项地点
+        const seaRoom = new Room({
+            game,
+            name: "大海",
+            entities: [
+                motherMonster,
+            ],
+        });
+        game.rooms.add(seaRoom);
 
         this.connectRooms(corridorRoom, guestRoom217, "金属门", game);
         this.connectRooms(corridorRoom, kitchenRoom, "金属门", game);
@@ -363,6 +371,7 @@ class CritNPCEntity extends NeutralEntity {
         return corpse;
 
     }
+    
 }
 
 const BUFF_TYPE_CALL_OF_ABYSS = new BuffType("call_of_abyss", "深渊之召");
