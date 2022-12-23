@@ -1,9 +1,10 @@
 import { ActionParams } from "./common";
 import { Entity } from "./Entity";
-import { PlayerEntity, PROPERTY_TYPE_WATCH } from "./entity/PlayerEntity";
+import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Interaction, InteractionTarget } from "./Interaction";
 import { Item } from "./Item";
+import { PROPERTY_TYPE_WATCH } from "./profile/GenericPropertyTypes";
 import { PropertyType } from "./profile/PropertyType";
 import { simpleCheck } from "./task/FightingTask";
 

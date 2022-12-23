@@ -16,7 +16,7 @@ import { filterNotNull } from "../util/lang";
 import { ItemEntity } from "./ItemEntity";
 import { SimpleEntity } from "./SimpleEntity";
 
-alert("FUCK from LivingEntity");
+// alert("FUCK from LivingEntity");
 
 
 export interface LivingEntityData extends EntityData {

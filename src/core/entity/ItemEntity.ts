@@ -3,7 +3,7 @@ import { Entity } from "../Entity";
 import { Game } from "../Game";
 import { Item } from "../Item";
 
-alert("FUCK from ItemEntity");
+// alert("FUCK from ItemEntity");
 
 
 export interface ItemEntityData {
@@ -49,5 +49,9 @@ export class ItemEntity extends Entity {
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
     getBrief() {
         return `【物品】${this.name}`;
+    }
+
+    canInteract(): boolean {
+        return true;
     }
 }

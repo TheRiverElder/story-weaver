@@ -59,6 +59,7 @@ export class DoorEntity extends Entity {
             description: this.getBrief(),
             actions: [action],
             labels: ["door-entity"],
+            target: this,
         }];
     }
 

@@ -4,7 +4,7 @@ import type { Interaction } from "./Interaction";
 import type { Room } from "./Room";
 import { UniqueSet } from "./util/UniqueSet";
 
-alert("FUCK from Game")
+// alert("FUCK from Game")
 
 export interface GameData {
     uidGenerator: Generator<number>;

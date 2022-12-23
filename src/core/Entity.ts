@@ -4,7 +4,7 @@ import { Game } from "./Game";
 import { Clue, GenericInvestigatableObject, GenericInvestigatableObjectData } from "./InvestigatableObject";
 import { Room } from "./Room";
 
-alert("FUCK from Entity");
+// alert("FUCK from Entity");
 
 
 export interface EntityData extends GenericInvestigatableObjectData {

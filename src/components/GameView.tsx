@@ -2,10 +2,10 @@ import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
 import { PROPERTY_TYPE_ATTACK } from "../core/entity/LivingEntity";
-import { PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/entity/PlayerEntity";
 import { Game } from "../core/Game";
 import { Interaction } from "../core/Interaction";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
+import { PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/profile/GenericPropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
 

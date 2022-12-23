@@ -1,7 +1,8 @@
 import { Unique, InteractiveGroup, ActionGroup, ActionParams, Action } from "../common";
-import { PlayerEntity, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../entity/PlayerEntity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Game } from "../Game";
 import { InvestigatableObject } from "../InvestigatableObject";
+import { PROPERTY_TYPE_WATCH, PROPERTY_TYPE_LISTEN } from "../profile/GenericPropertyTypes";
 import { PropertyType } from "../profile/PropertyType";
 import { filterNotNull } from "../util/lang";
 
