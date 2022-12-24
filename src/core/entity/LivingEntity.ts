@@ -91,8 +91,13 @@ export abstract class LivingEntity extends Entity {
         if (params.actor.uid === this.uid) return [];
 
         const attackAction: Action = {
-            text: '攻击' + this.getBrief(),
-            act: ({ game, actor }) => game.appendInteravtiveGroup(new FightingTask(game, [actor, this])),
+            text: '攻击',
+            labels: ['attack'],
+            act: ({ game, actor }) => {
+                const fighting = new FightingTask(game, [actor, this]);
+                game.appendInteravtiveGroup(fighting);
+                fighting.continueRound();
+            },
         };
         return [{
             source: this,

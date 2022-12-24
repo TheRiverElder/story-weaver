@@ -15,22 +15,6 @@ export class NeutralEntity extends LivingEntity {
         this.chatProvider = data.chatProvider || null;
     }
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
-        if (params.actor.uid === this.uid) return [];
-
-        const groups = super.getActionGroups(params);
-        groups[0]?.actions.push({
-            text: '攻击',
-            labels: ['attack'],
-            act: ({ game, actor }) => {
-                const fighting = new FightingTask(game, [actor, this]);
-                game.appendInteravtiveGroup(fighting);
-                fighting.continueRound();
-            },
-        });
-        return groups;
-    }
-
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
     getBrief() {
         return `${this.name}（${this.health}/${this.maxHealth}）`;

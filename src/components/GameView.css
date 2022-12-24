@@ -179,7 +179,10 @@
 .GameView .buttons button {
     padding: 0.2em 0.5em;
     margin-top: 0.5em;
+    border: none;
+    border-radius: 1em;
     font-family: "楷体", "Microsoft YaHei", "微软雅黑", "Microsoft JhengHei", "华文细黑", "STHeiti", "MingLiu";
+    color: #ffffff;
 }
 
 .GameView .card .index {
@@ -189,6 +192,10 @@
     color: #7f7f7f;
     font-size: 0.6em;
     font-family: Consolas, "黑体";
+}
+
+.GameView .buttons button.empty {
+    color: #000000; 
 }
 
 .GameView .buttons button.walk {

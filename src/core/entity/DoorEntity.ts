@@ -55,7 +55,7 @@ export class DoorEntity extends Entity {
         }
         return [{
             source: this,
-            title: "通往" + this.targetRoom.name,
+            title: `${this.name}：${this.targetRoom.name}`,
             description: this.getBrief(),
             actions: [action],
             labels: ["door-entity"],
@@ -66,6 +66,10 @@ export class DoorEntity extends Entity {
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
     getBrief() {
         return `${this.name}${this.lock?.locked ? "，已上锁" : ""}，通向${this.targetRoom.name}`;
+    }
+
+    canInteract(): boolean {
+        return true;
     }
 
 }

@@ -146,7 +146,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
     renderActionButton(action: Action, index: number) {
         return (
             <button 
-                className={ classNames("action-button", "fill-x", action.labels) }
+                className={ classNames("action-button", "fill-x", action.labels || "empty") }
                 key={ index }
                 onClick={ event => this.onClickActionButton(event, action) }
             >{ action.text }</button>
