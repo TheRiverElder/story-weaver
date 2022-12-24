@@ -21,7 +21,7 @@ export class StartPage extends Component<StartPageProps, StartPageState> {
     render() { 
         return (
             <div className="StartPage fill">
-                <button style={{ padding: "1em", margin: "1em" }} onClick={ this.onClickStart }>开始</button>
+                <button onClick={ this.onClickStart }>开始</button>
             </div>
         );
     }

@@ -7,6 +7,7 @@ import { Interaction } from "../core/Interaction";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
 import { PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/profile/GenericPropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
+import { filterNotNull } from "../core/util/lang";
 import "./GameView.css";
 
 interface GameViewProps {
@@ -88,25 +89,27 @@ class GameView extends Component<GameViewProps, GameViewState> {
     renderTopBar() {
         const { game } = this.props;
         const adventurer = game.adventurer;
-        const room = adventurer.room;
-        
-        // const text = `
-        //     当前层级：${game.level}
-        //     当前房间：#${room?.uid} ${room?.name}
-        //     房内实体：${room?.entities.values().map(it => it.getBrief()).join("，")}
-        //     冒险者状态：生命：${adventurer.health}/${adventurer.maxHealth}，攻击力：${adventurer.attackPower}，防御力：${adventurer.defensePower}，敏捷：${adventurer.dexterity}
-        //     物品：${adventurer.inventory.size == 0 ? "空" : adventurer.inventory.values().map(it => it.name).join("，")}
-        // `;
 
-        const weapon = adventurer.weapon == null ? "" : "|🔪" + adventurer.weapon.name;
-        const armor = adventurer.armor == null ? "" : "|☂️" + adventurer.armor.name;
-        
-        const text = `
-            lvl.${game.level} @${room?.name}
-            ♥${adventurer.health}/${adventurer.maxHealth}|🗡${adventurer.attackPower}|🛡${adventurer.defensePower}|🏃‍♀️${adventurer.dexterity}${weapon}${armor}
-        `;
+        const properties: [string, string | number | undefined][] = [
+            ["lvl", game.level],
+            ["@", adventurer.room?.name],
+            ["♥", `${adventurer.health}/${adventurer.maxHealth}`],
+            ["🗡", adventurer.attackPower],
+            ["🛡", adventurer.defensePower],
+            ["🏃‍♀️", adventurer.dexterity],
+            ["🔪", adventurer.weapon?.name],
+            ["☂️", adventurer.armor?.name],
+        ];
+
         return (
-            <header className="top-bar">{ text.split('\n').map((it, i) => (<p key={ i }>{ it }</p>)) }</header>
+            <header className="top-bar">
+                { properties.map(([icon, content]) => (content !== undefined) && (
+                    <div className="property" key={ icon }>
+                        <span className="icon">{icon}</span>
+                        <span className="content">{content}</span>
+                    </div>
+                )) }
+            </header>
         );
     }
 
