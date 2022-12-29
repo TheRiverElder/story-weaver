@@ -172,6 +172,7 @@
     transition: all 200ms ease-in-out;
     overflow-x: auto;
     overflow-y: hidden;
+    pointer-events: all;
 }
 
 .GameView .skill-selection-bar.collapsed {

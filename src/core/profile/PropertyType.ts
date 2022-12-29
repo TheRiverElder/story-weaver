@@ -1,3 +1,5 @@
+import { Interaction } from "../Interaction";
+
 export class PropertyType {
     public readonly id: string;
     public readonly name: string;
@@ -8,4 +10,6 @@ export class PropertyType {
         this.name = name;
         this.defaultValue = defaultValue;
     }
+
+    onInteract(interaction: Interaction): void { }
 }

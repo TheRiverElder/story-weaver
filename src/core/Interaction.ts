@@ -1,14 +1,14 @@
-import { LivingEntity } from "./entity/LivingEntity";
 import { PlayerEntity } from "./entity/PlayerEntity";
+import { InvestigatableObject } from "./InvestigatableObject";
 import { PropertyType } from "./profile/PropertyType";
 
 export interface InteractionMedia {
-    onApply(interaction: Interaction): void;
+    // onApply(interaction: Interaction): void;
 }
 
-export interface InteractionTarget {
+export interface InteractionTarget extends InvestigatableObject {
     canInteract(): boolean;
-    onReceive(interaction: Interaction): void;
+    // onReceive(interaction: Interaction): void;
 }
 
 export interface Interaction {

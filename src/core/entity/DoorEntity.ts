@@ -1,8 +1,8 @@
 import { Action, ActionGroup } from "../common";
 import { Entity, EntityData } from "../Entity";
+import { PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
 import { Room } from "../Room";
 import { simpleCheck } from "../task/FightingTask";
-import { PROPERTY_TYPE_STRENGTH } from "./LivingEntity";
 
 export interface DoorEntityData extends EntityData {
     targetRoom: Room;

@@ -11,6 +11,7 @@ import { GenericProfile } from "../profile/GenericProfile";
 import { Profile } from "../profile/Profile";
 import { ProfileEffector } from "../profile/ProfileEffector";
 import { PropertyType } from "../profile/PropertyType";
+import { PROPERTY_TYPE_HEALTH, PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE, PROPERTY_TYPE_DEXTERITY } from "../profile/PropertyTypes";
 import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { filterNotNull } from "../util/lang";
 import { ItemEntity } from "./ItemEntity";
@@ -31,12 +32,6 @@ export interface LivingEntityData extends EntityData {
     tags?: string[]; 
     buffs?: Buff[]; 
 }
-
-export const PROPERTY_TYPE_HEALTH = new PropertyType("health", "生命", 0);
-export const PROPERTY_TYPE_ATTACK = new PropertyType("attack", "攻击力", 0);
-export const PROPERTY_TYPE_DEFENSE = new PropertyType("defense", "防御力", 0);
-export const PROPERTY_TYPE_DEXTERITY = new PropertyType("dexterity", "敏捷", 50);
-export const PROPERTY_TYPE_STRENGTH = new PropertyType("strength", "体力", 50);
 
 export abstract class LivingEntity extends Entity {
 

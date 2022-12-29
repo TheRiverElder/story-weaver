@@ -4,7 +4,7 @@ import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Interaction, InteractionTarget } from "./Interaction";
 import { Item } from "./Item";
-import { PROPERTY_TYPE_WATCH } from "./profile/GenericPropertyTypes";
+import { PROPERTY_TYPE_WATCH } from "./profile/PropertyTypes";
 import { PropertyType } from "./profile/PropertyType";
 import { simpleCheck } from "./task/FightingTask";
 

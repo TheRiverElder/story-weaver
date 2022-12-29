@@ -1,4 +1,4 @@
-import { ActionGroup, ActionParams } from "../common";
+import { ActionParams } from "../common";
 import { ChatTask } from "../task/ChatTask";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";

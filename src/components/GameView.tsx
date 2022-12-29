@@ -1,13 +1,11 @@
 import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
-import { PROPERTY_TYPE_ATTACK } from "../core/entity/LivingEntity";
 import { Game } from "../core/Game";
 import { Interaction } from "../core/Interaction";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
-import { PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/profile/GenericPropertyTypes";
+import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
-import { filterNotNull } from "../core/util/lang";
 import "./GameView.css";
 
 interface GameViewProps {
@@ -75,7 +73,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
                 <div 
                     className="cards fill-x animate-flash-appear" key={ this.programCounter }
-                    onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
+                    // onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
                 >
                     { this.state.actionGroups.map(this.renderActionGroupView.bind(this)) }
                 </div>
@@ -193,7 +191,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
         const target = actionGroup.target;
         if (!target) return;
-
+        
         const actor = this.props.game.adventurer;
         const interaction: Interaction = {
             actor,

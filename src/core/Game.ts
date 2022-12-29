@@ -86,10 +86,12 @@ export class Game implements InteractiveGroup {
 
     appendInteravtiveGroup(interactiveGroup: InteractiveGroup) {
         this.interactiveGroups.push(interactiveGroup);
+        this.notifyUpdate();
     }
 
     removeInteravtiveGroup(interactiveGroup: InteractiveGroup) {
         this.interactiveGroups = this.interactiveGroups.filter(e => e !== interactiveGroup);
+        this.notifyUpdate();
     }
 
     appendMessage(message: Message | string) {
@@ -102,10 +104,11 @@ export class Game implements InteractiveGroup {
     }
 
     interact(interaction: Interaction) {
-        const { media, target } = interaction;
+        const { skill, target } = interaction;
         if (!target.canInteract()) return;
+        skill.onInteract(interaction);
 
-        media?.onApply(interaction);
-        target.onReceive(interaction);
+        // media?.onApply(interaction);
+        // target.onReceive(interaction);
     }
 }

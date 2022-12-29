@@ -2,7 +2,7 @@ import { Unique, InteractiveGroup, ActionGroup, ActionParams, Action } from "../
 import { PlayerEntity } from "../entity/PlayerEntity";
 import { Game } from "../Game";
 import { InvestigatableObject } from "../InvestigatableObject";
-import { PROPERTY_TYPE_WATCH, PROPERTY_TYPE_LISTEN } from "../profile/GenericPropertyTypes";
+import { PROPERTY_TYPE_WATCH, PROPERTY_TYPE_LISTEN } from "../profile/PropertyTypes";
 import { PropertyType } from "../profile/PropertyType";
 import { filterNotNull } from "../util/lang";
 
