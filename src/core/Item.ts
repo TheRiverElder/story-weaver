@@ -39,5 +39,5 @@ export abstract class Item implements Unique, ProfileEffector, InteractionMedia 
         return [];
     }
 
-    onApply(interaction: Interaction) { }
+    onUse(interaction: Interaction) { }
 }

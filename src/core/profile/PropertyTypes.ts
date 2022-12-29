@@ -1,7 +1,10 @@
 import { FightingPropertyType } from "./FightingPropertyType";
 import { InvestigationPropertyType } from "./InvestigationPropertyType";
 import { PropertyType } from "./PropertyType";
+import { UsePropertyType } from "./UsePropertyType";
 
+
+export const PROPERTY_TYPE_USE = new UsePropertyType("use", "使用", 0);
 
 export const PROPERTY_TYPE_HEALTH = new PropertyType("health", "生命", 0);
 export const PROPERTY_TYPE_ATTACK = new FightingPropertyType("attack", "攻击", 0);

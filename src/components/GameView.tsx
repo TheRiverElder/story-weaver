@@ -4,9 +4,10 @@ import { Action, ActionGroup } from "../core/common";
 import { Game } from "../core/Game";
 import { Interaction } from "../core/Interaction";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
-import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
+import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
+import { filterNotNull } from "../core/util/lang";
 
 interface GameViewProps {
     game: Game;
@@ -167,11 +168,12 @@ class GameView extends Component<GameViewProps, GameViewState> {
     }
 
     getSkills(): PropertyType[] {
-        return [
+        return filterNotNull([
             PROPERTY_TYPE_ATTACK,
             PROPERTY_TYPE_LISTEN,
             PROPERTY_TYPE_WATCH,
-        ];
+            this.props.game.adventurer.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() && PROPERTY_TYPE_USE,
+        ]);
     }
 
     onSelectGroup(event: MouseEvent, index: number = -1) {

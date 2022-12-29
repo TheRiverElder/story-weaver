@@ -3,7 +3,7 @@ import { InvestigatableObject } from "./InvestigatableObject";
 import { PropertyType } from "./profile/PropertyType";
 
 export interface InteractionMedia {
-    // onApply(interaction: Interaction): void;
+    onUse(interaction: Interaction): void;
 }
 
 export interface InteractionTarget extends InvestigatableObject {
