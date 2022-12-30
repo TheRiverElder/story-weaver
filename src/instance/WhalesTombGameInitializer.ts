@@ -1,6 +1,6 @@
 import { Buff } from "../core/buff/Buff";
 import { BuffType } from "../core/buff/BuffType";
-import { Action, ActionParams, GameInitializer, Generator } from "../core/common";
+import { Action, ActionGroup, ActionParams, GameInitializer, Generator } from "../core/common";
 import { Entity } from "../core/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
@@ -370,6 +370,23 @@ class CritNPCEntity extends NeutralEntity {
 
         return corpse;
 
+    }
+
+    getActionGroups(params: ActionParams): ActionGroup[] {
+        const result = super.getActionGroups(params);
+        const talkAction: Action = {
+            text: "交谈",
+            act: (params) => {
+                if (this.chatProvider) {
+                    const chat = this.chatProvider(params);
+                    if (chat) {
+                        this.game.appendInteravtiveGroup(chat);
+                    }
+                }
+            }
+        };
+        result[0]?.actions.push(talkAction);
+        return result;
     }
     
 }
