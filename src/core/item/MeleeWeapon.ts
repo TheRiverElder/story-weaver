@@ -1,6 +1,8 @@
 import { ActionParams, Action } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
+import { Interaction } from "../Interaction";
 import { Item, ItemData } from "../Item";
+import { FightingTask } from "../task/FightingTask";
 
 export interface MeleeWeaponData extends ItemData {
     damage: number; // 基础伤害
@@ -30,6 +32,12 @@ export class MeleeWeapon extends Item {
     
     onUnequip(entity: LivingEntity): void {
         entity.attackPower -= this.damage;
+    }
+
+    onUse(interaction: Interaction): void {
+        if (interaction.target instanceof LivingEntity) {
+            this.game.appendInteravtiveGroup(new FightingTask(this.game, [interaction.actor, interaction.target]));
+        }
     }
 
 }
