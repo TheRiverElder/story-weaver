@@ -1,4 +1,5 @@
 import { ActionParams, Action } from "../common";
+import { ItemEntity } from "../entity/ItemEntity";
 import { LivingEntity } from "../entity/LivingEntity";
 import { Item, ItemData } from "../Item";
 
@@ -30,6 +31,16 @@ export class ArmorItem extends Item {
     
     onUnequip(entity: LivingEntity): void {
         entity.attackPower -= this.defense;
+    }
+
+    getActionsAsEntity(entity: ItemEntity, params: ActionParams): Action[] {
+        return [{
+            text: "装备",
+            act: ({ actor }) => {
+                actor.equipArmor(this);
+                entity.remove();
+            },
+        }];
     }
 
 }

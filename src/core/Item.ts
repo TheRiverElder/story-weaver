@@ -1,5 +1,6 @@
 import { Action, ActionParams, Unique } from "./common";
 import { Entity } from "./Entity";
+import { ItemEntity } from "./entity/ItemEntity";
 import { LivingEntity } from "./entity/LivingEntity";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
@@ -29,6 +30,10 @@ export abstract class Item implements Unique, ProfileEffector, InteractionMedia 
     }
 
     abstract getActions(params: ActionParams): Action[];
+
+    getActionsAsEntity(entity: ItemEntity, params: ActionParams): Action[] { 
+        return []; 
+    }
 
     // 被装备时调用
     onEquip(entity: LivingEntity): void { }

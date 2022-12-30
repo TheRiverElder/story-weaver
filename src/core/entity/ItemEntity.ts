@@ -1,4 +1,4 @@
-import { ActionGroup, Action } from "../common";
+import { ActionGroup, Action, ActionParams } from "../common";
 import { Entity } from "../Entity";
 import { Game } from "../Game";
 import { Item } from "../Item";
@@ -23,7 +23,7 @@ export class ItemEntity extends Entity {
         this.item = data.item;
     }
 
-    getActionGroups(): ActionGroup[] {
+    getActionGroups(params: ActionParams): ActionGroup[] {
         const pickUpAction: Action = {
             text: '拾取',
             labels: ['pick-up'],
@@ -40,7 +40,7 @@ export class ItemEntity extends Entity {
             source: this,
             title: this.name,
             description: this.getBrief(),
-            actions: [pickUpAction],
+            actions: [pickUpAction, ...this.item.getActionsAsEntity(this, params)],
             labels: ["item-entity"],
             target: this,
         }];

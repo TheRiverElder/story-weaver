@@ -1,4 +1,5 @@
 import { ActionParams, Action } from "../common";
+import { ItemEntity } from "../entity/ItemEntity";
 import { LivingEntity } from "../entity/LivingEntity";
 import { Interaction } from "../Interaction";
 import { Item, ItemData } from "../Item";
@@ -38,6 +39,16 @@ export class MeleeWeapon extends Item {
         if (interaction.target instanceof LivingEntity) {
             this.game.appendInteravtiveGroup(new FightingTask(this.game, [interaction.actor, interaction.target]));
         }
+    }
+
+    getActionsAsEntity(entity: ItemEntity, params: ActionParams): Action[] {
+        return [{
+            text: "装备",
+            act: ({ actor }) => {
+                actor.equipWeapon(this);
+                entity.remove();
+            },
+        }];
     }
 
 }
