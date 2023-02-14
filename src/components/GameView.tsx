@@ -74,7 +74,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
                 <div 
                     className="cards fill-x animate-flash-appear" key={ this.programCounter }
-                    // onMouseLeave={() => this.setState(() => ({ groupIndex: -1 }))}
+                    onClick={this.resetSelectedGroup.bind(this)}
                 >
                     { this.state.actionGroups.map(this.renderActionGroupView.bind(this)) }
                 </div>
@@ -131,7 +131,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 <div 
                     className={ classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty") } 
                     key={ index } 
-                    onClick={event => this.onSelectGroup(event, index)}
+                    onClick={event => this.toggleSelectedGroup(event, index)}
                 >
                     <div className="content">
                         <div>
@@ -186,9 +186,14 @@ class GameView extends Component<GameViewProps, GameViewState> {
         ]);
     }
 
-    onSelectGroup(event: MouseEvent, index: number = -1) {
+    toggleSelectedGroup(event: MouseEvent, index: number) {
         event.stopPropagation();
-        this.setState(() => ({ groupIndex: index }));
+        this.setState(s => ({ groupIndex: s.groupIndex === index ? -1 : index }));
+    }
+
+    resetSelectedGroup(event: MouseEvent) {
+        event.stopPropagation();
+        this.setState(() => ({ groupIndex: -1 }));
     }
 
     onClickActionButton(event: MouseEvent, action: Action) {
