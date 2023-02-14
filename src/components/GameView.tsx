@@ -1,8 +1,8 @@
 import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
-import { Game } from "../core/Game";
-import { Interaction } from "../core/Interaction";
+import { Game, Message } from "../core/Game";
+import { Interaction, MEDIA_EMPTY } from "../core/Interaction";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
 import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
@@ -67,7 +67,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                     { this.props.game.messages.map((m, i) => (
                         <div className="message animate-message-appear" key={i}>
                             <span className="timestamp">{timestampToString(m.timestamp)}</span>
-                            <span className="text">{m.text}</span>
+                            <div className="text">{this.renderMessage(m)}</div>
                         </div>
                     )) }
                 </main>
@@ -80,6 +80,16 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 </div>
                 
                 { this.renderSkillSelectionBar() }
+            </div>
+        );
+    }
+
+    renderMessage(message: Message) {
+        return (
+            <div>
+                {message.text.split("\n").map(line => (
+                    <p>{line}</p>
+                ))}
             </div>
         );
     }
@@ -157,7 +167,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
     renderSkillSelectionBar() {
         const actionGroup = this.state.actionGroups[this.state.groupIndex];
-        const collapsed = !(actionGroup && actionGroup.target?.canInteract());
+        const collapsed = !(actionGroup && actionGroup.target?.canInteract(this.props.game.adventurer, PROPERTY_TYPE_USE));
         return (
             <div className={ classNames("skill-selection-bar", { collapsed }) }>
                 { this.getSkills().map(skill => (
@@ -197,7 +207,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
         const actor = this.props.game.adventurer;
         const interaction: Interaction = {
             actor,
-            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || null, 
+            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || MEDIA_EMPTY, 
             skill,
             target,
         };

@@ -1,5 +1,4 @@
 import { PlayerEntity } from "./entity/PlayerEntity";
-import { InvestigatableObject } from "./InvestigatableObject";
 import { PropertyType } from "./profile/PropertyType";
 
 export const MEDIA_EMPTY: InteractionMedia = {

@@ -117,7 +117,6 @@ export class Game implements InteractiveGroup {
             if (currentMessage.type === MESSAGE_TYPE_COLLAPSE) {
                 lastMessage.text += "\n" + currentMessage.text;
             } else {
-                currentMessage.text;
                 this.messages.push(currentMessage);
             }
         } else {

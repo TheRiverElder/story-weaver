@@ -2,7 +2,7 @@ import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./c
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Interaction, InteractionTarget } from "./Interaction";
-import { Clue, GenericInvestigatableObject, GenericInvestigatableObjectData, InvestigatableObject } from "./InvestigatableObject";
+import { Clue, GenericInvestigatableObject, GenericInvestigatableObjectData } from "./InvestigatableObject";
 import { PropertyType } from "./profile/PropertyType";
 import { Room } from "./Room";
 
@@ -22,7 +22,7 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
     readonly game: Game;
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
-    abstract readonly brief: string;
+    abstract get brief(): string;
 
     room: Room | null = null;
 

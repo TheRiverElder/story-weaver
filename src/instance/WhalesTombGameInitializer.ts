@@ -225,7 +225,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
                 new SimpleEntity({
                     game,
                     name: "船长的尸体",
-                    brief: "看来是被穿刺心脏，失血而死",
+                    brief: "看来是被穿刺心脏而死",
                     maxInvestigationAmount: 2,
                     clues: [
                         createItemClue(new TextItem({
@@ -477,7 +477,7 @@ class FireSourceItem extends NormalItem {
             text: "使用",
             act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
             labels: [],
-        }]
+        }];
     }
 
     getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
@@ -495,7 +495,7 @@ class FireSourceItem extends NormalItem {
 
 interface OldBookItemData extends TextItemData {
     skill: PropertyType; 
-    maxDecryptAmount: number;
+    maxDecryptAmount: number; 
 }
 
 const PROPERTY_TYPE_READ = new PropertyType("read", "阅读", 20);
