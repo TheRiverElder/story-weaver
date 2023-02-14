@@ -2,7 +2,7 @@ import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./c
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Interaction, InteractionTarget } from "./Interaction";
-import { Clue, GenericInvestigatableObjectData, InvestigatableObject } from "./InvestigatableObject";
+import { Clue, GenericInvestigatableObject, GenericInvestigatableObjectData, InvestigatableObject } from "./InvestigatableObject";
 import { PropertyType } from "./profile/PropertyType";
 import { Room } from "./Room";
 
@@ -13,7 +13,7 @@ export interface EntityData extends GenericInvestigatableObjectData {
     name: string;
     game: Game;
     clues?: Clue[];
-    investigatableObject?: InvestigatableObject;
+    investigatableObject?: GenericInvestigatableObject;
 }
 
 export abstract class Entity implements Unique, InteractiveGroup, InteractionTarget {
@@ -26,7 +26,7 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
 
     room: Room | null = null;
 
-    readonly investigatableObject: InvestigatableObject | null = null;
+    readonly investigatableObject: GenericInvestigatableObject | null = null;
 
     constructor(data: EntityData) {
         this.name = data.name;

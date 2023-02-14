@@ -363,7 +363,7 @@ class CritNPCEntity extends NeutralEntity {
                 lock: this.onGetCaptainRoomDoorLock(),
             })));
 
-            corpse.clues.push(...clues);
+            corpse.investigatableObject?.clues.push(...clues);
     
             return corpse;
         }
@@ -383,7 +383,8 @@ class CritNPCEntity extends NeutralEntity {
                         this.game.appendInteravtiveGroup(chat);
                     }
                 }
-            }
+            },
+            labels: [],
         };
         result[0]?.actions.push(talkAction);
         return result;
@@ -456,7 +457,7 @@ class MonsterEntity extends EnemyEntity {
             actor.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
         };
 
-        corpse.clues.push(clue);
+        corpse.investigatableObject?.clues.push(clue);
 
         return corpse;
     }
@@ -475,6 +476,7 @@ class FireSourceItem extends NormalItem {
         return [{
             text: "使用",
             act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
+            labels: [],
         }]
     }
 
@@ -486,6 +488,7 @@ class FireSourceItem extends NormalItem {
         return [{
             text: "引爆",
             act: () => item.explode(),
+            labels: [],
         }];
     }
 }
@@ -513,6 +516,7 @@ class OldBookItem extends TextItem {
         const burn: Action = {
             text: '扔掉',
             act: ({ actor }) => actor.inventory.remove(this),
+            labels: [],
         }
         if (this.decrypted) {
             return [
@@ -526,6 +530,7 @@ class OldBookItem extends TextItem {
                         this.game.appendMessage(`在最后吞噬船只的咆哮声出现之前，你就已经在极度的恐惧中放弃了生存的思考`);
                         this.game.appendInteravtiveGroup(new GameOverTask(this.game, "惊惧而终"));
                     },
+                    labels: [],
                 },
                 burn,
             ];
@@ -543,6 +548,7 @@ class OldBookItem extends TextItem {
                         }
                         this.decryptCounter++;
                     },
+                    labels: [],
                 },
                 burn,
             ];
@@ -563,6 +569,7 @@ class SignalPistolItem extends MeleeWeapon {
                 this.game.appendMessage(`终于，你获救了`);
                 this.game.appendInteravtiveGroup(new GameOverTask(this.game, "被其它船只救走了"));
             },
+            labels: [],
         });
     }
 }
@@ -578,6 +585,7 @@ class BoatEntity extends SimpleEntity {
                 this.game.appendMessage(`你陷入了深不见底的绝望`);
                 this.game.appendInteravtiveGroup(new GameOverTask(this.game, "I C U!"));
             },
+            labels: [],
         };
         if (groups.length > 0) {
             groups[0].actions.push(action);
@@ -585,7 +593,7 @@ class BoatEntity extends SimpleEntity {
             groups.push({
                 source: this,
                 title: this.name,
-                description: this.getBrief(),
+                description: this.brief,
                 actions: [action],
             });
         }
