@@ -18,11 +18,12 @@ export class KeyItem extends NormalItem {
         this.lock = data.lock;
     }
 
-    getActions(params: ActionParams): Action[] {
+    getItemActions(params: ActionParams): Action[] {
         return [{
             text: "使用",
             act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
-        }]
+            labels: ["eat"],
+        }];
     }
 
     getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
@@ -43,6 +44,7 @@ export class KeyItem extends NormalItem {
                 }
                 this.game.appendMessage(`${previous ? "解锁" : "上锁"}${previous === door.lock.locked ? "失败" : "成功"}`);
             },
+            labels: ["eat"],
         }]
     }
 }

@@ -15,13 +15,14 @@ export class ArmorItem extends Item {
         this.defense = data.defense;
     }
 
-    getActions(params: ActionParams): Action[] {
+    getItemActions(params: ActionParams): Action[] {
         return [{
             text: "装备",
             act: ({ actor }) => {
                 actor.inventory.remove(this);
                 actor.equipArmor(this);
             },
+            labels: ["equip"],
         }];
     }
     
@@ -33,13 +34,14 @@ export class ArmorItem extends Item {
         entity.attackPower -= this.defense;
     }
 
-    getActionsAsEntity(entity: ItemEntity, params: ActionParams): Action[] {
+    getItemEntityActions(entity: ItemEntity, params: ActionParams): Action[] {
         return [{
             text: "装备",
             act: ({ actor }) => {
                 actor.equipArmor(this);
                 entity.remove();
             },
+            labels: ["equip"],
         }];
     }
 

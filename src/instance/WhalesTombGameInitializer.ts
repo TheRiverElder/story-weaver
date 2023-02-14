@@ -471,7 +471,7 @@ class DynamiteItem extends NormalItem {
 
 class FireSourceItem extends NormalItem {
 
-    getActions(): Action[] {
+    getItemActions(): Action[] {
         return [{
             text: "使用",
             act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
@@ -509,14 +509,14 @@ class OldBookItem extends TextItem {
         this.maxDecryptAmount = data.maxDecryptAmount;
     }
 
-    getActions(): Action[] {
+    getItemActions(): Action[] {
         const burn: Action = {
             text: '扔掉',
             act: ({ actor }) => actor.inventory.remove(this),
         }
         if (this.decrypted) {
             return [
-                ...super.getActions(),
+                ...super.getItemActions(),
                 {
                     text: `使用咒语`,
                     act: ({ actor }) => {
@@ -552,8 +552,8 @@ class OldBookItem extends TextItem {
 
 class SignalPistolItem extends MeleeWeapon {
 
-    getActions(params: ActionParams): Action[] {
-        return super.getActions(params).concat({
+    getItemActions(params: ActionParams): Action[] {
+        return super.getItemActions(params).concat({
             text: "发射求救信号",
             act: () => {
                 this.game.appendMessage(`若干秒的火光转瞬即逝`);

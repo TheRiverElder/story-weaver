@@ -22,7 +22,7 @@ export class EnemyEntity extends LivingEntity {
         return [{
             source: this,
             title: this.name,
-            description: this.getBrief(),
+            description: this.brief,
             actions: [attackAction],
             labels: ["living-entity"],
             target: this,
@@ -30,8 +30,8 @@ export class EnemyEntity extends LivingEntity {
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
-    getBrief() {
-        return `【敌人】${this.name}（${this.health}/${this.maxHealth}）`;
+    get brief() {
+        return `💢${this.name}（${this.health}/${this.maxHealth}♥）`;
     }
 
     onFightTurn(fighting: FightingTask): FightingActionType {

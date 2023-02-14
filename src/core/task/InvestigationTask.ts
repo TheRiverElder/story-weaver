@@ -27,6 +27,7 @@ export class InvestigationTask implements Unique, InteractiveGroup {
                 {
                     text: "返回",
                     act: (params: ActionParams) => this.game.removeInteravtiveGroup(this),
+                    labels: [],
                 },
             ],
             labels: ["menu"],
@@ -45,21 +46,21 @@ export class InvestigationTask implements Unique, InteractiveGroup {
             source: this,
             title: actor.name,
             description: "对自己使用",
-            actions: this.getActions(actor, actor),
+            actions: this.getActions(actor, actor.investigatableObject),
         };
         
         const roomItem: ActionGroup | null = room ? {
             source: this,
             title: room.name,
             description: "对当前房间使用",
-            actions: this.getActions(actor, actor),
+            actions: this.getActions(actor, actor.investigatableObject),
         } : null;
 
         const entityItems: ActionGroup[] = (room?.entities.values() || []).filter(entity => entity !== actor).map(entity => ({
             source: this,
             title: entity.name,
-            description: entity.getBrief(),
-            actions: this.getActions(actor, actor),
+            description: entity.brief,
+            actions: this.getActions(actor, actor.investigatableObject),
         }));
 
         return filterNotNull([
@@ -69,15 +70,18 @@ export class InvestigationTask implements Unique, InteractiveGroup {
         ]);
     }
 
-    getActions(actor: PlayerEntity, target: InvestigatableObject): Action[] {
+    getActions(actor: PlayerEntity, target: InvestigatableObject | null): Action[] {
+        if (!target) return [];
         return [
             {
                 text: "回顾线索",
                 act: () => this.reviewClues(actor, target),
+                labels: [],
             },
             ...this.getSkills().map(skill => ({
                 text: skill.name,
                 act: () => this.investigate(actor, target, skill),
+                labels: [],
             })),
         ];
     }

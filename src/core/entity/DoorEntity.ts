@@ -1,5 +1,6 @@
 import { Action, ActionGroup } from "../common";
 import { Entity, EntityData } from "../Entity";
+import { MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
 import { PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
 import { Room } from "../Room";
 import { simpleCheck } from "../task/FightingTask";
@@ -29,9 +30,9 @@ export class DoorEntity extends Entity {
             action = {
                 text: '前往',
                 labels: ['walk'],
-                act: ({ actor }) => {
+                act: ({ actor, game }) => {
                     actor.teleport(this.targetRoom);
-                    // game.appendMessage(`穿过${this.name}，进入${this.targetRoom.name}`);
+                    game.appendMessageText(`穿过${this.name}，进入${this.targetRoom.name}`, MESSAGE_TYPE_REPLACEABLE);
                 },
             };
         } else {
@@ -53,10 +54,11 @@ export class DoorEntity extends Entity {
                 },
             };
         }
+        const locked = !!(this.lock?.locked);
         return [{
             source: this,
-            title: `${this.name}：${this.targetRoom.name}`,
-            description: this.getBrief(),
+            title: `${locked ? "🔒" : ""}${this.name}：${this.targetRoom.name}`,
+            description: this.brief,
             actions: [action],
             labels: ["door-entity"],
             target: this,
@@ -64,12 +66,8 @@ export class DoorEntity extends Entity {
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
-    getBrief() {
-        return `${this.name}${this.lock?.locked ? "，已上锁" : ""}，通向${this.targetRoom.name}`;
+    get brief() {
+        const locked = !!(this.lock?.locked);
+        return `${this.name}${locked ? "，已上锁🔒" : ""}，通向${this.targetRoom.name}`;
     }
-
-    canInteract(): boolean {
-        return true;
-    }
-
 }

@@ -1,6 +1,7 @@
 import type { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "./common";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import type { Interaction } from "./Interaction";
+import { MessageType, MESSAGE_TYPE_COLLAPSE, MESSAGE_TYPE_NORMAL, MESSAGE_TYPE_REPLACEABLE } from "./message/MessageTypes";
 import type { Room } from "./Room";
 import { UniqueSet } from "./util/UniqueSet";
 
@@ -12,6 +13,7 @@ export interface GameData {
 }
 
 export interface Message {
+    type: MessageType;
     timestamp: Date;
     text: string;
 }
@@ -95,17 +97,42 @@ export class Game implements InteractiveGroup {
     }
 
     appendMessage(message: Message | string) {
-        const msg = (typeof message === "string") ? {
+        const currentMessage = (typeof message === "string") ? {
+            type: MESSAGE_TYPE_NORMAL,
             timestamp: new Date(),
             text: message,
         } : message;
+
+        const lastMessageIndex = this.messages.length - 1;
+        const lastMessage = this.messages[lastMessageIndex];
+
+        if (!lastMessage) {
+            this.messages.push(currentMessage);
+            return;
+        }
+
+        if (lastMessage.type === MESSAGE_TYPE_REPLACEABLE) {
+            this.messages.splice(lastMessageIndex, 1, currentMessage);
+        } else if (lastMessage.type === MESSAGE_TYPE_COLLAPSE) {
+            if (currentMessage.type === MESSAGE_TYPE_COLLAPSE) {
+                lastMessage.text += "\n" + currentMessage.text;
+            } else {
+                currentMessage.text;
+                this.messages.push(currentMessage);
+            }
+        } else {
+            this.messages.push(currentMessage);
+        }
         
-        this.messages.push(msg);
+    }
+
+    appendMessageText(text: string, type: MessageType = MESSAGE_TYPE_NORMAL) {
+        this.appendMessage({ text, type, timestamp: new Date() });
     }
 
     interact(interaction: Interaction) {
         const { skill, target } = interaction;
-        if (!target.canInteract()) return;
+        if (!target.canInteract(interaction.actor, interaction.skill)) return;
         skill.onInteract(interaction);
 
         // media?.onApply(interaction);

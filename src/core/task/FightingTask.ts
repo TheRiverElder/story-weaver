@@ -1,6 +1,7 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
 import { Game } from "../Game";
+import { MESSAGE_TYPE_COLLAPSE } from "../message/MessageTypes";
 import { InventoryTask } from "./InventoryTask";
 
 export enum FightingActionType {
@@ -113,7 +114,7 @@ export class FightingTask implements Unique, InteractiveGroup {
             
             this.continueEscape();
         } else {
-            this.game.appendMessage(`${entity.name}逃跑失败！`);
+            this.game.appendMessageText(`${entity.name}逃跑失败！`, MESSAGE_TYPE_COLLAPSE);
             this.turn();
         }
     }
@@ -149,7 +150,7 @@ export class FightingTask implements Unique, InteractiveGroup {
         if (this.escapingIndex >= this.participants.length && !this.escapingFinished) {
             this.remove(this.escapingParticipant.entity);
 
-            this.game.appendMessage(`${this.escapingParticipant.entity.name}逃跑成功！`);
+            this.game.appendMessageText(`${this.escapingParticipant.entity.name}逃跑成功！`, MESSAGE_TYPE_COLLAPSE);
 
             this.escapingParticipant = null;
             this.escapingIndex = 0;
@@ -210,17 +211,17 @@ export class FightingTask implements Unique, InteractiveGroup {
 
     private sigleAttack(source: LivingEntity, target: LivingEntity, prefix: string, isStrike: boolean = false): boolean {
         if (Math.random() < target.dexterity / 100) {
-            this.game.appendMessage(prefix + `${target.name}躲过了${source.name}的攻击！`);
+            this.game.appendMessageText(prefix + `${target.name}躲过了${source.name}的攻击！`, MESSAGE_TYPE_COLLAPSE);
         } else {
             if (isStrike) {
                 this.escapingFinished = true;
             }
             const damage = Math.max(0, source.attackPower - target.defensePower);
             target.mutateHealth(-damage);
-            this.game.appendMessage(prefix + `${source.name}对${target.name}造成${damage}点伤害！`);
+            this.game.appendMessageText(prefix + `${source.name}对${target.name}造成${damage}点伤害！`, MESSAGE_TYPE_COLLAPSE);
     
             if (target.health <= 0) {
-                this.game.appendMessage(`💀${target.name}阵亡！`);
+                this.game.appendMessageText(`💀${target.name}阵亡！`, MESSAGE_TYPE_COLLAPSE);
             }
         }
         return target.health > 0;
@@ -243,7 +244,7 @@ export class FightingTask implements Unique, InteractiveGroup {
             return [{
                 source: this,
                 title: this.escapingParticipant.entity.name,
-                description: this.escapingParticipant.entity.getBrief(),
+                description: this.escapingParticipant.entity.brief,
                 actions: [
                     {
                         text: "追击",
@@ -254,9 +255,10 @@ export class FightingTask implements Unique, InteractiveGroup {
                                 this.strike(actor);
                                 this.continueEscape();
                             } else {
-                                this.game.appendMessage(`${actor.name}追击${this.escapingParticipant.entity.name}失败！`);
+                                this.game.appendMessageText(`${actor.name}追击${this.escapingParticipant.entity.name}失败！`, MESSAGE_TYPE_COLLAPSE);
                             }
                         },
+                        labels: [],
                     },
                     {
                         text: "放走",
@@ -264,6 +266,7 @@ export class FightingTask implements Unique, InteractiveGroup {
                             this.release();
                             this.continueEscape();
                         },
+                        labels: [],
                     },
                 ]
             }];
@@ -280,10 +283,12 @@ export class FightingTask implements Unique, InteractiveGroup {
                         this.escape(actor);
                         this.continueRound();
                     },
+                    labels: [],
                 },
                 {
                     text: "打开背包",
                     act: ({ game }) => game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate())),
+                    labels: [],
                 },
             ],
             labels: ["menu"],
@@ -296,13 +301,14 @@ export class FightingTask implements Unique, InteractiveGroup {
             itemGroups.push({
                 source: this,
                 title: participant.entity.name,
-                description: participant.entity.getBrief(),
+                description: participant.entity.brief,
                 actions: [{
                     text: "攻击",
                     act: ({ actor }) => {
                         this.attack(actor, participant.entity);
                         this.continueRound();
                     },
+                    labels: [],
                 }],
             });
         }

@@ -17,13 +17,14 @@ export class MeleeWeapon extends Item {
         this.damage = data.damage;
     }
 
-    getActions(params: ActionParams): Action[] {
+    getItemActions(params: ActionParams): Action[] {
         return [{
             text: "装备",
             act: ({ actor }) => {
                 actor.inventory.remove(this);
                 actor.equipWeapon(this);
             },
+            labels: ["eat"],
         }];
     }
     
@@ -41,13 +42,14 @@ export class MeleeWeapon extends Item {
         }
     }
 
-    getActionsAsEntity(entity: ItemEntity, params: ActionParams): Action[] {
+    getItemEntityActions(entity: ItemEntity, params: ActionParams): Action[] {
         return [{
             text: "装备",
             act: ({ actor }) => {
                 actor.equipWeapon(this);
                 entity.remove();
             },
+            labels: ["eat"],
         }];
     }
 

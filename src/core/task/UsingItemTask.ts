@@ -24,6 +24,7 @@ export class UsingItemTask implements Unique, InteractiveGroup {
                 {
                     text: "返回",
                     act: ({ game }) => game.removeInteravtiveGroup(this),
+                    labels: [],
                 },
             ],
             labels: ["menu"],
@@ -34,7 +35,7 @@ export class UsingItemTask implements Unique, InteractiveGroup {
             if (actions && actions.length > 0) return {
                 source: this,
                 title: entity.name,
-                description: entity.getBrief(),
+                description: entity.brief,
                 actions,
                 labels: ["item"],
             };

@@ -16,7 +16,7 @@ export class NeutralEntity extends LivingEntity {
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
-    getBrief() {
+    get brief() {
         return `${this.name}（${this.health}/${this.maxHealth}）`;
     }
 

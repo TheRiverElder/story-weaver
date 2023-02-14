@@ -16,15 +16,17 @@ export class PlayerEntity extends LivingEntity {
         return [{
             source: this,
             title: this.name,
-            description: this.getBrief(),
+            description: this.brief,
             actions: [
                 {
                     text: "打开背包",
                     act: ({ game }) => {game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate()))},
+                    labels: ["opan"],
                 },
                 {
                     text: "调查现场",
                     act: ({ game }) => {game.appendInteravtiveGroup(new InvestigationTask(game))},
+                    labels: ["investigate"],
                 },
             ],
             labels: ["player-entity"],
@@ -32,7 +34,7 @@ export class PlayerEntity extends LivingEntity {
         }];
     }
 
-    getBrief(): string {
+    get brief(): string {
         return `这是你`;
     }
 

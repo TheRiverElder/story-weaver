@@ -19,7 +19,7 @@ export class NormalItem extends Item {
     //     this.usages = data.usages || [];
     // }
 
-    getActions(params: ActionParams): Action[] {
+    getItemActions(params: ActionParams): Action[] {
         return [];
     }
 

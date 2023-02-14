@@ -12,8 +12,4 @@ export class SimpleEntity extends Entity {
         this.brief = data.brief;
     }
 
-    getBrief(): string {
-        return this.brief;
-    }
-
 }

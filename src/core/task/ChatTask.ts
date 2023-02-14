@@ -36,7 +36,7 @@ export class ChatTextFragment {
         this.texts = texts;
         this.options = options;
     }
-    
+
 }
 
 export class ChatTask implements Unique, InteractiveGroup {
@@ -57,29 +57,35 @@ export class ChatTask implements Unique, InteractiveGroup {
     }
 
     getActionGroups(params: ActionParams): ActionGroup[] {
-        return (this.fragmentIndex < this.fragment.texts.length) ?[{
-            source: this,
-            title: "...",
-            description: "...",
-            actions: [{
-                text: "...",
-                act: () => this.step(),
-            }],
-        }] : this.fragment.options.map(o => ({
-            source: this,
-            title: "...",
-            description: o.text,
-            actions: [{
-                text: "...",
-                act: () => {
-                    this.game.appendMessage(`你：${o.text}`);
-                    this.jump(o.targetId);
-                    if (o.act) {
-                        o.act();
-                    }
-                },
-            }],
-        }));
+        if (this.fragmentIndex < this.fragment.texts.length) {
+            return [{
+                source: this,
+                title: "...",
+                description: "...",
+                actions: [{
+                    text: "...",
+                    act: () => this.step(),
+                    labels: ["eat"],
+                }],
+            }];
+        } else {
+            return this.fragment.options.map(o => ({
+                source: this,
+                title: "...",
+                description: o.text,
+                actions: [{
+                    text: "...",
+                    act: () => {
+                        this.game.appendMessage(`你：${o.text}`);
+                        this.jump(o.targetId);
+                        if (o.act) {
+                            o.act();
+                        }
+                    },
+                    labels: ["eat"],
+                }],
+            }));
+        }
     }
 
     step() {

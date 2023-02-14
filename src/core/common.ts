@@ -1,7 +1,5 @@
-import { Room } from "./Room";
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
-import { Entity } from "./Entity";
 import { InteractionTarget } from "./Interaction";
 
 export interface Unique {
@@ -16,16 +14,16 @@ export interface ActionParams {
 export interface Action {
     text: string;
     act(params: ActionParams): void;
-    labels?: string[];
+    labels: string[];
 }
 
 export interface ActionGroup {
-    source: Unique;
-    title: string;
-    description: string;
-    actions: Action[];
-    labels?: string[],
-    target?: InteractionTarget,
+    readonly source: Unique;
+    readonly title: string;
+    readonly description: string;
+    readonly actions: Action[];
+    readonly labels?: string[],
+    readonly target?: InteractionTarget;
 };
 
 export interface InteractiveGroup {
@@ -36,10 +34,6 @@ export type Text = string;
 
 export interface Generator<T> {
     generate(): T;
-}
-
-export interface Terrian {
-    rooms: Room[];
 }
 
 export interface GameInitializer {

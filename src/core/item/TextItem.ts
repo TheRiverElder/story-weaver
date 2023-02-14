@@ -15,7 +15,7 @@ export class TextItem extends NormalItem {
         this.texts = data.texts;
     }
 
-    getActions(): Action[] {
+    getItemActions(): Action[] {
         return [{
             text: "阅读",
             act: () => {
@@ -26,6 +26,7 @@ export class TextItem extends NormalItem {
                     0,
                 ))   
             },
+            labels: ["eat"],
         }];
     }
 }

@@ -29,9 +29,9 @@ export abstract class Item implements Unique, ProfileEffector, InteractionMedia 
         return value;
     }
 
-    abstract getActions(params: ActionParams): Action[];
+    abstract getItemActions(params: ActionParams): Action[];
 
-    getActionsAsEntity(entity: ItemEntity, params: ActionParams): Action[] { 
+    getItemEntityActions(entity: ItemEntity, params: ActionParams): Action[] { 
         return []; 
     }
 

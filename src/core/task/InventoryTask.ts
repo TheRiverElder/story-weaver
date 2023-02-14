@@ -19,6 +19,7 @@ export class InventoryTask implements Unique, InteractiveGroup {
                 {
                     text: "返回",
                     act: ({ game }) => game.removeInteravtiveGroup(this),
+                    labels: [],
                 },
             ],
             labels: ["menu"],
@@ -28,7 +29,7 @@ export class InventoryTask implements Unique, InteractiveGroup {
             source: this,
             title: item.name,
             description: "",
-            actions: item.getActions(params),
+            actions: item.getItemActions(params),
             labels: ["item"],
         }));
 

@@ -39,15 +39,15 @@ export class ItemEntity extends Entity {
         return [{
             source: this,
             title: this.name,
-            description: this.getBrief(),
-            actions: [pickUpAction, ...this.item.getActionsAsEntity(this, params)],
+            description: this.brief,
+            actions: [pickUpAction, ...this.item.getItemEntityActions(this, params)],
             labels: ["item-entity"],
             target: this,
         }];
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
-    getBrief() {
+    get brief() {
         return `【物品】${this.name}`;
     }
 
