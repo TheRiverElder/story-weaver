@@ -1,16 +1,16 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
 import { Entity } from "./Entity";
 import { Game } from "./Game";
-import { GenericInvestigatableObject, GenericInvestigatableObjectData } from "./InvestigatableObject";
+import { GenericInteractionBehavior, GenericInteractionBehaviorData } from "./InteractionBehavior";
 import { UniqueSet } from "./util/UniqueSet";
 
-export interface RoomData extends GenericInvestigatableObjectData {
+export interface RoomData extends GenericInteractionBehaviorData {
     name: string;
     game: Game;
     entities: Entity[];
 }
 
-export class Room extends GenericInvestigatableObject implements Unique, InteractiveGroup {
+export class Room extends GenericInteractionBehavior implements Unique, InteractiveGroup {
     uid: number;
     game: Game;
     name: string;

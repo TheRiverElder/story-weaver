@@ -2,18 +2,17 @@ import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "./c
 import { PlayerEntity } from "./entity/PlayerEntity";
 import { Game } from "./Game";
 import { Interaction, InteractionTarget } from "./Interaction";
-import { Clue, GenericInvestigatableObject, GenericInvestigatableObjectData } from "./InvestigatableObject";
+import { GenericInteractionBehavior, GenericInteractionBehaviorData } from "./InteractionBehavior";
 import { PropertyType } from "./profile/PropertyType";
 import { Room } from "./Room";
 
 // alert("FUCK from Entity");
 
 
-export interface EntityData extends GenericInvestigatableObjectData {
+export interface EntityData extends GenericInteractionBehaviorData {
     name: string;
     game: Game;
-    clues?: Clue[];
-    investigatableObject?: GenericInvestigatableObject;
+    investigatableObject?: GenericInteractionBehavior;
 }
 
 export abstract class Entity implements Unique, InteractiveGroup, InteractionTarget {
@@ -26,7 +25,7 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
 
     room: Room | null = null;
 
-    readonly investigatableObject: GenericInvestigatableObject | null = null;
+    readonly investigatableObject: GenericInteractionBehavior | null = null;
 
     constructor(data: EntityData) {
         this.name = data.name;
@@ -62,7 +61,7 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
         return investigatableObject.canInvestigate(actor);
     }
 
-    onReceive(interaction: Interaction): void {
+    onInteract(interaction: Interaction): void {
         const investigatableObject = this.investigatableObject;
         if (!investigatableObject) return;
 

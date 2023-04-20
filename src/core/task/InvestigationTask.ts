@@ -1,7 +1,7 @@
 import { Unique, InteractiveGroup, ActionGroup, ActionParams, Action } from "../common";
 import { PlayerEntity } from "../entity/PlayerEntity";
 import { Game } from "../Game";
-import { InvestigatableObject } from "../InvestigatableObject";
+import { InteractionBehavior } from "../InteractionBehavior";
 import { PROPERTY_TYPE_WATCH, PROPERTY_TYPE_LISTEN } from "../profile/PropertyTypes";
 import { PropertyType } from "../profile/PropertyType";
 import { filterNotNull } from "../util/lang";
@@ -70,7 +70,7 @@ export class InvestigationTask implements Unique, InteractiveGroup {
         ]);
     }
 
-    getActions(actor: PlayerEntity, target: InvestigatableObject | null): Action[] {
+    getActions(actor: PlayerEntity, target: InteractionBehavior | null): Action[] {
         if (!target) return [];
         return [
             {
@@ -93,12 +93,12 @@ export class InvestigationTask implements Unique, InteractiveGroup {
         ];
     }
 
-    investigate(actor: PlayerEntity, target: InvestigatableObject, skill: PropertyType) {
+    investigate(actor: PlayerEntity, target: InteractionBehavior, skill: PropertyType) {
         target.onInvestigate(actor, skill);
     }
 
-    reviewClues(actor: PlayerEntity, target: InvestigatableObject) {
-        const discoveredClues = target.getDiscoveredClues(actor);
+    reviewClues(actor: PlayerEntity, target: InteractionBehavior) {
+        const discoveredClues = target.getSolvedItems(actor);
         if (discoveredClues.length === 0) {
             this.game.appendMessage(`你没有从其获得过线索。`);
         } else {

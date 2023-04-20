@@ -5,7 +5,7 @@ import { EntityData, Entity } from "../Entity";
 import { Interaction } from "../Interaction";
 import { InventorySlot } from "../inventory/InventorySlot";
 import { LivingEntityInventory, SLOT_TYPE_WEAPON, SLOT_TYPE_ARMOR } from "../inventory/LivingEntityInventory";
-import { createItemClue } from "../InvestigatableObject";
+import { createItemClue } from "../InteractionBehavior";
 import { Item } from "../Item";
 import { GenericProfile } from "../profile/GenericProfile";
 import { Profile } from "../profile/Profile";
@@ -196,8 +196,8 @@ export abstract class LivingEntity extends Entity {
             game: this.game,
             name: `${this.name}的尸体`,
             brief: `这是${this.name}的尸体`,
-            maxInvestigationAmount: 5,
-            clues: [
+            maxAmount: 5,
+            items: [
                 ...this.inventory.getIndexedSlots(), 
                 ...this.inventory.getSpecialSlots(),
             ].map(slot => slot.get())
@@ -229,7 +229,7 @@ export abstract class LivingEntity extends Entity {
         return true;
     }
 
-    onReceive({ actor, skill }: Interaction) {
+    onInteract({ actor, skill }: Interaction) {
         if (skill === PROPERTY_TYPE_ATTACK) {
             this.game.appendInteravtiveGroup(new FightingTask(this.game, [actor, this]));
         }

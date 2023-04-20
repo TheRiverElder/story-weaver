@@ -11,7 +11,7 @@ export interface InteractionMedia {
 
 export interface InteractionTarget {
     canInteract(actor: PlayerEntity, skill: PropertyType): boolean;
-    onReceive(interaction: Interaction): void;
+    onInteract(interaction: Interaction): void;
 }
 
 export interface Interaction {

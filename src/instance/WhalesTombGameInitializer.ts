@@ -9,7 +9,7 @@ import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
 import { Game } from "../core/Game";
-import { Clue, createItemClue, createTextClue } from "../core/InvestigatableObject";
+import { InteractionBehaviorItem, createItemClue, createTextClue, GenericInteractionBehavior } from "../core/InteractionBehavior";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
@@ -24,6 +24,7 @@ import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
 import { simpleCheck } from "../core/task/FightingTask";
 import { GameOverTask } from "../core/task/GameOverTask";
 import { UsingItemTask } from "../core/task/UsingItemTask";
+import resources from "./resources";
 
 
 export class WhalesTombGameInitializer implements GameInitializer {
@@ -226,19 +227,16 @@ export class WhalesTombGameInitializer implements GameInitializer {
                     game,
                     name: "船长的尸体",
                     brief: "看来是被穿刺心脏而死",
-                    maxInvestigationAmount: 2,
-                    clues: [
-                        createItemClue(new TextItem({
-                            game,
-                            name: "船长日志",
-                            texts: [
-                                "3月3日 晴天：今天的乘客总觉得有些奇怪",
-                                "3月4日 阴天：似乎有些混种人在信奉什么异端，西往他们不要再我的船上搞事情",
-                                "3月5日 下雨：（字迹潦草）可恶，这群家伙要干什么？唯一能确定的是，不能只身前往海上，不能乘坐救生艇，更不能游泳",
-                                "3月6日 大风：（字迹十分潦草）如果上帝还有一丝怜悯，就让我和这艘船一起沉入这无底的深渊，而不复返吧！",
-                            ],
-                        })),
-                    ],
+                    maxAmount: 2,
+                    investigatableObject: new GenericInteractionBehavior({
+                        clues: [
+                            createItemClue(new TextItem({
+                                game,
+                                name: "船长日志",
+                                texts: resources.captainDairy.strings.content,
+                            })),
+                        ],
+                    }),
                 }),
                 new ItemEntity({item: new SignalPistolItem({
                     game,
@@ -250,12 +248,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
                     name: "残破的古卷",
                     skill: PROPERTY_TYPE_READ,
                     maxDecryptAmount: 5,
-                    texts: [
-                        "它来自一本有关深渊海洋恶魔的书",
-                        "其中一页记载了召唤与退去这种恶魔的咒语，",
-                        "但是唯一能解读出来的文字并不能确是用来召唤还是驱退它的：",
-                        "MI REEM REKIRTNEZXE IEB EMAN SED ULUTC RUF RIM NEMMOK EIS",
-                    ],
+                    texts: resources.ancientBook.strings.content,
                 })}),
             ],
         });
@@ -309,15 +302,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
         const fragments: ChatTextFragment[] = [
             new ChatTextFragment(
                 "start",
-                [
-                    "你！",
-                    "舵室有信号枪",
-                    "快，快去",
-                    "不要乘坐救生艇！",
-                    "千万不要乘坐救生艇！",
-                    "啊！",
-                    "（这个人失去了气息）",
-                ],
+                resources.crit.strings.firstMeet,
                 [
                     new ChatOption("什...？", null, () => {
                         entity.chatProvider = null;
@@ -352,7 +337,7 @@ class CritNPCEntity extends NeutralEntity {
         const corpse = super.createCorpse();
         if (!corpse) return null;
 
-        const clues: Clue[] = [
+        const clues: InteractionBehaviorItem[] = [
             createTextClue("皮肤溃烂严重，口中还有些许带有腥味的黑色液体"),
         ];
 
@@ -363,7 +348,7 @@ class CritNPCEntity extends NeutralEntity {
                 lock: this.onGetCaptainRoomDoorLock(),
             })));
 
-            corpse.investigatableObject?.clues.push(...clues);
+            corpse.investigatableObject?.items.push(...clues);
     
             return corpse;
         }
@@ -452,12 +437,12 @@ class MonsterEntity extends EnemyEntity {
         const corpse = super.createCorpse();
         if (!corpse) return null;
 
-        const clue: Clue = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
+        const clue: InteractionBehaviorItem = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
         clue.onDiscover = (clue, entity, { actor }) => {
             actor.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
         };
 
-        corpse.investigatableObject?.clues.push(clue);
+        corpse.investigatableObject?.items.push(clue);
 
         return corpse;
     }
