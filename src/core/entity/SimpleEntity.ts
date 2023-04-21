@@ -1,4 +1,4 @@
-import { Entity, EntityData } from "../Entity";
+import { Entity, EntityData } from "./Entity";
 
 export interface SimpleEntityData extends EntityData {
     brief: string;

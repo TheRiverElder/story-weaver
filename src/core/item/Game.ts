@@ -1,9 +1,9 @@
-import type { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "./common";
-import { PlayerEntity } from "./entity/PlayerEntity";
-import type { Interaction } from "./Interaction";
-import { MessageType, MESSAGE_TYPE_COLLAPSE, MESSAGE_TYPE_NORMAL, MESSAGE_TYPE_REPLACEABLE } from "./message/MessageTypes";
-import type { Room } from "./Room";
-import { UniqueSet } from "./util/UniqueSet";
+import type { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "../common";
+import { PlayerEntity } from "../entity/PlayerEntity";
+import { Interaction } from "../interaction/Interaction";
+import { MessageType, MESSAGE_TYPE_COLLAPSE, MESSAGE_TYPE_NORMAL, MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
+import type { Room } from "../room/Room";
+import { UniqueSet } from "../util/UniqueSet";
 
 // alert("FUCK from Game")
 
@@ -129,12 +129,16 @@ export class Game implements InteractiveGroup {
         this.appendMessage({ text, type, timestamp: new Date() });
     }
 
-    interact(interaction: Interaction) {
-        const { skill, target } = interaction;
-        if (!target.canInteract(interaction.actor, interaction.skill)) return;
-        skill.onInteract(interaction);
+    // 发布一条互动，返回是否执行成功
+    interact(interaction: Interaction): boolean {
+        const { media, skill, target } = interaction;
+        
+        if (!target.canReceiveInteraction(interaction)) return false;
 
-        // media?.onApply(interaction);
-        // target.onReceive(interaction);
+        media.onApplyInteraction(interaction);
+        skill.onPassInteraction(interaction);
+        target.onReceiveInteraction(interaction);
+
+        return true;
     }
 }

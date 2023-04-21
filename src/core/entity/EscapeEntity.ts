@@ -1,5 +1,5 @@
 import { Action, ActionGroup } from "../common";
-import { Entity } from "../Entity";
+import { Entity } from "./Entity";
 
 
 export class EscapeEntity extends Entity {

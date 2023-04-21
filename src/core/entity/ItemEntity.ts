@@ -1,7 +1,7 @@
 import { ActionGroup, Action, ActionParams } from "../common";
-import { Entity } from "../Entity";
-import { Game } from "../Game";
-import { Item } from "../Item";
+import { Entity } from "./Entity";
+import { Game } from "../item/Game";
+import { Item } from "../item/Item";
 
 // alert("FUCK from ItemEntity");
 

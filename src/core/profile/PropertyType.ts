@@ -1,4 +1,5 @@
-import { Interaction } from "../Interaction";
+import { Interaction } from "../interaction/Interaction";
+
 
 export class PropertyType {
     public readonly id: string;
@@ -11,5 +12,5 @@ export class PropertyType {
         this.defaultValue = defaultValue;
     }
 
-    onInteract(interaction: Interaction): void { }
+    onPassInteraction(interaction: Interaction): void { }
 }

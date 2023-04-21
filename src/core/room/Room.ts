@@ -1,8 +1,8 @@
-import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "./common";
-import { Entity } from "./Entity";
-import { Game } from "./Game";
-import { GenericInteractionBehavior, GenericInteractionBehaviorData } from "./InteractionBehavior";
-import { UniqueSet } from "./util/UniqueSet";
+import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
+import { Entity } from "../entity/Entity";
+import { GenericInteractionBehaviorData, GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
+import { Game } from "../item/Game";
+import { UniqueSet } from "../util/UniqueSet";
 
 export interface RoomData extends GenericInteractionBehaviorData {
     name: string;

@@ -1,13 +1,13 @@
-import { Action, ActionParams, Unique } from "./common";
-import { Entity } from "./Entity";
-import { ItemEntity } from "./entity/ItemEntity";
-import { LivingEntity } from "./entity/LivingEntity";
-import { PlayerEntity } from "./entity/PlayerEntity";
+import { Action, ActionParams, Unique } from "../common";
+import { Entity } from "../entity/Entity";
+import { ItemEntity } from "../entity/ItemEntity";
+import { LivingEntity } from "../entity/LivingEntity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Game } from "./Game";
-import { Interaction, InteractionMedia } from "./Interaction";
-import { Profile } from "./profile/Profile";
-import { ProfileEffector } from "./profile/ProfileEffector";
-import { PropertyType } from "./profile/PropertyType";
+import { Profile } from "../profile/Profile";
+import { ProfileEffector } from "../profile/ProfileEffector";
+import { PropertyType } from "../profile/PropertyType";
+import { Interaction, InteractionMedia } from "../interaction/Interaction";
 
 export interface ItemData {
     name: string;
@@ -44,5 +44,5 @@ export abstract class Item implements Unique, ProfileEffector, InteractionMedia 
         return [];
     }
 
-    onUse(interaction: Interaction) { }
+    onApplyInteraction(interaction: Interaction) { }
 }

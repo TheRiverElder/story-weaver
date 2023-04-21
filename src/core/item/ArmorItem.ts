@@ -1,7 +1,7 @@
 import { ActionParams, Action } from "../common";
 import { ItemEntity } from "../entity/ItemEntity";
 import { LivingEntity } from "../entity/LivingEntity";
-import { Item, ItemData } from "../Item";
+import { Item, ItemData } from "./Item";
 
 export interface ArmorItemData extends ItemData {
     defense: number;

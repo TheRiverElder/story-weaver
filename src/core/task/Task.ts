@@ -1,6 +1,6 @@
-import { Uid } from "./BasicTypes";
-import { ActionGroup, ActionParams, InteractiveGroup } from "./common";
-import { Game } from "./Game";
+import { Uid } from "../BasicTypes";
+import { ActionGroup, ActionParams, InteractiveGroup } from "../common";
+import { Game } from "../item/Game";
 
 export abstract class Task implements InteractiveGroup {
     readonly uid: Uid;

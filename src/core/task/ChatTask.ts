@@ -1,6 +1,6 @@
 import { Unique, InteractiveGroup, ActionGroup, ActionParams } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
-import { Game } from "../Game";
+import { Game } from "../item/Game";
 
 export class Chater {
     public readonly entity: LivingEntity;

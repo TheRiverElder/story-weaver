@@ -1,15 +1,14 @@
 import { Buff } from "../core/buff/Buff";
 import { BuffType } from "../core/buff/BuffType";
 import { Action, ActionGroup, ActionParams, GameInitializer, Generator } from "../core/common";
-import { Entity } from "../core/Entity";
+import { Entity } from "../core/entity/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
 import { ItemEntity } from "../core/entity/ItemEntity";
 import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity } from "../core/entity/PlayerEntity";
 import { SimpleEntity } from "../core/entity/SimpleEntity";
-import { Game } from "../core/Game";
-import { InteractionBehaviorItem, createItemClue, createTextClue, GenericInteractionBehavior } from "../core/InteractionBehavior";
+import { Game } from "../core/item/Game";
 import { ArmorItem } from "../core/item/ArmorItem";
 import { FoodItem } from "../core/item/FoodItem";
 import { KeyItem } from "../core/item/KeyItem";
@@ -19,12 +18,16 @@ import { TextItem, TextItemData } from "../core/item/TextItem";
 import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { Profile } from "../core/profile/Profile";
 import { PropertyType } from "../core/profile/PropertyType";
-import { Room } from "../core/Room";
+import { Room } from "../core/room/Room";
 import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
 import { simpleCheck } from "../core/task/FightingTask";
 import { GameOverTask } from "../core/task/GameOverTask";
 import { UsingItemTask } from "../core/task/UsingItemTask";
 import resources from "./resources";
+import { GenericInteractionBehavior } from "../core/interaction/GenericInteractionBehavior";
+import { InteractionBehaviorItem } from "../core/interaction/item/InteractionBehaviorItem";
+import { InteractionBehaviorItemCreators } from "../core/interaction/item/InteractionBehaviorItemCreators";
+import CustomInteractionBebaviorItem from "../core/interaction/item/impl/CustomInteractionBebaviorItem";
 
 
 export class WhalesTombGameInitializer implements GameInitializer {
@@ -227,10 +230,11 @@ export class WhalesTombGameInitializer implements GameInitializer {
                     game,
                     name: "船长的尸体",
                     brief: "看来是被穿刺心脏而死",
-                    maxAmount: 2,
-                    investigatableObject: new GenericInteractionBehavior({
-                        clues: [
-                            createItemClue(new TextItem({
+                    interactionBehavior: new GenericInteractionBehavior({
+                        game,
+                        maxCounter: 2,
+                        items: [
+                            InteractionBehaviorItemCreators.item(new TextItem({
                                 game,
                                 name: "船长日志",
                                 texts: resources.captainDairy.strings.content,
@@ -338,17 +342,17 @@ class CritNPCEntity extends NeutralEntity {
         if (!corpse) return null;
 
         const clues: InteractionBehaviorItem[] = [
-            createTextClue("皮肤溃烂严重，口中还有些许带有腥味的黑色液体"),
+            InteractionBehaviorItemCreators.text(this.game, ["皮肤溃烂严重，口中还有些许带有腥味的黑色液体"]),
         ];
 
         if (this.onGetCaptainRoomDoorLock) {
-            clues.push(createItemClue(new KeyItem({
+            clues.push(InteractionBehaviorItemCreators.item(new KeyItem({
                 game: this.game,
                 name: "钥匙",
                 lock: this.onGetCaptainRoomDoorLock(),
             })));
 
-            corpse.investigatableObject?.items.push(...clues);
+            (corpse.interactionBehavior as GenericInteractionBehavior).items.push(...clues);
     
             return corpse;
         }
@@ -437,12 +441,16 @@ class MonsterEntity extends EnemyEntity {
         const corpse = super.createCorpse();
         if (!corpse) return null;
 
-        const clue: InteractionBehaviorItem = createTextClue("十分腥臭，全身为粘液，找不到任何骨头");
-        clue.onDiscover = (clue, entity, { actor }) => {
-            actor.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
-        };
+        const clue: InteractionBehaviorItem = new CustomInteractionBebaviorItem({
+            game: this.game,
+            onSolve: (interaction) => {
+                this.game.appendMessageText("十分腥臭，全身为粘液，找不到任何骨头");
+                interaction.actor.buffs.add(new CallOfAbyssBuff(this.game, 1, 0, 0.05));
+            },
+            onReview: () => this.game.appendMessageText("十分腥臭，全身为粘液，找不到任何骨头"),
+        });
 
-        corpse.investigatableObject?.items.push(clue);
+        (corpse.interactionBehavior as GenericInteractionBehavior)?.items.push(clue);
 
         return corpse;
     }

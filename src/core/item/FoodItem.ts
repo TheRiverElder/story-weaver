@@ -1,6 +1,6 @@
 import { ActionParams, Action } from "../common";
 import { ItemEntity } from "../entity/ItemEntity";
-import { ItemData } from "../Item";
+import { ItemData } from "./Item";
 import { NormalItem } from "./NormalItem";
 
 export interface FoodItemData extends ItemData {

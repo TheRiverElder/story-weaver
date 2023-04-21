@@ -1,6 +1,6 @@
 import { ActionParams, Action } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
-import { Item } from "../Item";
+import { Item } from "./Item";
 
 // export interface Usage {
 //     text: string;

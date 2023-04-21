@@ -1,5 +1,5 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
-import { Game } from "../Game";
+import { Game } from "../item/Game";
 
 export class GameOverTask implements Unique, InteractiveGroup {
 

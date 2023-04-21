@@ -1,5 +1,5 @@
 import { Action } from "../common";
-import { ItemData } from "../Item";
+import { ItemData } from "./Item";
 import { ChatOption, ChatTask, ChatTextFragment } from "../task/ChatTask";
 import { NormalItem } from "./NormalItem";
 

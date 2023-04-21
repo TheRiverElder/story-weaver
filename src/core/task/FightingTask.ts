@@ -1,6 +1,6 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
 import { LivingEntity } from "../entity/LivingEntity";
-import { Game } from "../Game";
+import { Game } from "../item/Game";
 import { MESSAGE_TYPE_COLLAPSE } from "../message/MessageTypes";
 import { InventoryTask } from "./InventoryTask";
 

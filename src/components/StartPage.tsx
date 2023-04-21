@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { Game } from "../core/Game";
+import { Game } from "../core/item/Game";
 import { IncrementNumberGenerator } from "../core/util/IncrementNumberGenerator";
 import { WhalesTombGameInitializer } from "../instance/WhalesTombGameInitializer";
 import "./StartPage.css";

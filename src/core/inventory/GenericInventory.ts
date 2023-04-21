@@ -1,4 +1,4 @@
-import { Item } from "../Item";
+import { Item } from "../item/Item";
 import { Inventory } from "./Inventory";
 import { InventorySlot } from "./InventorySlot";
 import { InventorySlotType } from "./InventorySlotType";

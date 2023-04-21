@@ -1,8 +1,8 @@
 import { ActionParams, Action } from "../common";
-import { Entity } from "../Entity";
+import { Entity } from "../entity/Entity";
 import { DoorEntity, Lock } from "../entity/DoorEntity";
 import { PlayerEntity } from "../entity/PlayerEntity";
-import { ItemData } from "../Item";
+import { ItemData } from "./Item";
 import { UsingItemTask } from "../task/UsingItemTask";
 import { NormalItem } from "./NormalItem";
 

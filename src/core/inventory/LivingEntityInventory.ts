@@ -1,5 +1,5 @@
 import { LivingEntity } from "../entity/LivingEntity";
-import { Item } from "../Item";
+import { Item } from "../item/Item";
 import { GenericInventory } from "./GenericInventory"
 import { InventorySlot } from "./InventorySlot";
 import { InventorySlotType } from "./InventorySlotType";

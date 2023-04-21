@@ -1,12 +1,10 @@
 import { Buff } from "../buff/Buff";
 import { BuffSet } from "../buff/BuffSet";
 import { ActionParams, ActionGroup, Action } from "../common";
-import { EntityData, Entity } from "../Entity";
-import { Interaction } from "../Interaction";
+import { EntityData, Entity } from "./Entity";
 import { InventorySlot } from "../inventory/InventorySlot";
 import { LivingEntityInventory, SLOT_TYPE_WEAPON, SLOT_TYPE_ARMOR } from "../inventory/LivingEntityInventory";
-import { createItemClue } from "../InteractionBehavior";
-import { Item } from "../Item";
+import { Item } from "../item/Item";
 import { GenericProfile } from "../profile/GenericProfile";
 import { Profile } from "../profile/Profile";
 import { ProfileEffector } from "../profile/ProfileEffector";
@@ -16,6 +14,9 @@ import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { filterNotNull } from "../util/lang";
 import { ItemEntity } from "./ItemEntity";
 import { SimpleEntity } from "./SimpleEntity";
+import { GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
+import { InteractionBehaviorItemCreators } from "../interaction/item/InteractionBehaviorItemCreators";
+import { Interaction } from "../interaction/Interaction";
 
 // alert("FUCK from LivingEntity");
 
@@ -196,13 +197,16 @@ export abstract class LivingEntity extends Entity {
             game: this.game,
             name: `${this.name}的尸体`,
             brief: `这是${this.name}的尸体`,
-            maxAmount: 5,
-            items: [
-                ...this.inventory.getIndexedSlots(), 
-                ...this.inventory.getSpecialSlots(),
-            ].map(slot => slot.get())
-            .filter(item => !!item)
-            .map(item => createItemClue(item!!)),
+            interactionBehavior: new GenericInteractionBehavior({
+                game: this.game,
+                maxCounter: 5,
+                items: [
+                    ...this.inventory.getIndexedSlots(), 
+                    ...this.inventory.getSpecialSlots(),
+                ].map(slot => slot.get())
+                .filter(item => !!item)
+                .map(item => InteractionBehaviorItemCreators.item(item!!)),
+            }),
         });
     }
 
@@ -229,7 +233,7 @@ export abstract class LivingEntity extends Entity {
         return true;
     }
 
-    onInteract({ actor, skill }: Interaction) {
+    onReceiveInteraction({ actor, skill }: Interaction) {
         if (skill === PROPERTY_TYPE_ATTACK) {
             this.game.appendInteravtiveGroup(new FightingTask(this.game, [actor, this]));
         }

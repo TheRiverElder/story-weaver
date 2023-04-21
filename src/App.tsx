@@ -2,7 +2,7 @@ import { Component } from 'react';
 import './App.css';
 import GameView from './components/GameView';
 import { StartPage } from './components/StartPage';
-import { Game } from './core/Game';
+import { Game } from './core/item/Game';
 
 interface AppProps {
     

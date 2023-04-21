@@ -1,8 +1,8 @@
-import { Interaction } from "../Interaction";
+import { Interaction } from "../interaction/Interaction";
 import { PropertyType } from "./PropertyType";
 
 export class UsePropertyType extends PropertyType {
-    onInteract(interaction: Interaction): void {
-        interaction.media?.onUse(interaction);
+    onPassInteraction(interaction: Interaction): void {
+        interaction.media?.onApplyInteraction(interaction);
     }
 }

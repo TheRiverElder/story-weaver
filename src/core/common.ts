@@ -1,6 +1,6 @@
 import { PlayerEntity } from "./entity/PlayerEntity";
-import { Game } from "./Game";
-import { InteractionTarget } from "./Interaction";
+import { Game } from "./item/Game";
+import { InteractionTarget } from "./interaction/Interaction";
 
 export interface Unique {
     uid: number;

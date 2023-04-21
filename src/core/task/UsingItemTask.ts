@@ -1,5 +1,5 @@
 import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
-import { Item } from "../Item";
+import { Item } from "../item/Item";
 import { filterNotNull } from "../util/lang";
 
 export class UsingItemTask implements Unique, InteractiveGroup {

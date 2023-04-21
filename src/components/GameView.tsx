@@ -1,13 +1,13 @@
 import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
-import { Game, Message } from "../core/Game";
-import { Interaction, MEDIA_EMPTY } from "../core/Interaction";
+import { Game, Message } from "../core/item/Game";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
 import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
 import { filterNotNull } from "../core/util/lang";
+import { Interaction, MEDIA_EMPTY } from "../core/interaction/Interaction";
 
 interface GameViewProps {
     game: Game;
@@ -167,7 +167,17 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
     renderSkillSelectionBar() {
         const actionGroup = this.state.actionGroups[this.state.groupIndex];
-        const collapsed = !(actionGroup && actionGroup.target?.canInteract(this.props.game.adventurer, PROPERTY_TYPE_USE));
+        const target = actionGroup?.target;
+        let collapsed = true;
+        if (target) {
+            const interaction: Interaction = {
+                actor: this.props.game.adventurer,
+                media: MEDIA_EMPTY,
+                skill: PROPERTY_TYPE_USE,
+                target: actionGroup.target,
+            };
+            collapsed = !target.canReceiveInteraction(interaction);
+        }
         return (
             <div className={ classNames("skill-selection-bar", { collapsed }) }>
                 { this.getSkills().map(skill => (

@@ -1,8 +1,8 @@
 import { Action, ActionGroup } from "../common";
-import { Entity, EntityData } from "../Entity";
+import { Entity, EntityData } from "./Entity";
 import { MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
 import { PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
-import { Room } from "../Room";
+import { Room } from "../room/Room";
 import { simpleCheck } from "../task/FightingTask";
 
 export interface DoorEntityData extends EntityData {
