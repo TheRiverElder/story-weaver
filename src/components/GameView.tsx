@@ -13,12 +13,12 @@ interface GameViewProps {
     game: Game;
     onReturn: () => void;
 }
- 
+
 interface GameViewState {
     actionGroups: ActionGroup[];
     groupIndex: number;
 }
- 
+
 class GameView extends Component<GameViewProps, GameViewState> {
 
     constructor(props: GameViewProps) {
@@ -44,7 +44,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
     update = () => {
         this.programCounter++;
-        this.setState((_, { game }) => ({ 
+        this.setState((_, { game }) => ({
             actionGroups: game.getActionGroups({ game, actor: game.adventurer }),
             groupIndex: -1,
         }));
@@ -61,25 +61,27 @@ class GameView extends Component<GameViewProps, GameViewState> {
     render() {
         return (
             <div className="GameView fill">
-                { this.renderTopBar() }
+                {this.renderTopBar()}
 
-                <main className="messages fill-x" ref={ this.messageBox }>
-                    { this.props.game.messages.map((m, i) => (
-                        <div className="message animate-message-appear" key={i}>
-                            <span className="timestamp">{timestampToString(m.timestamp)}</span>
-                            <div className="text">{this.renderMessage(m)}</div>
-                        </div>
-                    )) }
-                </main>
+                <div className="content">
+                    <main className="messages fill-x" ref={this.messageBox}>
+                        {this.props.game.messages.map((m, i) => (
+                            <div className="message animate-message-appear" key={i}>
+                                <span className="timestamp">{timestampToString(m.timestamp)}</span>
+                                <div className="text">{this.renderMessage(m)}</div>
+                            </div>
+                        ))}
+                    </main>
 
-                <div 
-                    className="cards fill-x animate-flash-appear" key={ this.programCounter }
-                    onClick={this.resetSelectedGroup.bind(this)}
-                >
-                    { this.state.actionGroups.map(this.renderActionGroupView.bind(this)) }
+                    <div
+                        className="cards fill-x animate-flash-appear" key={this.programCounter}
+                        onClick={this.resetSelectedGroup.bind(this)}
+                    >
+                        {this.state.actionGroups.map(this.renderActionGroupView.bind(this))}
+                    </div>
+
+                    {this.renderSkillSelectionBar()}
                 </div>
-                
-                { this.renderSkillSelectionBar() }
             </div>
         );
     }
@@ -112,12 +114,12 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
         return (
             <header className="top-bar">
-                { properties.map(([icon, content]) => (content !== undefined) && (
-                    <div className="property" key={ icon }>
+                {properties.map(([icon, content]) => (content !== undefined) && (
+                    <div className="property" key={icon}>
                         <span className="icon">{icon}</span>
                         <span className="content">{content}</span>
                     </div>
-                )) }
+                ))}
             </header>
         );
     }
@@ -125,22 +127,22 @@ class GameView extends Component<GameViewProps, GameViewState> {
     renderActionGroupView(actionGroup: ActionGroup, index: number, actionGroups: ActionGroup[]) {
         const groupIndex = this.state.groupIndex;
         return (
-            <div 
-                className={ classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
+            <div
+                className={classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
             >
-                <div 
-                    className={ classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty") } 
-                    key={ index } 
+                <div
+                    className={classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty")}
+                    key={index}
                     onClick={event => this.toggleSelectedGroup(event, index)}
                 >
                     <div className="content">
                         <div>
-                            <h3 className="title">{ actionGroup.title }</h3>
-                            <article>{ actionGroup.description }</article>
+                            <h3 className="title">{actionGroup.title}</h3>
+                            <article>{actionGroup.description}</article>
                         </div>
 
                         <div className="buttons fill-x">
-                            { actionGroup.actions.map(this.renderActionButton.bind(this)) }
+                            {actionGroup.actions.map(this.renderActionButton.bind(this))}
                         </div>
 
                         <div className="index">
@@ -148,7 +150,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                         </div>
                     </div>
                     <div className="small-title">
-                        <span>{ actionGroup.title }</span>
+                        <span>{actionGroup.title}</span>
                     </div>
                 </div>
             </div>
@@ -157,11 +159,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
     renderActionButton(action: Action, index: number) {
         return (
-            <button 
-                className={ classNames("action-button", "fill-x", action.labels || "empty") }
-                key={ index }
-                onClick={ event => this.onClickActionButton(event, action) }
-            >{ action.text }</button>
+            <button
+                className={classNames("action-button", "fill-x", action.labels || "empty")}
+                key={index}
+                onClick={event => this.onClickActionButton(event, action)}
+            >{action.text}</button>
         );
     }
 
@@ -179,10 +181,10 @@ class GameView extends Component<GameViewProps, GameViewState> {
             collapsed = !target.canReceiveInteraction(interaction);
         }
         return (
-            <div className={ classNames("skill-selection-bar", { collapsed }) }>
-                { this.getSkills().map(skill => (
+            <div className={classNames("skill-selection-bar", { collapsed })}>
+                {this.getSkills().map(skill => (
                     <button onClick={() => this.onClickSkillButton(skill)}>{skill.name}</button>
-                )) }
+                ))}
             </div>
         );
     }
@@ -218,11 +220,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
         const target = actionGroup.target;
         if (!target) return;
-        
+
         const actor = this.props.game.adventurer;
         const interaction: Interaction = {
             actor,
-            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || MEDIA_EMPTY, 
+            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || MEDIA_EMPTY,
             skill,
             target,
         };
@@ -231,7 +233,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
         this.forceUpdate();
     }
 }
- 
+
 export default GameView;
 
 function timestampToString(timestamp: Date): string {
