@@ -3,7 +3,7 @@ import React, { Component, MouseEvent } from "react";
 import { Action, ActionGroup } from "../core/common";
 import { Game, Message } from "../core/item/Game";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
-import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
+import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
 import { filterNotNull } from "../core/util/lang";
@@ -180,6 +180,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
             };
             collapsed = !target.canReceiveInteraction(interaction);
         }
+        // console.log("this.state.actionGroups", this.state.actionGroups);
+        // console.log("this.state.groupIndex", this.state.groupIndex);
+        // console.log("actionGroup", actionGroup);
+        // console.log("target", target);
+        // console.log("collapsed", collapsed);
         return (
             <div className={classNames("skill-selection-bar", { collapsed })}>
                 {this.getSkills().map(skill => (
@@ -194,6 +199,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
             PROPERTY_TYPE_ATTACK,
             PROPERTY_TYPE_LISTEN,
             PROPERTY_TYPE_WATCH,
+            PROPERTY_TYPE_STRENGTH,
             this.props.game.adventurer.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() && PROPERTY_TYPE_USE,
         ]);
     }

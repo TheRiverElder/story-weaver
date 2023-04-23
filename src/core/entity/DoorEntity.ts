@@ -1,9 +1,13 @@
 import { Action, ActionGroup } from "../common";
 import { Entity, EntityData } from "./Entity";
 import { MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
-import { PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
+import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
 import { Room } from "../room/Room";
 import { simpleCheck } from "../task/FightingTask";
+import CustomInteractionBebaviorItem from "../interaction/item/impl/CustomInteractionBebaviorItem";
+import { Interaction } from "../interaction/Interaction";
+import { GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
+import { PlayerEntity } from "./PlayerEntity";
 
 export interface DoorEntityData extends EntityData {
     targetRoom: Room;
@@ -22,6 +26,38 @@ export class DoorEntity extends Entity {
         super(data);
         this.targetRoom = data.targetRoom;
         this.lock = data.lock || null;
+
+        let interactionBehavior = this.interactionBehavior;
+        if (!interactionBehavior) {
+            interactionBehavior = new GenericInteractionBehavior({
+                game: this.game,
+                maxCounter: Number.POSITIVE_INFINITY,
+            });
+            this.interactionBehavior = interactionBehavior;
+        }
+        if (this.lock && this.lock.locked && interactionBehavior) {
+            interactionBehavior.setItems([
+                new CustomInteractionBebaviorItem({
+                    game: this.game,
+                    validSkills: [PROPERTY_TYPE_STRENGTH],
+                    isVisible: () => !!(this.lock && this.lock.locked),
+                    onSolve: ({ actor }: Interaction) => this.onRushTheDoor(actor, true), 
+                    onFail: ({ actor }: Interaction) => this.onRushTheDoor(actor, false),
+                }),
+            ]);
+        }
+    }
+
+    onRushTheDoor(actor: PlayerEntity, succeeded: boolean) {
+        if (!this.lock) return false;
+        const strength = actor.profile.getProperty(PROPERTY_TYPE_STRENGTH);
+        const damage = Math.max(1, Math.round(strength * 0.05));
+        const message = `以${damage}点生命为代价，` + (succeeded ? "撞开了门" : "也没把门撞开");
+        this.game.appendMessage(message);
+        actor.health -= damage;
+        if (succeeded) {
+            this.lock.locked = false;
+        }
     }
 
     getActionGroups(): ActionGroup[] {
@@ -41,16 +77,7 @@ export class DoorEntity extends Entity {
                 labels: ['rush'],
                 act: ({ actor }) => {
                     if (!this.lock || !this.lock.locked) return;
-
-                    const strength = actor.profile.getProperty(PROPERTY_TYPE_STRENGTH);
-                    const succeeded = simpleCheck(strength);
-                    const damage = Math.max(1, Math.round(strength * 0.05));
-                    const message = `以${damage}点生命为代价，` + (succeeded ? "撞开了门" : "也没把门撞开");
-                    this.game.appendMessage(message);
-                    actor.health -= damage;
-                    if (succeeded) {
-                        this.lock.locked = false;
-                    }
+                    this.onRushTheDoor(actor, simpleCheck(actor.getProperty(PROPERTY_TYPE_STRENGTH)));
                 },
             };
         }
@@ -61,7 +88,7 @@ export class DoorEntity extends Entity {
             description: this.brief,
             actions: [action],
             labels: ["door-entity"],
-            target: this,
+            target: this.interactionBehavior || undefined,
         }];
     }
 

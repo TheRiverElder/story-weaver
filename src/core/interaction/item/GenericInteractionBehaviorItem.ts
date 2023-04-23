@@ -22,6 +22,10 @@ export default abstract class GenericInteractionBehaviorItem implements Interact
         this.validSkills = new Set(args.validSkills || []);
     }
 
+    isVisible(player: PlayerEntity): boolean {
+        return true;
+    }
+
     setSolved(player: PlayerEntity) {
         this.solved = true;
     }
@@ -35,6 +39,8 @@ export default abstract class GenericInteractionBehaviorItem implements Interact
     }
 
     abstract onSolve(interaction: Interaction): void;
+
+    onFail(interaction: Interaction): void { }
 
     abstract onReview(player: PlayerEntity): void;
 }

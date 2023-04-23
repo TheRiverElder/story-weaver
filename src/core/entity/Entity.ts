@@ -24,7 +24,7 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
 
     room: Room | null = null;
 
-    readonly interactionBehavior: InteractionBehavior | null = null;
+    interactionBehavior: InteractionBehavior | null = null;
 
     constructor(data: EntityData) {
         this.name = data.name;

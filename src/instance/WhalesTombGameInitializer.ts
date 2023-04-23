@@ -15,7 +15,7 @@ import { KeyItem } from "../core/item/KeyItem";
 import { MeleeWeapon } from "../core/item/MeleeWeapon";
 import { NormalItem } from "../core/item/NormalItem";
 import { TextItem, TextItemData } from "../core/item/TextItem";
-import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
+import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { Profile } from "../core/profile/Profile";
 import { PropertyType } from "../core/profile/PropertyType";
 import { Room } from "../core/room/Room";
@@ -54,6 +54,7 @@ export class WhalesTombGameInitializer implements GameInitializer {
             tags: ["human"],
         }) : game.adventurer;
         adventurer.profile.setProperty(PROPERTY_TYPE_WATCH, 70);
+        adventurer.profile.setProperty(PROPERTY_TYPE_STRENGTH, 65);
 
         const crit = this.createEntityCrit(game);
         crit.onGetCaptainRoomDoorLock = () => captainRoomDoorLock;

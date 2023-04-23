@@ -4,6 +4,9 @@ import { Interaction } from "../Interaction";
 
 export interface InteractionBehaviorItem {
 
+    // 是否可见
+    isVisible(player: PlayerEntity): boolean;
+
     // 设为已经被破解
     setSolved(player: PlayerEntity): void;
 
@@ -15,6 +18,9 @@ export interface InteractionBehaviorItem {
     
     // 已经破解，执行破解后的业务
     onSolve(interaction: Interaction): void;
+    
+    // 破解失败
+    onFail(interaction: Interaction): void;
     
     // 已经破解过，回顾线索
     onReview(player: PlayerEntity): void;

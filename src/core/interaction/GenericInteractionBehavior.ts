@@ -25,6 +25,14 @@ export class GenericInteractionBehavior implements InteractionBehavior {
         this.counter = 0;
     }
 
+    getItems() {
+        return this.items;
+    }
+
+    setItems(items: Array<InteractionBehaviorItem>) {
+        this.items = items;
+    }
+
     canReceiveInteraction(interaction: Interaction): boolean {
         return this.counter < this.maxCounter;
     }
@@ -38,17 +46,14 @@ export class GenericInteractionBehavior implements InteractionBehavior {
 
         const clues = this.items.filter(clue => !clue.isSolved(actor) && clue.isValidSkill(skill));
         if (clues.length === 0) return;
-        this.game.appendMessage("什么都没发现");
 
         const clue = clues[0];
         this.counter++;
         if (simpleCheck(actor.getProperty(skill))) {
             clue.setSolved(actor);
-            this.game.appendMessage("❗新发现：");
             clue.onSolve(interaction);
-            
         } else {
-            this.game.appendMessage("一番检查后，什么都没发现");
+            clue.onFail(interaction);
         }
     }
 
