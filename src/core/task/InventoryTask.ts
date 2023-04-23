@@ -1,6 +1,11 @@
-import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
+import ActionGroup from "../action/ActionGroup";
+import CustomActionGroup from "../action/CustomActionGroup";
+import GameObject from "../action/GameObject";
+import CustomAction from "../action/impl/CustomAction";
+import { Unique } from "../BasicTypes";
+import { PlayerEntity } from "../entity/PlayerEntity";
 
-export class InventoryTask implements Unique, InteractiveGroup {
+export class InventoryTask implements Unique, GameObject {
 
     uid: number;
 
@@ -9,27 +14,24 @@ export class InventoryTask implements Unique, InteractiveGroup {
     }
 
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
-        const actor = params.actor;
-        const menu: ActionGroup = {
-            source: this,
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
+        const menu: ActionGroup = new CustomActionGroup({
             title: "菜单",
-            description: `共${params.actor.inventory.count()}项物品`,
+            description: `共${actor.inventory.count()}项物品`,
             actions: [
-                {
+                new CustomAction({
                     text: "返回",
                     act: ({ game }) => game.removeInteravtiveGroup(this),
                     labels: [],
-                },
+                }),
             ],
             labels: ["menu"],
-        };
+        });
 
-        const itemGroups: ActionGroup[] = params.actor.inventory.getItems().map(item => ({
-            source: this,
+        const itemGroups: ActionGroup[] = actor.inventory.getItems().map(item => new CustomActionGroup({
             title: item.name,
             description: "",
-            actions: item.getItemActions(params),
+            actions: item.getItemActions(actor),
             labels: ["item"],
         }));
 
@@ -37,22 +39,21 @@ export class InventoryTask implements Unique, InteractiveGroup {
             const item = slot.item;
             if (!item) continue;
 
-            itemGroups.unshift({
-                source: this,
+            itemGroups.unshift(new CustomActionGroup({
                 title: item.name,
                 description: "",
-                actions: [{
+                actions: [new CustomAction({
                     text: `取下该${slot.type.name}` ,
                     labels: ['unequip'],
-                    act: ({ game, actor }) => {
+                    act: (actor) => {
                         const item = slot.set(null);
                         if (item) {
                             actor.appendOrDropItem(item);
                         }
                     },
-                }],
+                })],
                 labels: ["item"],
-            });
+            }));
         }
 
         return [

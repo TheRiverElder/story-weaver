@@ -1,14 +1,15 @@
-import { ActionParams } from "../common";
+import { Productor } from "../BasicTypes";
 import { ChatTask } from "../task/ChatTask";
 import { FightingActionType, FightingTask } from "../task/FightingTask";
 import { LivingEntity, LivingEntityData } from "./LivingEntity";
+import { PlayerEntity } from "./PlayerEntity";
 
 export interface NeutralEntityData extends LivingEntityData {
-    chatProvider?: (params: ActionParams) => ChatTask | null;
+    chatProvider?: Productor<PlayerEntity, ChatTask | null>;
 }
 
 export class NeutralEntity extends LivingEntity {
-    chatProvider: ((params: ActionParams) => ChatTask | null) | null;
+    chatProvider: Productor<PlayerEntity, ChatTask | null> | null;
 
     constructor(data: NeutralEntityData) {
         super(data);

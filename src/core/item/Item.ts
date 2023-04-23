@@ -1,4 +1,3 @@
-import { Action, ActionParams, Unique } from "../common";
 import { Entity } from "../entity/Entity";
 import { ItemEntity } from "../entity/ItemEntity";
 import { LivingEntity } from "../entity/LivingEntity";
@@ -8,6 +7,8 @@ import { Profile } from "../profile/Profile";
 import { ProfileEffector } from "../profile/ProfileEffector";
 import { PropertyType } from "../profile/PropertyType";
 import { Interaction, InteractionMedia } from "../interaction/Interaction";
+import Action from "../action/Action";
+import { Unique } from "../BasicTypes";
 
 export interface ItemData {
     name: string;
@@ -29,9 +30,9 @@ export abstract class Item implements Unique, ProfileEffector, InteractionMedia 
         return value;
     }
 
-    abstract getItemActions(params: ActionParams): Action[];
+    abstract getItemActions(actor: PlayerEntity): Action[];
 
-    getItemEntityActions(entity: ItemEntity, params: ActionParams): Action[] { 
+    getItemEntityActions(entity: ItemEntity, actor: PlayerEntity): Action[] { 
         return []; 
     }
 

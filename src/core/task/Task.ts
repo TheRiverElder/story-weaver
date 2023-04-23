@@ -1,8 +1,10 @@
+import ActionGroup from "../action/ActionGroup";
+import GameObject from "../action/GameObject";
 import { Uid } from "../BasicTypes";
-import { ActionGroup, ActionParams, InteractiveGroup } from "../common";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Game } from "../item/Game";
 
-export abstract class Task implements InteractiveGroup {
+export abstract class Task implements GameObject {
     readonly uid: Uid;
     readonly game: Game;
 
@@ -11,5 +13,5 @@ export abstract class Task implements InteractiveGroup {
         this.game = game;
     }
 
-    abstract getActionGroups(params: ActionParams): ActionGroup[];
+    abstract getActionGroups(actor: PlayerEntity): ActionGroup[];
 }

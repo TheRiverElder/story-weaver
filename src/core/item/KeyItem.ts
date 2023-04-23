@@ -1,10 +1,11 @@
-import { ActionParams, Action } from "../common";
 import { Entity } from "../entity/Entity";
 import { DoorEntity, Lock } from "../entity/DoorEntity";
 import { PlayerEntity } from "../entity/PlayerEntity";
 import { ItemData } from "./Item";
 import { UsingItemTask } from "../task/UsingItemTask";
 import { NormalItem } from "./NormalItem";
+import Action from "../action/Action";
+import CustomAction from "../action/impl/CustomAction";
 
 export interface KeyItemData extends ItemData {
     lock: Lock;
@@ -18,12 +19,12 @@ export class KeyItem extends NormalItem {
         this.lock = data.lock;
     }
 
-    getItemActions(params: ActionParams): Action[] {
-        return [{
+    getItemActions(actor: PlayerEntity): Action[] {
+        return [new CustomAction({
             text: "使用",
             act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
             labels: ["eat"],
-        }];
+        })];
     }
 
     getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
@@ -34,7 +35,7 @@ export class KeyItem extends NormalItem {
 
         if (!door.lock) return [];
 
-        return [{
+        return [new CustomAction({
             text: door.lock.locked ? "解锁" : "上锁",
             act: () => {
                 if (!door.lock) return;
@@ -45,6 +46,6 @@ export class KeyItem extends NormalItem {
                 this.game.appendMessage(`${previous ? "解锁" : "上锁"}${previous === door.lock.locked ? "失败" : "成功"}`);
             },
             labels: ["eat"],
-        }]
+        })]
     }
 }

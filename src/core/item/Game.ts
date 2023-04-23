@@ -1,9 +1,13 @@
-import type { Action, InteractiveGroup, Generator, ActionParams, GameInitializer, ActionGroup } from "../common";
+import Action from "../action/Action";
+import ActionGroup from "../action/ActionGroup";
+import GameObject from "../action/GameObject";
+import { GameInitializer } from "../common";
 import { PlayerEntity } from "../entity/PlayerEntity";
 import { Interaction } from "../interaction/Interaction";
 import { MessageType, MESSAGE_TYPE_COLLAPSE, MESSAGE_TYPE_NORMAL, MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
 import type { Room } from "../room/Room";
 import { UniqueSet } from "../util/UniqueSet";
+import { Generator } from "../BasicTypes";
 
 // alert("FUCK from Game")
 
@@ -20,13 +24,13 @@ export interface Message {
 
 export type GameUpdateListener = (game: Game) => void;
 
-export class Game implements InteractiveGroup {
+export class Game implements GameObject {
 
     uidGenerator: Generator<number>;
     gameInitializer: GameInitializer;
     rooms: UniqueSet<Room> = new UniqueSet();
     adventurer: PlayerEntity = {} as PlayerEntity;
-    interactiveGroups: InteractiveGroup[] = [];
+    gameObjects: GameObject[] = [];
     messages: Message[] = [];
 
     level: number = 1; // 当前关卡数
@@ -64,15 +68,15 @@ export class Game implements InteractiveGroup {
         }
     }
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
-        if (this.interactiveGroups.length > 0) return this.interactiveGroups[this.interactiveGroups.length - 1].getActionGroups(params);
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
+        if (this.gameObjects.length > 0) return this.gameObjects[this.gameObjects.length - 1].getActionGroups(actor);
         
-        const adventurerActionGroups = this.adventurer.room?.getActionGroups(params);
+        const adventurerActionGroups = this.adventurer.room?.getActionGroups(actor);
         return adventurerActionGroups || [];
     }
 
     runAction(action: Action, actor: PlayerEntity = this.adventurer) {
-        action.act({ game: this, actor });
+        action.act(actor);
         for (const room of this.rooms.values()) {
             for (const entity of room.entities.values()) {
                 entity.onActed(actor, action);
@@ -86,13 +90,13 @@ export class Game implements InteractiveGroup {
         this.updateListeners.forEach(it => it(this));
     }
 
-    appendInteravtiveGroup(interactiveGroup: InteractiveGroup) {
-        this.interactiveGroups.push(interactiveGroup);
+    appendInteravtiveGroup(gameObject: GameObject) {
+        this.gameObjects.push(gameObject);
         this.notifyUpdate();
     }
 
-    removeInteravtiveGroup(interactiveGroup: InteractiveGroup) {
-        this.interactiveGroups = this.interactiveGroups.filter(e => e !== interactiveGroup);
+    removeInteravtiveGroup(gameObject: GameObject) {
+        this.gameObjects = this.gameObjects.filter(e => e !== gameObject);
         this.notifyUpdate();
     }
 

@@ -1,6 +1,8 @@
-import { ActionParams, Action } from "../common";
+import Action from "../action/Action";
+import CustomAction from "../action/impl/CustomAction";
 import { ItemEntity } from "../entity/ItemEntity";
 import { LivingEntity } from "../entity/LivingEntity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Item, ItemData } from "./Item";
 
 export interface ArmorItemData extends ItemData {
@@ -15,15 +17,15 @@ export class ArmorItem extends Item {
         this.defense = data.defense;
     }
 
-    getItemActions(params: ActionParams): Action[] {
-        return [{
+    getItemActions(actor: PlayerEntity): Action[] {
+        return [new CustomAction({
             text: "装备",
-            act: ({ actor }) => {
+            act: (actor) => {
                 actor.inventory.remove(this);
                 actor.equipArmor(this);
             },
             labels: ["equip"],
-        }];
+        })];
     }
     
     onEquip(entity: LivingEntity): void {
@@ -34,15 +36,15 @@ export class ArmorItem extends Item {
         entity.attackPower -= this.defense;
     }
 
-    getItemEntityActions(entity: ItemEntity, params: ActionParams): Action[] {
-        return [{
+    getItemEntityActions(entity: ItemEntity, actor: PlayerEntity): Action[] {
+        return [new CustomAction({
             text: "装备",
-            act: ({ actor }) => {
+            act: (actor) => {
                 actor.equipArmor(this);
                 entity.remove();
             },
             labels: ["equip"],
-        }];
+        })];
     }
 
 }

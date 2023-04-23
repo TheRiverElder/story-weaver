@@ -1,5 +1,6 @@
-import { ActionParams, Action } from "../common";
+import Action from "../action/Action";
 import { LivingEntity } from "../entity/LivingEntity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Item } from "./Item";
 
 // export interface Usage {
@@ -19,7 +20,7 @@ export class NormalItem extends Item {
     //     this.usages = data.usages || [];
     // }
 
-    getItemActions(params: ActionParams): Action[] {
+    getItemActions(actor: PlayerEntity): Action[] {
         return [];
     }
 

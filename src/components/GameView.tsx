@@ -1,13 +1,14 @@
 import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
-import { Action, ActionGroup } from "../core/common";
 import { Game, Message } from "../core/item/Game";
 import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
 import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
 import { filterNotNull } from "../core/util/lang";
-import { Interaction, MEDIA_EMPTY } from "../core/interaction/Interaction";
+import { Interaction, INTERACTION_MEDIA_EMPTY } from "../core/interaction/Interaction";
+import ActionGroup from "../core/action/ActionGroup";
+import Action from "../core/action/Action";
 
 interface GameViewProps {
     game: Game;
@@ -15,7 +16,7 @@ interface GameViewProps {
 }
 
 interface GameViewState {
-    actionGroups: ActionGroup[];
+    actionGroups: Array<ActionGroup>;
     groupIndex: number;
 }
 
@@ -45,7 +46,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
     update = () => {
         this.programCounter++;
         this.setState((_, { game }) => ({
-            actionGroups: game.getActionGroups({ game, actor: game.adventurer }),
+            actionGroups: game.getActionGroups(game.adventurer),
             groupIndex: -1,
         }));
     }
@@ -131,26 +132,27 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 className={classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
             >
                 <div
-                    className={classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty")}
+                    className={classNames("card", groupIndex === index && "selected", actionGroup.getLabels() || "empty")}
                     key={index}
                     onClick={event => this.toggleSelectedGroup(event, index)}
                 >
                     <div className="content">
                         <div>
-                            <h3 className="title">{actionGroup.title}</h3>
-                            <article>{actionGroup.description}</article>
+                            <h3 className="title">{actionGroup.getTitle()}</h3>
+                            <article>{actionGroup.getDescription()}</article>
                         </div>
 
                         <div className="buttons fill-x">
-                            {actionGroup.actions.map(this.renderActionButton.bind(this))}
+                            {actionGroup.getActions().map(this.renderActionButton.bind(this))}
                         </div>
 
                         <div className="index">
                             -= 第{index + 1}张 / 共{actionGroups.length}张 =-
                         </div>
                     </div>
+                    {/* 小标题，在卡片没有展现全貌时候竖着展示卡片名字 */}
                     <div className="small-title">
-                        <span>{actionGroup.title}</span>
+                        <span>{actionGroup.getTitle()}</span>
                     </div>
                 </div>
             </div>
@@ -160,23 +162,23 @@ class GameView extends Component<GameViewProps, GameViewState> {
     renderActionButton(action: Action, index: number) {
         return (
             <button
-                className={classNames("action-button", "fill-x", action.labels || "empty")}
+                className={classNames("action-button", "fill-x", action.getLabels() || "empty")}
                 key={index}
                 onClick={event => this.onClickActionButton(event, action)}
-            >{action.text}</button>
+            >{action.getText()}</button>
         );
     }
 
     renderSkillSelectionBar() {
         const actionGroup = this.state.actionGroups[this.state.groupIndex];
-        const target = actionGroup?.target;
+        const target = actionGroup?.getTarget();
         let collapsed = true;
         if (target) {
             const interaction: Interaction = {
                 actor: this.props.game.adventurer,
-                media: MEDIA_EMPTY,
+                media: INTERACTION_MEDIA_EMPTY,
                 skill: PROPERTY_TYPE_USE,
-                target: actionGroup.target,
+                target,
             };
             collapsed = !target.canReceiveInteraction(interaction);
         }
@@ -224,13 +226,13 @@ class GameView extends Component<GameViewProps, GameViewState> {
         const actionGroup = this.state.actionGroups[this.state.groupIndex];
         if (!actionGroup) return;
 
-        const target = actionGroup.target;
+        const target = actionGroup.getTarget();
         if (!target) return;
 
         const actor = this.props.game.adventurer;
         const interaction: Interaction = {
             actor,
-            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || MEDIA_EMPTY,
+            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || INTERACTION_MEDIA_EMPTY,
             skill,
             target,
         };

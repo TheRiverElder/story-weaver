@@ -1,6 +1,5 @@
 import { Buff } from "../core/buff/Buff";
 import { BuffType } from "../core/buff/BuffType";
-import { Action, ActionGroup, ActionParams, GameInitializer, Generator } from "../core/common";
 import { Entity } from "../core/entity/Entity";
 import { DoorEntity, Lock } from "../core/entity/DoorEntity";
 import { EnemyEntity } from "../core/entity/EnemyEntity";
@@ -28,6 +27,12 @@ import { GenericInteractionBehavior } from "../core/interaction/GenericInteracti
 import { InteractionBehaviorItem } from "../core/interaction/item/InteractionBehaviorItem";
 import { InteractionBehaviorItemCreators } from "../core/interaction/item/InteractionBehaviorItemCreators";
 import CustomInteractionBebaviorItem from "../core/interaction/item/impl/CustomInteractionBebaviorItem";
+import CustomAction from "../core/action/impl/CustomAction";
+import CustomActionGroup from "../core/action/CustomActionGroup";
+import Action from "../core/action/Action";
+import ActionGroup from "../core/action/ActionGroup";
+import { GameInitializer } from "../core/common";
+import { Generator } from "../core/BasicTypes";
 
 
 export class WhalesTombGameInitializer implements GameInitializer {
@@ -362,21 +367,21 @@ class CritNPCEntity extends NeutralEntity {
 
     }
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
-        const result = super.getActionGroups(params);
-        const talkAction: Action = {
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
+        const result = super.getActionGroups(actor);
+        const talkAction: Action = new CustomAction({
             text: "交谈",
-            act: (params) => {
+            act: (actor) => {
                 if (this.chatProvider) {
-                    const chat = this.chatProvider(params);
+                    const chat = this.chatProvider(actor);
                     if (chat) {
                         this.game.appendInteravtiveGroup(chat);
                     }
                 }
             },
             labels: [],
-        };
-        result[0]?.actions.push(talkAction);
+        });
+        (result[0] as any)?.actions.push(talkAction);
         return result;
     }
     
@@ -467,11 +472,11 @@ class DynamiteItem extends NormalItem {
 class FireSourceItem extends NormalItem {
 
     getItemActions(): Action[] {
-        return [{
+        return [new CustomAction({
             text: "使用",
             act: () => this.game.appendInteravtiveGroup(new UsingItemTask(this)),
             labels: [],
-        }];
+        })];
     }
 
     getUsageActions(actor: PlayerEntity, target: Entity | null): Action[] {
@@ -479,11 +484,11 @@ class FireSourceItem extends NormalItem {
         const item = target.item;
         if (!(item instanceof DynamiteItem)) return [];
 
-        return [{
+        return [new CustomAction({
             text: "引爆",
             act: () => item.explode(),
             labels: [],
-        }];
+        })];
     }
 }
 
@@ -507,17 +512,17 @@ class OldBookItem extends TextItem {
     }
 
     getItemActions(): Action[] {
-        const burn: Action = {
+        const burn: Action = new CustomAction({
             text: '扔掉',
-            act: ({ actor }) => actor.inventory.remove(this),
+            act: (actor) => actor.inventory.remove(this),
             labels: [],
-        }
+        });
         if (this.decrypted) {
             return [
                 ...super.getItemActions(),
-                {
+                new CustomAction({
                     text: `使用咒语`,
-                    act: ({ actor }) => {
+                    act: (actor) => {
                         this.game.appendMessage(`你大声念出了咒语`);
                         this.game.appendMessage(`却没想到，这段咒语是用来召唤深渊母体的，`);
                         this.game.appendMessage(`随着一阵阵狂浪的逼近，你的心跳愈发紧迫，`);
@@ -525,14 +530,14 @@ class OldBookItem extends TextItem {
                         this.game.appendInteravtiveGroup(new GameOverTask(this.game, "惊惧而终"));
                     },
                     labels: [],
-                },
+                }),
                 burn,
             ];
         } else if (this.decryptCounter < this.maxDecryptAmount) {
             return [
-                {
+                new CustomAction({
                     text: `尝试破译（${this.skill.name}）`,
-                    act: ({ actor }) => {
+                    act: (actor) => {
                         if (simpleCheck(actor.getProperty(this.skill))) {
                             this.decrypted = true;
                             this.game.appendMessage(`❗你从这些文字中窥探到一些信息：`);
@@ -543,7 +548,7 @@ class OldBookItem extends TextItem {
                         this.decryptCounter++;
                     },
                     labels: [],
-                },
+                }),
                 burn,
             ];
         } else return [burn];
@@ -552,8 +557,8 @@ class OldBookItem extends TextItem {
 
 class SignalPistolItem extends MeleeWeapon {
 
-    getItemActions(params: ActionParams): Action[] {
-        return super.getItemActions(params).concat({
+    getItemActions(actor: PlayerEntity): Action[] {
+        return super.getItemActions(actor).concat(new CustomAction({
             text: "发射求救信号",
             act: () => {
                 this.game.appendMessage(`若干秒的火光转瞬即逝`);
@@ -564,14 +569,14 @@ class SignalPistolItem extends MeleeWeapon {
                 this.game.appendInteravtiveGroup(new GameOverTask(this.game, "被其它船只救走了"));
             },
             labels: [],
-        });
+        }));
     }
 }
 
 class BoatEntity extends SimpleEntity {
-    getActionGroups(params: ActionParams) {
-        const groups = super.getActionGroups(params);
-        const action: Action = {
+    getActionGroups(actor: PlayerEntity) {
+        const groups = super.getActionGroups(actor);
+        const action: Action = new CustomAction({
             text: "坐上出逃",
             act: () => {
                 this.game.appendMessage(`开始的一片平静让你松了一口气`);
@@ -580,16 +585,15 @@ class BoatEntity extends SimpleEntity {
                 this.game.appendInteravtiveGroup(new GameOverTask(this.game, "I C U!"));
             },
             labels: [],
-        };
+        });
         if (groups.length > 0) {
-            groups[0].actions.push(action);
+            (groups[0] as any).actions.push(action);
         } else {
-            groups.push({
-                source: this,
+            groups.push(new CustomActionGroup({
                 title: this.name,
                 description: this.brief,
                 actions: [action],
-            });
+            }));
         }
         return groups;
     }

@@ -1,5 +1,10 @@
-import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
+import ActionGroup from "../action/ActionGroup";
+import CustomActionGroup from "../action/CustomActionGroup";
+import GameObject from "../action/GameObject";
+import CustomAction from "../action/impl/CustomAction";
+import { Unique } from "../BasicTypes";
 import { LivingEntity } from "../entity/LivingEntity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Game } from "../item/Game";
 import { MESSAGE_TYPE_COLLAPSE } from "../message/MessageTypes";
 import { InventoryTask } from "./InventoryTask";
@@ -22,7 +27,7 @@ export class Participant {
     }
 }
 
-export class FightingTask implements Unique, InteractiveGroup {
+export class FightingTask implements Unique, GameObject {
 
     public readonly uid: number;
     public readonly game: Game;
@@ -239,16 +244,15 @@ export class FightingTask implements Unique, InteractiveGroup {
     }
 
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
         if (this.escapingParticipant) {
-            return [{
-                source: this,
+            return [new CustomActionGroup({
                 title: this.escapingParticipant.entity.name,
                 description: this.escapingParticipant.entity.brief,
                 actions: [
-                    {
+                    new CustomAction({
                         text: "追击",
-                        act: ({ actor }) => {
+                        act: (actor) => {
                             if (!this.escapingParticipant) return;
 
                             if (simpleCheck(actor.dexterity)) {
@@ -259,58 +263,56 @@ export class FightingTask implements Unique, InteractiveGroup {
                             }
                         },
                         labels: [],
-                    },
-                    {
+                    }),
+                    new CustomAction({
                         text: "放走",
                         act: () => {
                             this.release();
                             this.continueEscape();
                         },
                         labels: [],
-                    },
+                    }),
                 ]
-            }];
+            })];
         }
 
-        const menu: ActionGroup = {
-            source: this,
+        const menu: ActionGroup = new CustomActionGroup({
             title: "特殊动作",
             description: ``,
             actions: [
-                {
+                new CustomAction({
                     text: "逃跑",
-                    act: ({ actor }) => {
+                    act: (actor) => {
                         this.escape(actor);
                         this.continueRound();
                     },
                     labels: [],
-                },
-                {
+                }),
+                new CustomAction({
                     text: "打开背包",
                     act: ({ game }) => game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate())),
                     labels: [],
-                },
+                }),
             ],
             labels: ["menu"],
-        };
+        });
 
         const itemGroups: ActionGroup[] = [];
         for (const participant of this.participants) {
-            if (participant.entity === params.actor) continue;
+            if (participant.entity === actor) continue;
 
-            itemGroups.push({
-                source: this,
+            itemGroups.push(new CustomActionGroup({
                 title: participant.entity.name,
                 description: participant.entity.brief,
-                actions: [{
+                actions: [new CustomAction({
                     text: "攻击",
-                    act: ({ actor }) => {
+                    act: (actor) => {
                         this.attack(actor, participant.entity);
                         this.continueRound();
                     },
                     labels: [],
-                }],
-            });
+                })],
+            }));
         }
 
         return [

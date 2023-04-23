@@ -1,7 +1,8 @@
-import { Action } from "../common";
 import { ItemData } from "./Item";
 import { ChatOption, ChatTask, ChatTextFragment } from "../task/ChatTask";
 import { NormalItem } from "./NormalItem";
+import Action from "../action/Action";
+import CustomAction from "../action/impl/CustomAction";
 
 export interface TextItemData extends ItemData {
     texts: string[];
@@ -16,7 +17,7 @@ export class TextItem extends NormalItem {
     }
 
     getItemActions(): Action[] {
-        return [{
+        return [new CustomAction({
             text: "阅读",
             act: () => {
                 this.game.appendInteravtiveGroup(new ChatTask(
@@ -27,6 +28,6 @@ export class TextItem extends NormalItem {
                 ))   
             },
             labels: ["eat"],
-        }];
+        })];
     }
 }

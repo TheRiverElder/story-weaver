@@ -1,8 +1,13 @@
-import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
+import ActionGroup from "../action/ActionGroup";
+import CustomActionGroup from "../action/CustomActionGroup";
+import GameObject from "../action/GameObject";
+import CustomAction from "../action/impl/CustomAction";
+import { Unique } from "../BasicTypes";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { Item } from "../item/Item";
 import { filterNotNull } from "../util/lang";
 
-export class UsingItemTask implements Unique, InteractiveGroup {
+export class UsingItemTask implements Unique, GameObject {
 
     uid: number;
     item: Item;
@@ -13,32 +18,29 @@ export class UsingItemTask implements Unique, InteractiveGroup {
     }
 
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
-        const actor = params.actor;
-        const menu: ActionGroup = {
-            source: this,
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
+        const menu: ActionGroup = new CustomActionGroup({
             title: `使用物品`,
             description: this.item.name,
             actions: [
                 ...this.item.getUsageActions(actor, null),
-                {
+                new CustomAction({
                     text: "返回",
                     act: ({ game }) => game.removeInteravtiveGroup(this),
                     labels: [],
-                },
+                }),
             ],
             labels: ["menu"],
-        };
+        });
 
-        const itemGroups: ActionGroup[] = filterNotNull(Array.from(params.actor.room?.entities.values() || []).map(entity => {
+        const itemGroups: ActionGroup[] = filterNotNull(Array.from(actor.room?.entities.values() || []).map(entity => {
             const actions = this.item.getUsageActions(actor, entity);
-            if (actions && actions.length > 0) return {
-                source: this,
+            if (actions && actions.length > 0) return new CustomActionGroup({
                 title: entity.name,
                 description: entity.brief,
                 actions,
                 labels: ["item"],
-            };
+            });
             return null;
         }));
 

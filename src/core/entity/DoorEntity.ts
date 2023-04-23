@@ -1,13 +1,15 @@
-import { Action, ActionGroup } from "../common";
 import { Entity, EntityData } from "./Entity";
 import { MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
-import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
+import { PROPERTY_TYPE_STRENGTH } from "../profile/PropertyTypes";
 import { Room } from "../room/Room";
 import { simpleCheck } from "../task/FightingTask";
 import CustomInteractionBebaviorItem from "../interaction/item/impl/CustomInteractionBebaviorItem";
-import { Interaction } from "../interaction/Interaction";
+import { Interaction, InteractionTarget } from "../interaction/Interaction";
 import { GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
 import { PlayerEntity } from "./PlayerEntity";
+import Action from "../action/Action";
+import ActionGroup from "../action/ActionGroup";
+import CustomAction from "../action/impl/CustomAction";
 
 export interface DoorEntityData extends EntityData {
     targetRoom: Room;
@@ -18,7 +20,7 @@ export class Lock {
     locked: boolean = true;
 }
 
-export class DoorEntity extends Entity {
+export class DoorEntity extends Entity implements ActionGroup {
     targetRoom: Room;
     lock: Lock | null;
 
@@ -60,41 +62,56 @@ export class DoorEntity extends Entity {
         }
     }
 
+    isLocked(): boolean {
+        return !!(this.lock?.locked);
+    }
+
     getActionGroups(): ActionGroup[] {
-        let action: Action;
-        if (!this.lock || !this.lock.locked) {
-            action = {
-                text: '前往',
-                labels: ['walk'],
-                act: ({ actor, game }) => {
-                    actor.teleport(this.targetRoom);
-                    game.appendMessageText(`穿过${this.name}，进入${this.targetRoom.name}`, MESSAGE_TYPE_REPLACEABLE);
-                },
-            };
-        } else {
-            action = {
-                text: '撞它丫的！',
-                labels: ['rush'],
-                act: ({ actor }) => {
-                    if (!this.lock || !this.lock.locked) return;
-                    this.onRushTheDoor(actor, simpleCheck(actor.getProperty(PROPERTY_TYPE_STRENGTH)));
-                },
-            };
-        }
-        const locked = !!(this.lock?.locked);
-        return [{
-            source: this,
-            title: `${locked ? "🔒" : ""}${this.name}：${this.targetRoom.name}`,
-            description: this.brief,
-            actions: [action],
-            labels: ["door-entity"],
-            target: this.interactionBehavior || undefined,
-        }];
+        return [this];
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
     get brief() {
-        const locked = !!(this.lock?.locked);
-        return `${this.name}${locked ? "，已上锁🔒" : ""}，通向${this.targetRoom.name}`;
+        return `${this.name}${this.isLocked() ? "，已上锁🔒" : ""}，通向${this.targetRoom.name}`;
+    }
+    
+    getTitle(): string {
+        return `${this.isLocked() ? "🔒" : ""}${this.name}：${this.targetRoom.name}`;
+    }
+
+    getDescription(): string {
+        return this.brief;
+    }
+
+    getActions(): Action[] {
+        let action: Action;
+        if (!this.lock || !this.lock.locked) {
+            action = new CustomAction({
+                text: '前往',
+                labels: ['walk'],
+                act: (actor) => {
+                    actor.teleport(this.targetRoom);
+                    this.game.appendMessageText(`穿过${this.name}，进入${this.targetRoom.name}`, MESSAGE_TYPE_REPLACEABLE);
+                },
+            });
+        } else {
+            action = new CustomAction({
+                text: '撞它丫的！',
+                labels: ['rush'],
+                act: (actor) => {
+                    if (!this.lock || !this.lock.locked) return;
+                    this.onRushTheDoor(actor, simpleCheck(actor.getProperty(PROPERTY_TYPE_STRENGTH)));
+                },
+            });
+        }
+        return [action];
+    }
+
+    getLabels(): string[] {
+        return ["door-entity"];
+    }
+
+    getTarget(): InteractionTarget {
+        return this.interactionBehavior;
     }
 }

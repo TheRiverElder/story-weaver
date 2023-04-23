@@ -1,6 +1,5 @@
 import { Buff } from "../buff/Buff";
 import { BuffSet } from "../buff/BuffSet";
-import { ActionParams, ActionGroup, Action } from "../common";
 import { EntityData, Entity } from "./Entity";
 import { InventorySlot } from "../inventory/InventorySlot";
 import { LivingEntityInventory, SLOT_TYPE_WEAPON, SLOT_TYPE_ARMOR } from "../inventory/LivingEntityInventory";
@@ -16,7 +15,11 @@ import { ItemEntity } from "./ItemEntity";
 import { SimpleEntity } from "./SimpleEntity";
 import { GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
 import { InteractionBehaviorItemCreators } from "../interaction/item/InteractionBehaviorItemCreators";
-import { Interaction } from "../interaction/Interaction";
+import { Interaction, InteractionTarget } from "../interaction/Interaction";
+import { PlayerEntity } from "./PlayerEntity";
+import Action from "../action/Action";
+import ActionGroup from "../action/ActionGroup";
+import CustomAction from "../action/impl/CustomAction";
 
 // alert("FUCK from LivingEntity");
 
@@ -34,7 +37,7 @@ export interface LivingEntityData extends EntityData {
     buffs?: Buff[]; 
 }
 
-export abstract class LivingEntity extends Entity {
+export abstract class LivingEntity extends Entity implements ActionGroup {
 
     public readonly inventory: LivingEntityInventory;
     public readonly profile = new GenericProfile();
@@ -83,30 +86,42 @@ export abstract class LivingEntity extends Entity {
         data.buffs?.forEach(buff => this.buffs.add(buff));
     }
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
-        if (params.actor.uid === this.uid) return [];
-
-        const attackAction: Action = {
-            text: '攻击',
-            labels: ['attack'],
-            act: ({ game, actor }) => {
-                const fighting = new FightingTask(game, [actor, this]);
-                game.appendInteravtiveGroup(fighting);
-                fighting.continueRound();
-            },
-        };
-        return [{
-            source: this,
-            title: this.name,
-            description: this.brief,
-            actions: [attackAction],
-            target: this,
-        }];
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
+        if (actor.uid === this.uid) return [];
+        else return [this];
     }
 
     // 获取该实体的一段简短描述，例如名字、血量、物品类型等
     get brief() {
         return `【生物】${this.name}（${this.health}/${this.maxHealth}）`;
+    }
+    
+    getTitle(): string {
+        return this.name;
+    }
+
+    getDescription(): string {
+        return this.brief;
+    }
+
+    getActions(): Action[] {
+        return [new CustomAction({
+            text: '攻击',
+            labels: ['attack'],
+            act: (actor) => {
+                const fighting = new FightingTask(this.game, [actor, this]);
+                this.game.appendInteravtiveGroup(fighting);
+                fighting.continueRound();
+            },
+        })];
+    }
+
+    getLabels(): string[] {
+        return ["living-entity"];
+    }
+
+    getTarget(): InteractionTarget {
+        return this.interactionBehavior;
     }
 
     equipWeapon(item: Item) {

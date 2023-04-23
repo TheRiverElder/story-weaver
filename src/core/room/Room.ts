@@ -1,5 +1,8 @@
-import { ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
+import ActionGroup from "../action/ActionGroup";
+import GameObject from "../action/GameObject";
+import { Unique } from "../BasicTypes";
 import { Entity } from "../entity/Entity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 import { GenericInteractionBehaviorData, GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
 import { Game } from "../item/Game";
 import { UniqueSet } from "../util/UniqueSet";
@@ -10,7 +13,7 @@ export interface RoomData extends GenericInteractionBehaviorData {
     entities: Entity[];
 }
 
-export class Room extends GenericInteractionBehavior implements Unique, InteractiveGroup {
+export class Room extends GenericInteractionBehavior implements Unique, GameObject {
     uid: number;
     game: Game;
     name: string;
@@ -44,11 +47,11 @@ export class Room extends GenericInteractionBehavior implements Unique, Interact
         }
     }
     
-    getActionGroups(params: ActionParams): ActionGroup[] {
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
         const entityActionGroups: ActionGroup[] = [];
         for (const entity of this.entities.values()) {
-            const groups = entity.getActionGroups(params);
-            if (entity === params.game.adventurer) {
+            const groups = entity.getActionGroups(actor);
+            if (entity === this.game.adventurer) {
                 entityActionGroups.unshift(...groups);
             } else {
                 entityActionGroups.push(...groups);

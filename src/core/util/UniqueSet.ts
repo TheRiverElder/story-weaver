@@ -1,4 +1,4 @@
-import { Unique } from "../common";
+import { Unique } from "../BasicTypes";
 
 export class UniqueSet<T extends Unique> {
     private elements: Map<number, T> = new Map();

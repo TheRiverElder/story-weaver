@@ -1,9 +1,13 @@
-import { Action, ActionGroup, ActionParams, InteractiveGroup, Unique } from "../common";
 import { PlayerEntity } from "./PlayerEntity";
 import { Game } from "../item/Game";
 import { InteractionTarget, Interaction } from "../interaction/Interaction";
 import { InteractionBehavior } from "../interaction/InteractionBehavior";
 import { Room } from "../room/Room";
+import { GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
+import GameObject from "../action/GameObject";
+import Action from "../action/Action";
+import ActionGroup from "../action/ActionGroup";
+import { Unique } from "../BasicTypes";
 
 // alert("FUCK from Entity");
 
@@ -14,7 +18,7 @@ export interface EntityData {
     interactionBehavior?: InteractionBehavior;
 }
 
-export abstract class Entity implements Unique, InteractiveGroup, InteractionTarget {
+export abstract class Entity implements Unique, GameObject, InteractionTarget {
     readonly uid: number;
     readonly name: string;
     readonly game: Game;
@@ -24,15 +28,15 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
 
     room: Room | null = null;
 
-    interactionBehavior: InteractionBehavior | null = null;
+    interactionBehavior: InteractionBehavior;
 
     constructor(data: EntityData) {
         this.name = data.name;
         this.game = data.game;
         this.uid = this.game.uidGenerator.generate();
-        if (data.interactionBehavior) {
-            this.interactionBehavior = data.interactionBehavior;
-        }
+        this.interactionBehavior = data.interactionBehavior || new GenericInteractionBehavior({
+            game: this.game,
+        });
     }
     remove() {
         this.room?.entities.removeByUid(this.uid);
@@ -48,7 +52,7 @@ export abstract class Entity implements Unique, InteractiveGroup, InteractionTar
     onActed(actor: PlayerEntity, action: Action) { }
 
 
-    getActionGroups(params: ActionParams): ActionGroup[] {
+    getActionGroups(plater: PlayerEntity): ActionGroup[] {
         return [];
     }
 

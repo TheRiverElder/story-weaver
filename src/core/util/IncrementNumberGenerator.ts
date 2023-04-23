@@ -1,4 +1,4 @@
-import { Generator } from '../common';
+import { Generator } from "../BasicTypes";
 
 export class IncrementNumberGenerator implements Generator<number> {
     private counter: number;

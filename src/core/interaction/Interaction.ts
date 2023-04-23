@@ -17,6 +17,13 @@ export interface Interaction {
     readonly target: InteractionTarget; // 接受该行动的目标
 }
 
-export const MEDIA_EMPTY: InteractionMedia = {
+export const INTERACTION_MEDIA_EMPTY: InteractionMedia = {
     onApplyInteraction(interaction: Interaction): void { }
+};
+
+export const INTERACTION_TARGET_EMPTY: InteractionTarget = {
+    canReceiveInteraction: function (interaction: Interaction): boolean {
+        return false;
+    },
+    onReceiveInteraction: function (interaction: Interaction): void { },
 };
