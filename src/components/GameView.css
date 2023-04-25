@@ -145,7 +145,7 @@
     left: 0;
     right: 0;
     top: 0;
-    height: 70%;
+    height: calc(100% - 16em);
     padding: 0 1em;
     overflow: auto;
 }

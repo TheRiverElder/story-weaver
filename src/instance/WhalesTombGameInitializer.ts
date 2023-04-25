@@ -381,7 +381,7 @@ class CritNPCEntity extends NeutralEntity {
             },
             labels: [],
         });
-        (result[0] as any)?.actions.push(talkAction);
+        (result[0] as any)?.getActions().push(talkAction);
         return result;
     }
     

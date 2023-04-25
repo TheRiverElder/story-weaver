@@ -95,7 +95,7 @@ export class DefaultChatActionGroup implements ActionGroup {
     }
 
     getActions(): Action[] {
-        throw new Error("Method not implemented.");
+        return [];
     }
 
     getLabels(): string[] {

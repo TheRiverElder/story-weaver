@@ -8,6 +8,7 @@ import GameObject from "../action/GameObject";
 import Action from "../action/Action";
 import ActionGroup from "../action/ActionGroup";
 import { Unique } from "../BasicTypes";
+import ActionsSupplier from "../action/ActionsSupplier";
 
 // alert("FUCK from Entity");
 
@@ -52,7 +53,7 @@ export abstract class Entity implements Unique, GameObject, InteractionTarget {
     onActed(actor: PlayerEntity, action: Action) { }
 
 
-    getActionGroups(plater: PlayerEntity): ActionGroup[] {
+    getActionGroups(actor: PlayerEntity): ActionGroup[] {
         return [];
     }
 
@@ -64,5 +65,14 @@ export abstract class Entity implements Unique, GameObject, InteractionTarget {
     onReceiveInteraction(interaction: Interaction): void {
         this.interactionBehavior?.onReceiveInteraction(interaction);
     }
+
+    // // 等待被覆写
+    // getActionsSuppliers(): Array<ActionsSupplier> {
+    //     return [];
+    // }
+
+    // getActionsFromSuppliers(actor: PlayerEntity): Array<Action> {
+    //     return this.getActionsSuppliers().map(it => it.getActions(actor)).flat();
+    // }
 
 }

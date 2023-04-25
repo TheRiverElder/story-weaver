@@ -59,6 +59,7 @@ export class DoorEntity extends Entity implements ActionGroup {
         actor.health -= damage;
         if (succeeded) {
             this.lock.locked = false;
+            actor.teleport(this.targetRoom);
         }
     }
 
