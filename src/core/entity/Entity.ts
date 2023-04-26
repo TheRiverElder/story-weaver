@@ -19,7 +19,7 @@ export interface EntityData {
     interactionBehavior?: InteractionBehavior;
 }
 
-export abstract class Entity implements Unique, GameObject, InteractionTarget {
+export abstract class Entity implements Unique, GameObject, InteractionTarget, ActionGroup {
     readonly uid: number;
     readonly name: string;
     readonly game: Game;
@@ -39,6 +39,7 @@ export abstract class Entity implements Unique, GameObject, InteractionTarget {
             game: this.game,
         });
     }
+
     remove() {
         this.room?.entities.removeByUid(this.uid);
     }
@@ -54,7 +55,7 @@ export abstract class Entity implements Unique, GameObject, InteractionTarget {
 
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
-        return [];
+        return this.isVisibleActionGroup() ? [this] : [];
     }
 
     canReceiveInteraction(interaction: Interaction): boolean {
@@ -66,13 +67,36 @@ export abstract class Entity implements Unique, GameObject, InteractionTarget {
         this.interactionBehavior?.onReceiveInteraction(interaction);
     }
 
-    // // 等待被覆写
-    // getActionsSuppliers(): Array<ActionsSupplier> {
-    //     return [];
-    // }
+    // 等待被覆写
+    getActionsSuppliers(): Array<ActionsSupplier> {
+        return [];
+    }
 
-    // getActionsFromSuppliers(actor: PlayerEntity): Array<Action> {
-    //     return this.getActionsSuppliers().map(it => it.getActions(actor)).flat();
-    // }
+    getActionsFromSuppliers(actor: PlayerEntity): Array<Action> {
+        return this.getActionsSuppliers().map(it => it.getActions(actor)).flat();
+    }
 
+    isVisibleActionGroup(): boolean {
+        return true;
+    }
+
+    getTitle(): string {
+        return this.name;
+    }
+
+    getDescription(): string {
+        return this.brief;
+    }
+
+    getActions(): Action[] {
+        return [];
+    }
+
+    getLabels(): string[] {
+        return [];
+    }
+
+    getTarget(): InteractionTarget {
+        return this;
+    }
 }
