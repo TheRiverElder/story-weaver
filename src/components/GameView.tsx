@@ -78,7 +78,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                         className="cards fill-x animate-flash-appear" key={this.programCounter}
                         onClick={this.resetSelectedGroup.bind(this)}
                     >
-                        {this.state.actionGroups.map(this.renderActionGroupView.bind(this))}
+                        {this.state.actionGroups.map(this.renderActionGroupView)}
                     </div>
 
                     {this.renderSkillSelectionBar()}
@@ -125,7 +125,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
         );
     }
 
-    renderActionGroupView(actionGroup: ActionGroup, index: number, actionGroups: ActionGroup[]) {
+    renderActionGroupView = (actionGroup: ActionGroup, index: number, actionGroups: ActionGroup[]) => {
         const groupIndex = this.state.groupIndex;
         return (
             <div
@@ -138,12 +138,12 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 >
                     <div className="content">
                         <div>
-                            <h3 className="title">{actionGroup.getTitle()}</h3>
-                            <article>{actionGroup.getDescription()}</article>
+                            <h3 className="title">{actionGroup.title}</h3>
+                            <article>{actionGroup.descriptions.join("\n")}</article>
                         </div>
 
                         <div className="buttons fill-x">
-                            {actionGroup.getActions().map(this.renderActionButton.bind(this))}
+                            {actionGroup.actions.map(this.renderActionButton.bind(this))}
                         </div>
 
                         <div className="index">
@@ -152,20 +152,20 @@ class GameView extends Component<GameViewProps, GameViewState> {
                     </div>
                     {/* 小标题，在卡片没有展现全貌时候竖着展示卡片名字 */}
                     <div className="small-title">
-                        <span>{actionGroup.getTitle()}</span>
+                        <span>{actionGroup.title}</span>
                     </div>
                 </div>
             </div>
         );
-    }
+    };
 
     renderActionButton(action: Action, index: number) {
         return (
             <button
-                className={classNames("action-button", "fill-x", action.getLabels() || "empty")}
+                className={classNames("action-button", "fill-x", action.labels || "empty")}
                 key={index}
                 onClick={event => this.onClickActionButton(event, action)}
-            >{action.getText()}</button>
+            >{action.text}</button>
         );
     }
 
