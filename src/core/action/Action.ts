@@ -8,6 +8,6 @@ import { PlayerEntity } from "../entity/PlayerEntity";
 
 export default interface Action {
     readonly text: string;
-    readonly labels: Array<string>;
+    readonly labels?: Array<string>;
     readonly act: (player: PlayerEntity) => void;
 }

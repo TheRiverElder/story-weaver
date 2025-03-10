@@ -9,8 +9,8 @@ export default class GameObject<TComponent extends HostedComponentBase<GameObjec
 
     constructor({ components }: GameObjectProps<TComponent>) {
         if (components && components.length > 0) {
-            this.components.listeners.ADD.add(c => c.onAddToHost(this));
-            this.components.listeners.REMOVE.add(c => c.onRemoveFromHost());
+            this.components.listeners.ADD.add(c => c.bindHost(this));
+            this.components.listeners.REMOVE.add(c => c.unbindHost());
             this.components.add(...components);
         }
     }
