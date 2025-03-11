@@ -1,5 +1,6 @@
 import EntityComponent from "../structure/EntityComponent";
 import Site from "../structure/Site";
+import LockComponent from "./LockComponent";
 
 export default class PortComponent extends EntityComponent {
 
@@ -12,16 +13,23 @@ export default class PortComponent extends EntityComponent {
     }
 
     public override onRegisterListeners() {
-        return [this.host.modifiers.actions.add((previousValue) => [
-            ...previousValue,
-            {
-                text: "Port",
-                act: (player) => {
-                    const site: Site = player.game.sites.find(this.targetSiteId);
-                    player.teleport(site);
+        return [this.host.modifiers.actions.add((previousValue) => {
+
+            const lock = this.host.components.get(LockComponent);
+    
+            if (lock?.locked) return previousValue;
+
+            return [
+                ...previousValue,
+                {
+                    text: "Port",
+                    act: (player) => {
+                        const site: Site = player.game.sites.find(this.targetSiteId);
+                        player.teleport(site);
+                    },
                 },
-            },
-        ])];
+            ];
+        })];
     }
 
 }
