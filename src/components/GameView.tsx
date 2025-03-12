@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import React, { Component, MouseEvent } from "react";
 import { Game, Message } from "../core/item/Game";
-import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
-import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
-import { PropertyType } from "../core/profile/PropertyType";
+// import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
+// import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
+// import { PropertyType } from "../core/profile/PropertyType";
 import "./GameView.css";
-import { filterNotNull } from "../core/util/lang";
-import { Interaction, INTERACTION_MEDIA_EMPTY } from "../core/interaction/Interaction";
+// import { filterNotNull } from "../core/util/lang";
+// import { Interaction, INTERACTION_MEDIA_EMPTY } from "../core/interaction/Interaction";
 import ActionGroup from "../core/action/ActionGroup";
 import Action from "../core/action/Action";
 
@@ -81,7 +81,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                         {this.state.actionGroups.map(this.renderActionGroupView)}
                     </div>
 
-                    {this.renderSkillSelectionBar()}
+                    {/* {this.renderSkillSelectionBar()} */}
                 </div>
             </div>
         );
@@ -132,7 +132,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 className={classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
             >
                 <div
-                    className={classNames("card", groupIndex === index && "selected", actionGroup.getLabels() || "empty")}
+                    className={classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty")}
                     key={index}
                     onClick={event => this.toggleSelectedGroup(event, index)}
                 >
@@ -164,47 +164,47 @@ class GameView extends Component<GameViewProps, GameViewState> {
             <button
                 className={classNames("action-button", "fill-x", action.labels || "empty")}
                 key={index}
-                onClick={event => this.onClickActionButton(event, action)}
+                // onClick={event => this.onClickActionButton(event, action)}
             >{action.text}</button>
         );
     }
 
-    renderSkillSelectionBar() {
-        const actionGroup = this.state.actionGroups[this.state.groupIndex];
-        const target = actionGroup?.getTarget();
-        let collapsed = true;
-        if (target) {
-            const interaction: Interaction = {
-                actor: this.props.game.adventurer,
-                media: INTERACTION_MEDIA_EMPTY,
-                skill: PROPERTY_TYPE_USE,
-                target,
-            };
-            collapsed = !target.canReceiveInteraction(interaction);
-        }
-        // console.log("this.state.actionGroups", this.state.actionGroups);
-        // console.log("this.state.groupIndex", this.state.groupIndex);
-        // console.log("actionGroup", actionGroup);
-        // console.log("target", target);
-        // console.log("collapsed", collapsed);
-        return (
-            <div className={classNames("skill-selection-bar", { collapsed })}>
-                {this.getSkills().map(skill => (
-                    <button onClick={() => this.onClickSkillButton(skill)}>{skill.name}</button>
-                ))}
-            </div>
-        );
-    }
+    // renderSkillSelectionBar() {
+    //     const actionGroup = this.state.actionGroups[this.state.groupIndex];
+    //     const target = actionGroup?.getTarget();
+    //     let collapsed = true;
+    //     if (target) {
+    //         const interaction: Interaction = {
+    //             actor: this.props.game.adventurer,
+    //             media: INTERACTION_MEDIA_EMPTY,
+    //             skill: PROPERTY_TYPE_USE,
+    //             target,
+    //         };
+    //         collapsed = !target.canReceiveInteraction(interaction);
+    //     }
+    //     // console.log("this.state.actionGroups", this.state.actionGroups);
+    //     // console.log("this.state.groupIndex", this.state.groupIndex);
+    //     // console.log("actionGroup", actionGroup);
+    //     // console.log("target", target);
+    //     // console.log("collapsed", collapsed);
+    //     return (
+    //         <div className={classNames("skill-selection-bar", { collapsed })}>
+    //             {this.getSkills().map(skill => (
+    //                 <button onClick={() => this.onClickSkillButton(skill)}>{skill.name}</button>
+    //             ))}
+    //         </div>
+    //     );
+    // }
 
-    getSkills(): PropertyType[] {
-        return filterNotNull([
-            PROPERTY_TYPE_ATTACK,
-            PROPERTY_TYPE_LISTEN,
-            PROPERTY_TYPE_WATCH,
-            PROPERTY_TYPE_STRENGTH,
-            this.props.game.adventurer.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() && PROPERTY_TYPE_USE,
-        ]);
-    }
+    // getSkills(): PropertyType[] {
+    //     return filterNotNull([
+    //         PROPERTY_TYPE_ATTACK,
+    //         PROPERTY_TYPE_LISTEN,
+    //         PROPERTY_TYPE_WATCH,
+    //         PROPERTY_TYPE_STRENGTH,
+    //         this.props.game.adventurer.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() && PROPERTY_TYPE_USE,
+    //     ]);
+    // }
 
     toggleSelectedGroup(event: MouseEvent, index: number) {
         event.stopPropagation();
@@ -216,30 +216,30 @@ class GameView extends Component<GameViewProps, GameViewState> {
         this.setState(() => ({ groupIndex: -1 }));
     }
 
-    onClickActionButton(event: MouseEvent, action: Action) {
-        event.stopPropagation();
-        this.props.game.runAction(action);
-        this.update();
-    }
+    // onClickActionButton(event: MouseEvent, action: Action) {
+    //     event.stopPropagation();
+    //     this.props.game.runAction(action);
+    //     this.update();
+    // }
 
-    onClickSkillButton(skill: PropertyType) {
-        const actionGroup = this.state.actionGroups[this.state.groupIndex];
-        if (!actionGroup) return;
+    // onClickSkillButton(skill: PropertyType) {
+    //     const actionGroup = this.state.actionGroups[this.state.groupIndex];
+    //     if (!actionGroup) return;
 
-        const target = actionGroup.getTarget();
-        if (!target) return;
+    //     const target = actionGroup.getTarget();
+    //     if (!target) return;
 
-        const actor = this.props.game.adventurer;
-        const interaction: Interaction = {
-            actor,
-            media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || INTERACTION_MEDIA_EMPTY,
-            skill,
-            target,
-        };
+    //     const actor = this.props.game.adventurer;
+    //     const interaction: Interaction = {
+    //         actor,
+    //         media: actor.inventory.getSpecialSlot(SLOT_TYPE_WEAPON)?.get() || INTERACTION_MEDIA_EMPTY,
+    //         skill,
+    //         target,
+    //     };
 
-        this.props.game.interact(interaction);
-        this.forceUpdate();
-    }
+    //     this.props.game.interact(interaction);
+    //     this.forceUpdate();
+    // }
 }
 
 export default GameView;

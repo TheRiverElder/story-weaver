@@ -26,6 +26,7 @@ export default class PortComponent extends EntityComponent {
                     act: (player) => {
                         const site: Site = player.game.sites.find(this.targetSiteId);
                         player.teleport(site);
+                        this.host.game.appendMessageText(`进入${this.site.name}`, MESSAGE_TYPE_REPLACEABLE);
                     },
                 },
             ];

@@ -12,15 +12,15 @@ export interface CustomActionGroupData {
 
 export default class CustomActionGroup implements ActionGroup {
 
-    private readonly title: string;
-    private readonly description: string;
-    private readonly actions: Array<Action>;
-    private readonly labels: Array<string>;
-    private readonly target: InteractionTarget;
+    public readonly title: string;
+    public readonly descriptions: Array<string>;
+    public readonly actions: Array<Action>;
+    public readonly labels: Array<string>;
+    public readonly target: InteractionTarget;
 
     constructor(data: CustomActionGroupData) {
         this.title = data.title || "";
-        this.description = data.description || "";
+        this.descriptions = [data.description || ""];
         this.actions = data.actions || [];
         this.labels = data.labels || [];
         this.target = data.target || INTERACTION_TARGET_EMPTY;
@@ -31,7 +31,7 @@ export default class CustomActionGroup implements ActionGroup {
     }
     
     getDescription(): string {
-        return this.description;
+        return this.descriptions[0];
     }
     
     getActions(): Action[] {

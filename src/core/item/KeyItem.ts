@@ -1,5 +1,5 @@
 import { Entity } from "../entity/Entity";
-import { DoorEntity, Lock } from "../entity/DoorEntity";
+// import { DoorEntity, Lock } from "../entity/DoorEntity";
 import { PlayerEntity } from "../entity/PlayerEntity";
 import { ItemData } from "./Item";
 import { UsingItemTask } from "../task/UsingItemTask";

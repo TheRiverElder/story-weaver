@@ -5,9 +5,9 @@ import { GameInitializer } from "../common";
 import { PlayerEntity } from "../entity/PlayerEntity";
 import { Interaction } from "../interaction/Interaction";
 import { MessageType, MESSAGE_TYPE_COLLAPSE, MESSAGE_TYPE_NORMAL, MESSAGE_TYPE_REPLACEABLE } from "../message/MessageTypes";
-import type { Room } from "../room/Room";
-import { UniqueSet } from "../util/UniqueSet";
 import { Generator } from "../BasicTypes";
+import Site from "../structure/Site";
+import Registry from "../util/Registry";
 
 // alert("FUCK from Game")
 
@@ -26,12 +26,12 @@ export type GameUpdateListener = (game: Game) => void;
 
 export class Game implements GameObject {
 
-    uidGenerator: Generator<number>;
-    gameInitializer: GameInitializer;
-    rooms: UniqueSet<Room> = new UniqueSet();
-    adventurer: PlayerEntity = {} as PlayerEntity;
-    gameObjects: GameObject[] = [];
-    messages: Message[] = [];
+    public readonly uidGenerator: Generator<number>;
+    public readonly gameInitializer: GameInitializer;
+    public readonly sites = new Registry<string, Site>(s => s.id);
+    public adventurer: PlayerEntity = {} as PlayerEntity;
+    public gameObjects: GameObject[] = [];
+    public messages: Message[] = [];
 
     level: number = 1; // 当前关卡数
 
@@ -48,9 +48,9 @@ export class Game implements GameObject {
         const adventurers: PlayerEntity[] = [];
 
         this.gameInitializer.initialize(this);
-        
-        for (const room of this.rooms.values()) {
-            const adventurer = room.entities.values().find(it => it instanceof PlayerEntity);
+
+        for (const site of this.sites.getAll()) {
+            const adventurer = site.entities.find(it => it instanceof PlayerEntity);
             if (adventurer) {
                 adventurers.push(adventurer as PlayerEntity);
             }
@@ -70,16 +70,16 @@ export class Game implements GameObject {
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
         if (this.gameObjects.length > 0) return this.gameObjects[this.gameObjects.length - 1].getActionGroups(actor);
-        
+
         const adventurerActionGroups = this.adventurer.room?.getActionGroups(actor);
         return adventurerActionGroups || [];
     }
 
     runAction(action: Action, actor: PlayerEntity = this.adventurer) {
         action.act(actor);
-        for (const room of this.rooms.values()) {
+        for (const room of this.sites.getAll()) {
             for (const entity of room.entities.values()) {
-                entity.onActed(actor, action);
+                // entity.onActed(actor, action);
             }
         }
         this.notifyUpdate();
@@ -126,7 +126,7 @@ export class Game implements GameObject {
         } else {
             this.messages.push(currentMessage);
         }
-        
+
     }
 
     appendMessageText(text: string, type: MessageType = MESSAGE_TYPE_NORMAL) {
@@ -136,7 +136,7 @@ export class Game implements GameObject {
     // 发布一条互动，返回是否执行成功
     interact(interaction: Interaction): boolean {
         const { media, skill, target } = interaction;
-        
+
         if (!target.canReceiveInteraction(interaction)) return false;
 
         media.onApplyInteraction(interaction);

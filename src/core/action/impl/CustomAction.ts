@@ -10,11 +10,11 @@ export interface CustomActionData {
 
 const NOP: any = () => {};
 
-export default class CustomAction implements Action {
+export default class CustomAction implements Action { 
 
-    private readonly text: string;
-    private readonly actCallback: Consumer<PlayerEntity>;
-    private readonly labels: Array<string>;
+    public readonly text: string;
+    public readonly actCallback: Consumer<PlayerEntity>;
+    public readonly labels: Array<string>;
 
     constructor(data: CustomActionData) {
         this.text = data.text || "";

@@ -1,12 +1,17 @@
+import { Game } from "../item/Game";
 import Entity from "./Entity";
 
 export type SiteProps = {
+    game: Game;
+    id: string;
     name: string;
     entities: Array<Entity>;
 };
 
 export default class Site {
 
+    public readonly game: Game;
+    public readonly id: string;
     public name: string;
 
     private _entities: Array<Entity>;
@@ -16,6 +21,8 @@ export default class Site {
 
 
     constructor(props: SiteProps) {
+        this.game = props.game;
+        this.id = props.id;
         this.name = props.name;
         this._entities = [...props.entities];
         this._entities.forEach(entity => entity.site = this);
