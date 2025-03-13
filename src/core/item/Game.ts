@@ -71,17 +71,17 @@ export class Game implements GameObject {
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
         if (this.gameObjects.length > 0) return this.gameObjects[this.gameObjects.length - 1].getActionGroups(actor);
 
-        const adventurerActionGroups = this.adventurer.room?.getActionGroups(actor);
+        const adventurerActionGroups = this.adventurer.site?.getActionGroups();
         return adventurerActionGroups || [];
     }
 
-    runAction(action: Action, actor: PlayerEntity = this.adventurer) {
+    executeAction(action: Action, actor: PlayerEntity = this.adventurer) {
         action.act(actor);
-        for (const room of this.sites.getAll()) {
-            for (const entity of room.entities.values()) {
-                // entity.onActed(actor, action);
-            }
-        }
+        // for (const room of this.sites.getAll()) {
+        //     for (const entity of room.entities.values()) {
+        //         // entity.onActed(actor, action);
+        //     }
+        // }
         this.notifyUpdate();
     }
 
@@ -91,6 +91,12 @@ export class Game implements GameObject {
     }
 
     appendInteravtiveGroup(gameObject: GameObject) {
+        this.gameObjects.push(gameObject);
+        this.notifyUpdate();
+    }
+
+    replaceInteravtiveGroup(gameObject: GameObject) {
+        this.gameObjects.pop();
         this.gameObjects.push(gameObject);
         this.notifyUpdate();
     }

@@ -104,13 +104,13 @@ class GameView extends Component<GameViewProps, GameViewState> {
 
         const properties: [string, string | number | undefined][] = [
             ["lvl", game.level],
-            ["@", adventurer.room?.name],
-            ["♥", `${adventurer.health}/${adventurer.maxHealth}`],
-            ["🗡", adventurer.attackPower],
-            ["🛡", adventurer.defensePower],
-            ["🏃‍♀️", adventurer.dexterity],
-            ["🔪", adventurer.weapon?.name],
-            ["☂️", adventurer.armor?.name],
+            ["📍", adventurer.site.name],
+            // ["♥", `${adventurer.health}/${adventurer.maxHealth}`],
+            // ["🗡", adventurer.attackPower],
+            // ["🛡", adventurer.defensePower],
+            // ["🏃‍♀️", adventurer.dexterity],
+            // ["🔪", adventurer.weapon?.name],
+            // ["☂️", adventurer.armor?.name],
         ];
 
         return (

@@ -1,9 +1,12 @@
+import { sortBy } from "lodash";
+import ActionGroup from "../action/ActionGroup";
 import { Game } from "../item/Game";
 import Entity from "./Entity";
+import { PlayerEntity } from "../entity/PlayerEntity";
 
 export type SiteProps = {
     game: Game;
-    id: string;
+    id?: string; // 如果没有提供id，则默认按name字段
     name: string;
     entities: Array<Entity>;
 };
@@ -22,7 +25,7 @@ export default class Site {
 
     constructor(props: SiteProps) {
         this.game = props.game;
-        this.id = props.id;
+        this.id = props.id ?? props.name;
         this.name = props.name;
         this._entities = [...props.entities];
         this._entities.forEach(entity => entity.site = this);
@@ -46,6 +49,18 @@ export default class Site {
         if (index === -1) return false;
         this._entities.splice(index, 1);
         return true;
+    }
+
+    public getActionGroups(): Array<ActionGroup> {
+        // move advanturer to the first of the entities list
+        const entities = [...this.entities];
+        const index = entities.indexOf(this.game.adventurer);
+        if (index !== -1) {
+            entities.splice(index, 1);
+            entities.unshift(this.game.adventurer);
+        }
+
+        return entities.map(entity => entity.getActionGroup());
     }
 
 }

@@ -1,13 +1,18 @@
+import { Game } from "../item/Game";
 import ComponentManager from "../util/misc/ComponentManager";
 import HostedComponentBase from "./HostedComponentBase";
 
 export type GameObjectProps<TComponent> = {
+    game: Game;
     components?: Array<TComponent>;
 };
 
 export default class GameObject<TComponent extends HostedComponentBase<GameObject<TComponent>>> {
 
-    constructor({ components }: GameObjectProps<TComponent>) {
+    public readonly game: Game;
+
+    constructor({ game, components }: GameObjectProps<TComponent>) {
+        this.game = game;
         if (components && components.length > 0) {
             this.components.listeners.ADD.add(c => c.bindHost(this));
             this.components.listeners.REMOVE.add(c => c.unbindHost());
