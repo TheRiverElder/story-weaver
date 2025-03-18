@@ -10,6 +10,12 @@ export interface EntityProps extends GameObjectProps<EntityComponent> {
     descriptions?: Array<string>;
 }
 
+export interface EntityModifiers {
+    readonly title: ModifierManager<string>;
+    readonly descriptions: ModifierManager<Array<string>>;
+    readonly actions: ModifierManager<Array<Action>>;
+}
+
 export default class Entity extends GameObject<EntityComponent> {
 
     public name: string;
@@ -29,13 +35,15 @@ export default class Entity extends GameObject<EntityComponent> {
         super(props);
         this.name = props.name || '???';
         this.basicDescriptions = props.descriptions || [];
+
+        this.activate();
     }
 
-    public readonly modifiers = {
+    public readonly modifiers: EntityModifiers = Object.freeze({
         title: new ModifierManager<string>(),
         descriptions: new ModifierManager<Array<string>>(),
         actions: new ModifierManager<Array<Action>>(),
-    };
+    });
 
     public get originDescriptions(): Array<string> {
         return this.basicDescriptions;

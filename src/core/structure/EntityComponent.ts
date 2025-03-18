@@ -6,7 +6,7 @@ export default class EntityComponent extends HostedComponentBase<Entity> {
 
     private clearFunctions: Array<Function> = [];
 
-    public override onAddedToHost(host: Entity): void {
+    public override onActivate(): void {
         this.clearFunctions = this.onRegisterListeners().filter((f) => typeof f === "function");
     }
 

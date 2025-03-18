@@ -129,11 +129,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
         const groupIndex = this.state.groupIndex;
         return (
             <div
+                key={index}
                 className={classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
             >
                 <div
                     className={classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty")}
-                    key={index}
                     onClick={event => this.toggleSelectedGroup(event, index)}
                 >
                     <div className="content">

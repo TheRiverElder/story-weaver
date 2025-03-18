@@ -6,34 +6,26 @@
 // import { ItemEntity } from "../core/entity/ItemEntity";
 // import { NeutralEntity } from "../core/entity/NeutralEntity";
 import { PlayerEntity } from "../core/entity/PlayerEntity";
-import { SimpleEntity } from "../core/entity/SimpleEntity";
 import { Game } from "../core/item/Game";
 // import { ArmorItem } from "../core/item/ArmorItem";
 // import { FoodItem } from "../core/item/FoodItem";
 // import { KeyItem } from "../core/item/KeyItem";
-import { MeleeWeapon } from "../core/item/MeleeWeapon";
-import { NormalItem } from "../core/item/NormalItem";
-import { TextItem, TextItemData } from "../core/item/TextItem";
-import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
-import { Profile } from "../core/profile/Profile";
 // import { PropertyType } from "../core/profile/PropertyType";
 // import { Room } from "../core/room/Room";
 // import { ChatOption, ChatTask, ChatTextFragment } from "../core/task/ChatTask";
 // import { simpleCheck } from "../core/task/FightingTask";
-import { GameOverTask } from "../core/task/GameOverTask";
 // import { UsingItemTask } from "../core/task/UsingItemTask";
-import resources from "./resources";
 // import { GenericInteractionBehavior } from "../core/interaction/GenericInteractionBehavior";
 // import { InteractionBehaviorItem } from "../core/interaction/item/InteractionBehaviorItem";
 // import { InteractionBehaviorItemCreators } from "../core/interaction/item/InteractionBehaviorItemCreators";
 // import CustomInteractionBebaviorItem from "../core/interaction/item/impl/CustomInteractionBebaviorItem";
 // import CustomAction from "../core/action/impl/CustomAction";
 // import CustomActionGroup from "../core/action/CustomActionGroup";
-import Action from "../core/action/Action";
-import ActionGroup from "../core/action/ActionGroup";
 import { GameInitializer } from "../core/common";
 import { Generator } from "../core/BasicTypes";
 import Site from "../core/structure/Site";
+import Entity from "../core/structure/Entity";
+import PortComponent from "../core/entity/PortComponent";
 
 
 export class WhalesTombGameInitializer implements GameInitializer {
@@ -45,6 +37,22 @@ export class WhalesTombGameInitializer implements GameInitializer {
     
     initialize(game: Game): Game {
         this.uidGenerator = game.uidGenerator;
+
+        function createPorts(site1: Site, site2: Site, doorName?: string, keyOfLock?: string): [Entity, Entity] {
+            const port1 = new PortComponent(site2.id);
+            const port2 = new PortComponent(site1.id);
+
+            const portEntity1 = new Entity({ game, name: doorName ?? "门", components: [port1] });
+            const portEntity2 = new Entity({ game, name: doorName ?? "门", components: [port2] });
+
+            site1.addEntity(portEntity1);
+            site2.addEntity(portEntity2);
+
+            return [
+                portEntity1, 
+                portEntity2,
+            ];
+        }
 
         // const captainRoomDoorLock: Lock = { locked: true };
         // const storeRoomDoorLock: Lock = { locked: true };
@@ -125,12 +133,13 @@ export class WhalesTombGameInitializer implements GameInitializer {
          * 走廊也是一片死寂，除了。。。一位海员，从面相上看，他已经病入膏肓了，眼球布满红血丝，黑眼圈，龟裂布满它的脸
          * 很明显他也没有说话的力气，但是似乎还有一丝意识尚存
          */
-        // const corridorRoom = new Room({
-        //     game,
-        //     name: "走廊",
-        //     entities: [crit],
-        // });
-        // game.rooms.add(corridorRoom);
+        const corridorRoom = new Site({
+            game,
+            name: "走廊",
+        });
+        game.sites.add(corridorRoom);
+
+        createPorts(corridorRoom, guestRoom217);
 
         // // 厨房
         // const kitchenRoom = new Room({
@@ -287,26 +296,6 @@ export class WhalesTombGameInitializer implements GameInitializer {
 
         return game;
     }
-
-
-    // connectRooms(room1: Room, room2: Room, doorName: string, game: Game, lock?: Lock, doShowtargetName: boolean = true): [DoorEntity, DoorEntity] {
-    //     const door1 = new DoorEntity({
-    //         game,
-    //         lock,
-    //         name: doorName,
-    //         targetRoom: room2,
-    //     });
-    //     const door2 = new DoorEntity({
-    //         game,
-    //         lock,
-    //         name: doorName,
-    //         targetRoom: room1,
-    //     });
-    //     room1.addEntity(door1);
-    //     room2.addEntity(door2);
-
-    //     return [door1, door2];
-    // }
 
     // createEntityCrit(game: Game): CritNPCEntity {
 

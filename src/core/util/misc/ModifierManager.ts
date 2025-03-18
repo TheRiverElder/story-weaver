@@ -8,7 +8,7 @@ export default class ModifierManager<T> {
     public add(modifier: Modifier<T>, insertIndex?: number): Function | undefined {
         // check if the modifier is already present in the list
         const existingIndex = this._modifiers.findIndex((existingModifier) => existingModifier === modifier);
-        if (existingIndex !== -1) return;
+        if (existingIndex >= 0) return;
 
         // find the correct index to insert the new modifier
         if (insertIndex === undefined) {

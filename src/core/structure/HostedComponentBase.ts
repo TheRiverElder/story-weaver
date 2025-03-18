@@ -20,6 +20,7 @@ export default class HostedComponentBase<THost = any> {
     }
 
     public onAddedToHost(host: THost) { }
+    public onActivate() { }
     public onRemoveFromHost() { }
     
 }

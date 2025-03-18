@@ -1,14 +1,12 @@
-import { sortBy } from "lodash";
 import ActionGroup from "../action/ActionGroup";
 import { Game } from "../item/Game";
 import Entity from "./Entity";
-import { PlayerEntity } from "../entity/PlayerEntity";
 
 export type SiteProps = {
     game: Game;
     id?: string; // 如果没有提供id，则默认按name字段
     name: string;
-    entities: Array<Entity>;
+    entities?: Array<Entity>;
 };
 
 export default class Site {
@@ -27,7 +25,7 @@ export default class Site {
         this.game = props.game;
         this.id = props.id ?? props.name;
         this.name = props.name;
-        this._entities = [...props.entities];
+        this._entities = props.entities?.slice() || [];
         this._entities.forEach(entity => entity.site = this);
     }
 
