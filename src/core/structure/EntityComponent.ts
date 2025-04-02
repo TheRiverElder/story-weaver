@@ -1,4 +1,4 @@
-import { invokeAllAndClear, pushIfNotNull } from "../util/lang";
+import { invokeAllAndClear } from "../util/lang";
 import Entity from "./Entity";
 import HostedComponentBase from "./HostedComponentBase";
 

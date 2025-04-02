@@ -164,7 +164,7 @@ class GameView extends Component<GameViewProps, GameViewState> {
             <button
                 className={classNames("action-button", "fill-x", action.labels || "empty")}
                 key={index}
-                // onClick={event => this.onClickActionButton(event, action)}
+                onClick={event => this.onClickActionButton(event, action)}
             >{action.text}</button>
         );
     }
@@ -216,11 +216,11 @@ class GameView extends Component<GameViewProps, GameViewState> {
         this.setState(() => ({ groupIndex: -1 }));
     }
 
-    // onClickActionButton(event: MouseEvent, action: Action) {
-    //     event.stopPropagation();
-    //     this.props.game.runAction(action);
-    //     this.update();
-    // }
+    onClickActionButton(event: MouseEvent, action: Action) {
+        event.stopPropagation();
+        this.props.game.runAction(action);
+        this.update();
+    }
 
     // onClickSkillButton(skill: PropertyType) {
     //     const actionGroup = this.state.actionGroups[this.state.groupIndex];

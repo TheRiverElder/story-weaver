@@ -67,6 +67,10 @@ export class Game implements GameObject {
             return true;
         }
     }
+    
+    runAction(action: Action) {
+        action.act(this.adventurer);
+    }
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
         if (this.gameObjects.length > 0) return this.gameObjects[this.gameObjects.length - 1].getActionGroups(actor);
