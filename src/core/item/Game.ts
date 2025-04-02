@@ -8,6 +8,10 @@ import { MessageType, MESSAGE_TYPE_COLLAPSE, MESSAGE_TYPE_NORMAL, MESSAGE_TYPE_R
 import { Generator } from "../BasicTypes";
 import Site from "../structure/Site";
 import Registry from "../util/Registry";
+import GameActivity from "../structure/GameActivity";
+import { last } from "lodash";
+import ErrorActivity from "../activity/ErrorActivity";
+import SiteActivity from "../activity/SiteActivity";
 
 // alert("FUCK from Game")
 
@@ -30,8 +34,12 @@ export class Game implements GameObject {
     public readonly gameInitializer: GameInitializer;
     public readonly sites = new Registry<string, Site>(s => s.id);
     public adventurer: PlayerEntity = {} as PlayerEntity;
-    public gameObjects: GameObject[] = [];
     public messages: Message[] = [];
+
+    private _activities: Array<GameActivity<any>> = [];
+    public get activities() {
+        return this._activities.slice();
+    }
 
     level: number = 1; // 当前关卡数
 
@@ -41,6 +49,8 @@ export class Game implements GameObject {
     constructor(data: GameData) {
         this.uidGenerator = data.uidGenerator;
         this.gameInitializer = data.gameInitializer;
+
+        this._activities.push(new SiteActivity({ game: this }));
     }
 
     // 初始化当前关卡
@@ -67,16 +77,14 @@ export class Game implements GameObject {
             return true;
         }
     }
-    
+
     runAction(action: Action) {
         action.act(this.adventurer);
     }
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
-        if (this.gameObjects.length > 0) return this.gameObjects[this.gameObjects.length - 1].getActionGroups(actor);
-
-        const adventurerActionGroups = this.adventurer.site?.getActionGroups();
-        return adventurerActionGroups || [];
+        const activity = last(this._activities) ?? new ErrorActivity({ game: this, message: "未找到活动" });
+        return activity.getActionGroups(actor);
     }
 
     executeAction(action: Action, actor: PlayerEntity = this.adventurer) {
@@ -94,20 +102,22 @@ export class Game implements GameObject {
         this.updateListeners.forEach(it => it(this));
     }
 
-    appendInteravtiveGroup(gameObject: GameObject) {
-        this.gameObjects.push(gameObject);
-        this.notifyUpdate();
+    public startActivity<R = void>(activity: GameActivity<R>) {
+        this._activities.push(activity);
+        activity.onAdded();
     }
 
-    replaceInteravtiveGroup(gameObject: GameObject) {
-        this.gameObjects.pop();
-        this.gameObjects.push(gameObject);
-        this.notifyUpdate();
-    }
-
-    removeInteravtiveGroup(gameObject: GameObject) {
-        this.gameObjects = this.gameObjects.filter(e => e !== gameObject);
-        this.notifyUpdate();
+    // 只能销毁最上层的Activity
+    public finishActivity<R = void>(activity?: GameActivity<R>) {
+        if (!activity) {
+            this._activities.pop()?.onRemoved();
+        } else {
+            const lastActivity = last(this._activities);
+            if (lastActivity === activity) {
+                this._activities.pop();
+                lastActivity.onRemoved();
+            }
+        }
     }
 
     appendMessage(message: Message | string) {

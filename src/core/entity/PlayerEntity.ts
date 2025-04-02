@@ -1,7 +1,7 @@
 import Action from "../action/Action";
+import InventoryActivity from "../activity/InventoryActivity";
 import Entity from "../structure/Entity";
-import { InventoryTask } from "../task/InventoryTask";
-import { InvestigationTask } from "../task/InvestigationTask";
+import InventoryComponent from "./InventoryComponent";
 import { LivingEntityData } from "./LivingEntity";
 
 // alert("FUCK from PlayerEntity");
@@ -11,6 +11,16 @@ export interface PlayerEntityData extends LivingEntityData {
 
 export class PlayerEntity extends Entity {
 
+    constructor(data: PlayerEntityData) {
+        super(data);
+        
+        this.components.add(new InventoryComponent());
+    }
+
+    public get inventory(): InventoryComponent {
+        return this.components.get(InventoryComponent)!;
+    } 
+
     public override get descriptions(): string[] {
         return ["这是你。"];
     }
@@ -19,14 +29,14 @@ export class PlayerEntity extends Entity {
         return [
             {
                 text: "🎒打开背包",
-                act: ({ game }) => {game.appendInteravtiveGroup(new InventoryTask(game.uidGenerator.generate()))},
+                act: ({ game }) => {game.startActivity(new InventoryActivity({ game }))},
                 labels: ["open"],
             },
-            {
-                text: "🔍调查现场",
-                act: ({ game }) => {game.appendInteravtiveGroup(new InvestigationTask(game))},
-                labels: ["investigate"],
-            },
+            // {
+            //     text: "🔍调查现场",
+            //     act: ({ game }) => {game.appendInteravtiveGroup(new InvestigationTask(game))},
+            //     labels: ["investigate"],
+            // },
         ];
     }
 }
