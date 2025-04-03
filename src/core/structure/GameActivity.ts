@@ -15,6 +15,9 @@ export default class GameActivity<R = void> {
         this.game = props.game;
     }
 
+    public get allowManualFinish() {
+        return false;
+    }
 
     public onAdded() { }
 

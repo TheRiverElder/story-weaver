@@ -44,6 +44,26 @@
     position: relative;
 }
 
+.GameView .bottom-bar {
+    height: 3em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5em;
+    color: #ffffff;
+    background-color: #4f71b9
+}
+
+.GameView .bottom-bar .icon-back {
+    margin-right: 1em;
+    border-radius: 2em;
+    outline: none;
+    border: none;
+    padding: 0.5em 1em;
+    content: "Back";
+}
+
 .GameView .cards {
     /* width: 100%;*/
     position: absolute;

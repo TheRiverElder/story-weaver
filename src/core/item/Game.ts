@@ -41,6 +41,10 @@ export class Game implements GameObject {
         return this._activities.slice();
     }
 
+    public get currentActivity(): GameActivity<any> {
+        return last(this._activities) ?? new ErrorActivity({ game: this, message: "未找到活动" });
+    }
+
     level: number = 1; // 当前关卡数
 
     public updateListeners: Set<GameUpdateListener> = new Set();
@@ -83,7 +87,7 @@ export class Game implements GameObject {
     }
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
-        const activity = last(this._activities) ?? new ErrorActivity({ game: this, message: "未找到活动" });
+        const activity = this.currentActivity;
         return activity.getActionGroups(actor);
     }
 
@@ -105,6 +109,7 @@ export class Game implements GameObject {
     public startActivity<R = void>(activity: GameActivity<R>) {
         this._activities.push(activity);
         activity.onAdded();
+        this.notifyUpdate();
     }
 
     // 只能销毁最上层的Activity
@@ -118,6 +123,7 @@ export class Game implements GameObject {
                 lastActivity.onRemoved();
             }
         }
+        this.notifyUpdate();
     }
 
     appendMessage(message: Message | string) {

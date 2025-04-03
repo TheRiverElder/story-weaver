@@ -4,6 +4,10 @@ import GameActivity from "../structure/GameActivity";
 
 export default class InventoryActivity extends GameActivity {
 
+    public override get allowManualFinish(): boolean {
+        return true;
+    }
+
     public override getActionGroups(player: PlayerEntity): Array<ActionGroup> {
         return [
             ...player.inventory.items.map(item => ({

@@ -81,8 +81,9 @@ class GameView extends Component<GameViewProps, GameViewState> {
                         {this.state.actionGroups.map(this.renderActionGroupView)}
                     </div>
 
-                    {/* {this.renderSkillSelectionBar()} */}
                 </div>
+
+                {this.renderBottomBar()}
             </div>
         );
     }
@@ -122,6 +123,20 @@ class GameView extends Component<GameViewProps, GameViewState> {
                     </div>
                 ))}
             </header>
+        );
+    }
+
+    renderBottomBar() {
+        const { game } = this.props;
+        const adventurer = game.adventurer;
+        const currentActivity = game.currentActivity;
+
+        return (
+            <div className="bottom-bar">
+                {currentActivity.allowManualFinish && (
+                    <button className="icon-back" onClick={() => game.finishActivity()}>◀</button>
+                )}
+            </div>
         );
     }
 
