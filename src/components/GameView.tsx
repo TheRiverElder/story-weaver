@@ -4,7 +4,7 @@ import { Game, Message } from "../core/item/Game";
 // import { SLOT_TYPE_WEAPON } from "../core/inventory/LivingEntityInventory";
 // import { PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_LISTEN, PROPERTY_TYPE_STRENGTH, PROPERTY_TYPE_USE, PROPERTY_TYPE_WATCH } from "../core/profile/PropertyTypes";
 // import { PropertyType } from "../core/profile/PropertyType";
-import "./GameView.css";
+import "./GameView.scss";
 // import { filterNotNull } from "../core/util/lang";
 // import { Interaction, INTERACTION_MEDIA_EMPTY } from "../core/interaction/Interaction";
 import ActionGroup from "../core/action/ActionGroup";
@@ -145,17 +145,18 @@ class GameView extends Component<GameViewProps, GameViewState> {
         return (
             <div
                 key={index}
-                className={classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated")}
+                className={classNames("card-wrapper", (groupIndex >= 0 && index > groupIndex) && "abdicated", groupIndex === index && "selected")}
             >
                 <div
                     className={classNames("card", groupIndex === index && "selected", actionGroup.labels || "empty")}
                     onClick={event => this.toggleSelectedGroup(event, index)}
                 >
+
                     <div className="content">
-                        <div>
-                            <h3 className="title">{actionGroup.title}</h3>
-                            <article>{actionGroup.descriptions.join("\n")}</article>
-                        </div>
+
+                        <h3 className="title">{actionGroup.title}</h3>
+
+                        <article>{actionGroup.descriptions.join("\n")}</article>
 
                         <div className="buttons fill-x">
                             {actionGroup.actions.map(this.renderActionButton.bind(this))}

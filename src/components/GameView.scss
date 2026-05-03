@@ -1,0 +1,345 @@
+.GameView {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #efefef;
+    position: relative;
+
+    // 顶部栏
+    .top-bar {
+        z-index: 2;
+        width: 100%;
+        padding: 0.5em;
+        color: #ffffff;
+        background-color: #4f71b9;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .property {
+            flex-shrink: 0;
+            margin: 0.1em;
+            padding: 0.3em;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            background-color: #00000040;
+            border-radius: 0.2em;
+
+            .icon {
+                margin-right: 0.2em;
+            }
+
+            .content {
+                font-size: 0.6em;
+            }
+        }
+    }
+
+    // 主内容区
+    .content {
+        width: 100%;
+        flex: 1;
+        position: relative;
+    }
+
+    // 底部栏
+    .bottom-bar {
+        height: 3em;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5em;
+        color: #ffffff;
+        background-color: #4f71b9;
+
+        .icon-back {
+            margin-right: 1em;
+            border-radius: 2em;
+            outline: none;
+            border: none;
+            padding: 0.5em 1em;
+            content: "Back";
+        }
+    }
+
+    // 卡片容器
+    .cards {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: flex-end;
+        padding: 1em 0;
+
+        >.card-wrapper {
+            width: 2.5em;
+            padding: 0.5em;
+            flex-shrink: 0;
+            transition: all 100ms ease;
+            position: relative;
+
+            &.abdicated {
+                transform: translateX(8em);
+            }
+
+            >.card {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                width: 10em;
+                height: 16em;
+                flex-shrink: 0;
+                padding: 0;
+                margin: 0 0.5em;
+                background-color: #ffffff;
+                border: #ffffff solid 0.5em;
+                border-radius: 0.5em;
+                box-shadow: #00000040 0 0 0.2em;
+                display: flex;
+                flex-direction: column;
+
+                &.selected {
+                    transform: translateY(-20%) scale(120%, 120%);
+                    z-index: 1;
+                }
+
+                &.empty {
+                    .small-title {
+                        background-color: #ffffff;
+                        color: #000000;
+                    }
+                }
+
+                .title {
+                    font-family: 'MircosoftYahei';
+                }
+
+                .small-title {
+                    font-family: 'MircosoftYahei';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    writing-mode: vertical-lr;
+                    opacity: 1;
+                    padding: 0.5em 0.2em;
+                    border-bottom-right-radius: 0.5em;
+                }
+
+                .content {
+                    width: 100%;
+                    height: 100%;
+                    padding: 0.5em;
+                    opacity: 0;
+                    font-size: 0.8em;
+                    display: flex;
+                    flex-direction: column;
+                    pointer-events: none;
+                }
+
+                // 卡片过渡动画
+                &,
+                .small-title,
+                .content {
+                    transition: all 200ms ease-in-out;
+                }
+            }
+
+            // 最后一个卡片 / 选中卡片 样式
+            &.abdicated .small-title,
+            &:last-child .small-title,
+            &.selected .small-title {
+                opacity: 0;
+            }
+
+            &.abdicated .content,
+            &:last-child .content,
+            &.selected .content {
+                opacity: 1;
+                pointer-events: all;
+            }
+        }
+    }
+
+    // 消息区域
+    .messages {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: calc(100% - 16em);
+        padding: 0 1em;
+        overflow: auto;
+
+        >.message {
+            display: flex;
+            font-size: 0.8em;
+            font-family: "楷体", "黑体";
+
+            >.timestamp {
+                width: 3em;
+                padding-top: 0.1em;
+                font-family: Consolas;
+                font-size: 0.9em;
+                color: #7f7f7f;
+            }
+
+            >.text {
+                flex: 1;
+
+                p {
+                    margin: 0;
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    // 按钮通用样式
+    .buttons {
+        button {
+            padding: 0.2em 0.5em;
+            margin-top: 0.5em;
+            border: none;
+            border-radius: 1em;
+            font-family: "楷体", "Microsoft YaHei", "微软雅黑", "Microsoft JhengHei", "华文细黑", "STHeiti", "MingLiu";
+            color: #ffffff;
+
+            &::before {
+                content: '';
+                width: 200%;
+                height: 200%;
+                background-color: #000000;
+            }
+
+            &.empty {
+                color: #000000;
+            }
+
+            &.walk {
+                background-color: #3a9b3a;
+            }
+
+            &.pick-up {
+                background-color: #4f71b9;
+            }
+
+            &.attack {
+                background-color: #c54040;
+            }
+
+            &.escape {
+                background-color: #4dff4d;
+            }
+
+            &.use {
+                background-color: #d1e947;
+            }
+        }
+    }
+
+    // 技能选择栏
+    .skill-selection-bar {
+        z-index: 2;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3em;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        background-color: #00000040;
+        transition: all 200ms ease-in-out;
+        overflow-x: auto;
+        overflow-y: hidden;
+        pointer-events: all;
+
+        &.collapsed {
+            height: 0;
+        }
+
+        >button {
+            margin-left: 1em;
+            width: 6em;
+            outline: none;
+
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+    }
+
+    // 卡片内部结构
+    .card {
+        .buttons {
+            padding: 0.5em;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .index {
+            width: 100%;
+            height: 1em;
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 0.6em;
+            font-family: Consolas, "黑体";
+        }
+    }
+
+    // 卡片类型主题色
+    .card-wrapper {
+        >.card {
+            &.menu {
+                border-color: #d1e947;
+
+                .small-title {
+                    background-color: #d1e947;
+                }
+            }
+
+            &.door-entity {
+                border-color: #4f71b9;
+
+                .small-title {
+                    background-color: #4f71b9;
+                }
+            }
+
+            &.living-entity {
+                border-color: #c54040;
+
+                .small-title {
+                    background-color: #c54040;
+                }
+            }
+
+            &.player-entity {
+                border-color: #3a9b3a;
+
+                .small-title {
+                    background-color: #3a9b3a;
+                }
+            }
+
+            &.item-entity {
+                border-color: #7f7f7f;
+
+                .small-title {
+                    background-color: #7f7f7f;
+                }
+            }
+        }
+    }
+}

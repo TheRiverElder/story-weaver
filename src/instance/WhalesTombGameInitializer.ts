@@ -60,12 +60,12 @@ export class WhalesTombGameInitializer implements GameInitializer {
         const adventurer = game.level === 1 ? new PlayerEntity({
             game,
             name: 'Jack',
-            // health: 7,
-            // maxHealth: 11,
-            // attackPower: 2,
-            // defensePower: 0,
-            // dexterity: 100,
-            // tags: ["human"],
+            health: 7,
+            maxHealth: 11,
+            attackPower: 2,
+            defensePower: 0,
+            dexterity: 100,
+            tags: ["human"],
         }) : game.adventurer;
         // adventurer.profile.setProperty(PROPERTY_TYPE_WATCH, 70);
         // adventurer.profile.setProperty(PROPERTY_TYPE_STRENGTH, 65);
