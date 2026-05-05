@@ -19,7 +19,7 @@ export interface EntityData {
     interactionBehavior?: InteractionBehavior;
 }
 
-export abstract class Entity implements Unique, GameObject, InteractionTarget, ActionGroup {
+export abstract class Entity implements Unique, GameObject, InteractionTarget {
     readonly uid: number;
     readonly name: string;
     readonly game: Game;
@@ -55,7 +55,7 @@ export abstract class Entity implements Unique, GameObject, InteractionTarget, A
 
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
-        return this.isVisibleActionGroup() ? [this] : [];
+        return this.isVisibleActionGroup() ? [] : [];
     }
 
     canReceiveInteraction(interaction: Interaction): boolean {

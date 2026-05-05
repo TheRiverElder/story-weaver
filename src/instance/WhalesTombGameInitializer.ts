@@ -26,6 +26,10 @@ import { Generator } from "../core/BasicTypes";
 import Site from "../core/structure/Site";
 import Entity from "../core/structure/Entity";
 import PortComponent from "../core/entity/PortComponent";
+import LockComponent from "../core/entity/LockComponent";
+import { Item } from "../core/item/Item";
+import DroppedItemComponent from "../core/entity/DroppedItemComponent";
+import { MeleeWeapon } from "../core/item/MeleeWeapon";
 
 
 export class WhalesTombGameInitializer implements GameInitializer {
@@ -38,12 +42,21 @@ export class WhalesTombGameInitializer implements GameInitializer {
     initialize(game: Game): Game {
         this.uidGenerator = game.uidGenerator;
 
-        function createPorts(site1: Site, site2: Site, doorName?: string, keyOfLock?: string): [Entity, Entity] {
+        function createPorts(site1: Site, site2: Site, doorName?: string, keyOfLock?: string, locked: boolean = true): [Entity, Entity] {
             const port1 = new PortComponent(site2.id);
             const port2 = new PortComponent(site1.id);
 
             const portEntity1 = new Entity({ game, name: doorName ?? "门", components: [port1] });
             const portEntity2 = new Entity({ game, name: doorName ?? "门", components: [port2] });
+
+            if (keyOfLock) {
+                // TODO add lock to ports
+                const lockComponent1 = new LockComponent({ key: keyOfLock, locked });
+                const lockComponent2 = new LockComponent({ key: keyOfLock, locked });
+
+                portEntity1.components.add(lockComponent1);
+                portEntity2.components.add(lockComponent2);
+            }
 
             site1.addEntity(portEntity1);
             site2.addEntity(portEntity2);
@@ -52,6 +65,13 @@ export class WhalesTombGameInitializer implements GameInitializer {
                 portEntity1, 
                 portEntity2,
             ];
+        }
+
+        function createDroppedItem(item: Item): Entity {
+            const droppedItemComponent = new DroppedItemComponent({ item });
+            const entity = new Entity({ game, name: item.name, components: [droppedItemComponent] });
+
+            return entity;
         }
 
         // const captainRoomDoorLock: Lock = { locked: true };
@@ -117,14 +137,11 @@ export class WhalesTombGameInitializer implements GameInitializer {
             name: "217号客房",
             entities: [
                 adventurer,
-                // new ItemEntity({
-                //     game,
-                //     item: new MeleeWeapon({
-                //         game,
-                //         name: "拆信刀",
-                //         damage: 1,
-                //     }),
-                // }),
+                createDroppedItem(new MeleeWeapon({
+                    game,
+                    name: "拆信刀",
+                    damage: 1,
+                })),
             ],
         });
         game.sites.add(guestRoom217);
@@ -138,33 +155,28 @@ export class WhalesTombGameInitializer implements GameInitializer {
             name: "走廊",
         });
         game.sites.add(corridorRoom);
-
         createPorts(corridorRoom, guestRoom217);
 
-        // // 厨房
-        // const kitchenRoom = new Room({
-        //     game,
-        //     name: "厨房",
-        //     entities: [
-        //         new ItemEntity({
-        //             game,
-        //             item: new MeleeWeapon({
-        //                 game,
-        //                 name: "菜刀",
-        //                 damage: 3,
-        //             }),
-        //         }),
-        //         new ItemEntity({
-        //             game,
-        //             item: new ArmorItem({
-        //                 game,
-        //                 name: "汤锅",
-        //                 defense: 3,
-        //             }),
-        //         }),
-        //     ],
-        // });
-        // game.rooms.add(kitchenRoom);
+        // 厨房
+        const kitchenRoom = new Site({
+            game,
+            name: "厨房",
+            entities: [
+                createDroppedItem(new MeleeWeapon({
+                    game,
+                    name: "菜刀",
+                    damage: 3,
+                })),
+                // createDroppedItem(new MeleeWeapon({
+                //         game,
+                //         name: "汤锅",
+                //         defense: 3,
+                //     })),
+            ],
+        });
+        game.sites.add(kitchenRoom);
+        createPorts(corridorRoom, kitchenRoom);
+
         // // 餐厅
         // const dinningRoom = new Room({
         //     game,

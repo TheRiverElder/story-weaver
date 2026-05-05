@@ -47,3 +47,7 @@ export default class ModifierManager<T> {
 }
 
 export type Modifier<T> = (previousValue: T) => T;
+
+export function composeFunctions(...fns: Array<Function | null | undefined>) {
+    return () => fns.forEach(fn => fn?.());
+}

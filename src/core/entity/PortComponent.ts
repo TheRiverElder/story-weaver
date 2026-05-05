@@ -13,27 +13,30 @@ export default class PortComponent extends EntityComponent {
     }
 
     public override onRegisterListeners() {
-        
-        return [this.host.modifiers.actions.add((previousValue) => {
 
-            const lock = this.host.components.get(LockComponent);
-            if (lock?.locked === true) return previousValue;
+        return [
+            this.host.modifiers.title.add((previousValue) => `${previousValue}【${this.targetSiteId}】`),
+            this.host.modifiers.actions.add((previousValue) => {
 
-            const targetSiteName = this.host.game.sites.get(this.targetSiteId)?.name ?? "未知地点";
+                const lock = this.host.components.get(LockComponent);
+                if (lock?.locked === true) return previousValue;
 
-            return [
-                ...previousValue,
-                {
-                    text: `去【${targetSiteName}】`,
-                    act: (player) => {
-                        const site = player.game.sites.get(this.targetSiteId);
-                        if (!site) return;
-                        player.teleport(site);
-                        this.host.game.appendMessageText(`进入${player.site.name}`, MESSAGE_TYPE_REPLACEABLE);
+                const targetSiteName = this.host.game.sites.get(this.targetSiteId)?.name ?? "未知地点";
+
+                return [
+                    ...previousValue,
+                    {
+                        text: `去【${targetSiteName}】`,
+                        act: (player) => {
+                            const site = player.game.sites.get(this.targetSiteId);
+                            if (!site) return;
+                            player.teleport(site);
+                            this.host.game.appendMessageText(`进入${player.site.name}`, MESSAGE_TYPE_REPLACEABLE);
+                        },
                     },
-                },
-            ];
-        })];
+                ];
+            }),
+        ];
     }
 
 }

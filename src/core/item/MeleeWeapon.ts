@@ -1,11 +1,9 @@
-import { ItemEntity } from "../entity/ItemEntity";
-import { LivingEntity } from "../entity/LivingEntity";
-import { Item, ItemData } from "./Item";
-import { FightingTask } from "../task/FightingTask";
 import { Interaction } from "../interaction/Interaction";
 import CustomAction from "../action/impl/CustomAction";
 import Action from "../action/Action";
 import { PlayerEntity } from "../entity/PlayerEntity";
+import Entity from "../structure/Entity";
+import { Item, ItemData } from "./Item";
 
 export interface MeleeWeaponData extends ItemData {
     damage: number; // 基础伤害
@@ -24,32 +22,33 @@ export class MeleeWeapon extends Item {
             text: "装备",
             act: (actor) => {
                 actor.inventory.remove(this);
-                actor.equipWeapon(this);
+                const oldItem = actor.hand.setHeldItem(this);
+                if(oldItem != null){
+                    actor.inventory.add(oldItem); // 如果有旧物品，则将其放回背包
+                }
             },
             labels: ["eat"],
         })];
     }
     
-    onEquip(entity: LivingEntity): void {
-        entity.attackPower += this.damage;
+    onEquip(entity: Entity, slotIndex: number): void {
+        // TODO
     }
     
-    onUnequip(entity: LivingEntity): void {
-        entity.attackPower -= this.damage;
+    onUnequip(entity: Entity, slotIndex: number): void {
+        // TODO
     }
 
     onApplyInteraction(interaction: Interaction): void {
-        if (interaction.target instanceof LivingEntity) {
-            this.game.appendInteravtiveGroup(new FightingTask(this.game, [interaction.actor, interaction.target]));
-        }
+        // TODO
     }
 
-    getItemEntityActions(entity: ItemEntity, actor: PlayerEntity): Action[] {
+    getItemEntityActions(entity: Entity, actor: PlayerEntity): Action[] {
         return [new CustomAction({
             text: "装备",
             act: (actor) => {
-                actor.equipWeapon(this);
-                entity.remove();
+                entity.removeFromSite();
+                actor.hand.setHeldItem(this);
             },
             labels: ["eat"],
         })];

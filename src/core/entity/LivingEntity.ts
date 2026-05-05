@@ -11,8 +11,6 @@ import { PropertyType } from "../profile/PropertyType";
 import { PROPERTY_TYPE_HEALTH, PROPERTY_TYPE_ATTACK, PROPERTY_TYPE_DEFENSE, PROPERTY_TYPE_DEXTERITY } from "../profile/PropertyTypes";
 import { FightingTask, FightingActionType } from "../task/FightingTask";
 import { filterNotNull } from "../util/lang";
-import { ItemEntity } from "./ItemEntity";
-import { SimpleEntity } from "./SimpleEntity";
 import { GenericInteractionBehavior } from "../interaction/GenericInteractionBehavior";
 import { InteractionBehaviorItemCreators } from "../interaction/item/InteractionBehaviorItemCreators";
 import { Interaction, InteractionTarget } from "../interaction/Interaction";
@@ -85,6 +83,10 @@ export abstract class LivingEntity extends Entity implements ActionGroup {
         data.tags?.forEach(tag => this.tags.add(tag));
         data.buffs?.forEach(buff => this.buffs.add(buff));
     }
+    title: string;
+    descriptions: string[];
+    actions: Action[];
+    labels: string[];
 
     getActionGroups(actor: PlayerEntity): ActionGroup[] {
         if (actor.uid === this.uid) return [];

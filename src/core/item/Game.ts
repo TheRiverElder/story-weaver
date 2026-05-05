@@ -13,8 +13,6 @@ import { last } from "lodash";
 import ErrorActivity from "../activity/ErrorActivity";
 import SiteActivity from "../activity/SiteActivity";
 
-// alert("FUCK from Game")
-
 export interface GameData {
     uidGenerator: Generator<number>;
     gameInitializer: GameInitializer;

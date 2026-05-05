@@ -1,5 +1,5 @@
+import { Item } from "../item/Item";
 import EntityComponent from "../structure/EntityComponent";
-import Item from "../structure/Item";
 import { createArray } from "../util/lang";
 
 export interface HandComponentProps {
@@ -14,7 +14,7 @@ export default class HandComponent extends EntityComponent {
 
     private hands: Array<Item | null> = [null, null];
 
-    constructor({ handAmount, hands }: HandComponentProps) {
+    constructor({ handAmount = 2, hands = [] }: HandComponentProps = {}) {
         super();
         this.hands = createArray(handAmount ?? 2, (index) => hands ? hands[index] ?? null : null);
     }
@@ -26,11 +26,11 @@ export default class HandComponent extends EntityComponent {
     public setHeldItem(item: Item | null, handIndex: number = HandComponent.MAIN_HAND): Item | null {
         const oldItem = this.getHeldItem(handIndex);
         if (oldItem) {
-            oldItem.onRelease(this, handIndex);
+            oldItem.onUnequip(this.host, handIndex);
         }
         this.hands[handIndex] = item;
         if (item) {
-            item.onHold(this, handIndex);
+            item.onEquip(this.host, handIndex);
         }
         return oldItem;
     }

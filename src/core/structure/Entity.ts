@@ -31,6 +31,12 @@ export default class Entity extends GameObject<EntityComponent> {
         this._site = site;
     }
 
+    public readonly modifiers: EntityModifiers = Object.freeze({
+        title: new ModifierManager<string>(),
+        descriptions: new ModifierManager<Array<string>>(),
+        actions: new ModifierManager<Array<Action>>(),
+    });
+
     constructor(props: EntityProps) {
         super(props);
         this.name = props.name || '???';
@@ -38,12 +44,6 @@ export default class Entity extends GameObject<EntityComponent> {
 
         this.activate();
     }
-
-    public readonly modifiers: EntityModifiers = Object.freeze({
-        title: new ModifierManager<string>(),
-        descriptions: new ModifierManager<Array<string>>(),
-        actions: new ModifierManager<Array<Action>>(),
-    });
 
     public get originDescriptions(): Array<string> {
         return this.basicDescriptions;
@@ -80,5 +80,9 @@ export default class Entity extends GameObject<EntityComponent> {
             actions: this.actions,
             labels: [],
         };
+    }
+
+    public removeFromSite() {
+        if (this._site) this._site.removeEntity(this);
     }
 }

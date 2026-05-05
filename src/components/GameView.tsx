@@ -136,6 +136,8 @@ class GameView extends Component<GameViewProps, GameViewState> {
                 {currentActivity.allowManualFinish && (
                     <button className="icon-back" onClick={() => game.finishActivity()}>◀</button>
                 )}
+                <button className="icon-back" onClick={() => alert("WIP")}>观察</button>
+                <button className="icon-back" onClick={() => alert("WIP")}>聆听</button>
             </div>
         );
     }

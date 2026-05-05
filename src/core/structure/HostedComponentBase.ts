@@ -15,12 +15,15 @@ export default class HostedComponentBase<THost = any> {
 
     public unbindHost() {
         // Called when the component is removed from the host.
-        this._host = undefined;
         this.onRemoveFromHost();
+        this._host = undefined;
     }
 
+    // modifier不要在这个时候注册
     public onAddedToHost(host: THost) { }
+    // modifier要在这里注册
     public onActivate() { }
+    // 善后都在这里做，比如移除modifier
     public onRemoveFromHost() { }
     
 }
